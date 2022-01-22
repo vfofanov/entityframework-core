@@ -2,10 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.DbContext.Initial;
+using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 
@@ -13,11 +14,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
     public class MigrationsTest
     {
-        protected InitialDbContext InitialDbContext;
-        protected MainDbContext MainDbContext;
-        protected IServiceProvider ServiceProvider;
+        private const string DBName = "stenn_efcore_tests";
+        private InitialDbContext _dbContextInitial;
 
-        protected static string GetConnectionString(string dbName)
+        private MainDbContext _dbContextMain;
+        private IServiceProvider _serviceProviderInitial;
+        private IServiceProvider _serviceProviderMain;
+
+        private static string GetConnectionString(string dbName)
         {
             return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
         }
@@ -25,47 +29,55 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [SetUp]
         public void Setup()
         {
+            _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init);
+            _dbContextInitial = _serviceProviderInitial.GetRequiredService<InitialDbContext>();
+
+            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init);
+            _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
+        }
+
+        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init)
+            where TDbContext : Microsoft.EntityFrameworkCore.DbContext
+        {
             var services = new ServiceCollection();
 
-            var dbName = "stenn_efcore_tests";
-            var connectionString = GetConnectionString(dbName);
+            var connectionString = GetConnectionString(DBName);
 
-            void DbContextConfigure(DbContextOptionsBuilder builder)
+            services.AddStaticMigrations<SqlServerMigrations>(init);
+            services.AddTransient<IStaticMigrationHistoryRepositoryFactory, StaticMigrationHistoryRepositoryFactorySqlServer>();
+            services.AddTransient<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
+
+            services.AddDbContext<TDbContext>((provider, builder) =>
             {
-                builder.ReplaceService<IMigrator, MigratorWithStaticMigrations>();
+                builder.UseStaticMigrations(provider);
                 builder.UseSqlServer(connectionString);
                 //builder.UseInMemoryDatabase(dbName);
-            }
+            });
 
-            services.AddScoped<IStaticMigrationHistoryRepositoryFactory, StaticMigrationHistoryRepositoryFactorySqlServer>();
-            services.AddScoped<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
-            
-            services.AddDbContext<InitialDbContext>(DbContextConfigure);
-            services.AddDbContext<MainDbContext>(DbContextConfigure);
-
-            ServiceProvider = services.BuildServiceProvider();
-            InitialDbContext = ServiceProvider.GetRequiredService<InitialDbContext>();
-            MainDbContext = ServiceProvider.GetRequiredService<MainDbContext>();
+            return services.BuildServiceProvider();
         }
+
+        
 
         [Test]
         public async Task InitialMigration()
         {
-            await RunMigrations(InitialDbContext);
+            await RunMigrations(_dbContextInitial);
             Assert.Pass();
         }
+
         [Test]
         public async Task MainMigration()
         {
-            await RunMigrations(MainDbContext);
+            await RunMigrations(_dbContextMain);
             Assert.Pass();
         }
 
         [Test]
         public async Task InitialAndMainMigration()
         {
-            await RunMigrations(InitialDbContext, false);
-            await RunMigrations(MainDbContext);
+            await RunMigrations(_dbContextInitial, false);
+            await RunMigrations(_dbContextMain);
             Assert.Pass();
         }
 
@@ -84,7 +96,5 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                 }
             }
         }
-
-        
     }
 }

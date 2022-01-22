@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data\Stenn.EntityFrameworkCore.Data.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
@@ -17,6 +18,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="StaticMigrations" />
   </ItemGroup>
 
 </Project>

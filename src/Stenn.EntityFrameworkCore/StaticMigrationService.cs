@@ -85,11 +85,9 @@ namespace Stenn.EntityFrameworkCore
                     result.Add(new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) });
                 }
 
-                if (sqlMigration.FillApplyOperations(result, row == null))
-                {
-                    var historyRow = new StaticMigrationHistoryRow(sqlMigration.Name, sqlMigration.Hash, modifiedDate);
-                    result.Add(new SqlOperation { Sql = _historyRepository.GetInsertScript(historyRow) });
-                }
+                sqlMigration.FillApplyOperations(result, row == null);
+                var historyRow = new StaticMigrationHistoryRow(sqlMigration.Name, sqlMigration.Hash, modifiedDate);
+                result.Add(new SqlOperation { Sql = _historyRepository.GetInsertScript(historyRow) });
             }
             return result;
         }

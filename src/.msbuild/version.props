@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <!-- Specific package version can be found in csproj files -->
-    <TwoDigitVersion Condition="'$(TwoDigitVersion)'==''">1.0</TwoDigitVersion>
+    <TwoDigitVersion Condition="'$(TwoDigitVersion)'==''">5.0</TwoDigitVersion>
     <PatchNum Condition="'$(PatchNum)'==''">1</PatchNum>
 
     <!-- special postfix will be added to patch num if defined -->
