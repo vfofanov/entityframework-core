@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Dictionary entities contracts</Description>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

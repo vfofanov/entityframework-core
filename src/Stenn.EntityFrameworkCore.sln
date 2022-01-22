@@ -1,0 +1,88 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30524.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".msbuild", ".msbuild", "{BA3CF70D-79A2-4BD5-AE60-C4485E591D87}"
+ProjectSection(SolutionItems) = preProject
+	.msbuild\build.props = .msbuild\build.props
+	.msbuild\package.props = .msbuild\package.props
+	.msbuild\product.props = .msbuild\product.props
+	.msbuild\version.props = .msbuild\version.props
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.DictionaryEntities.Contracts", "Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj", "{BDBEA802-3D20-4426-982D-F1A5613EAE14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore", "Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj", "{3762C10B-20AE-432E-AE0A-6261886D4A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer", "Stenn.EntityFrameworkCore.SqlServer\Stenn.EntityFrameworkCore.SqlServer.csproj", "{3416A707-49CC-45BA-A488-9C6A823BAA18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{1EEB475D-C4E1-4DD8-BE10-44D2185F355B}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build_and_publish_nuget.yml = ..\.github\workflows\build_and_publish_nuget.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.DictionaryEntities", "Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj", "{D3693447-48B5-4651-8087-FCC6A799457E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{4D0A2092-01C6-4396-A117-31263DD64D57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Tests", "Stenn.EntityFrameworkCore.SqlServer.Tests\Stenn.EntityFrameworkCore.SqlServer.Tests.csproj", "{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data", "Stenn.EntityFrameworkCore.Data\Stenn.EntityFrameworkCore.Data.csproj", "{24C0E5C3-F871-4703-BD14-886C4122929E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Initial", "Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj", "{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main", "Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj", "{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C0E5C3-F871-4703-BD14-886C4122929E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C0E5C3-F871-4703-BD14-886C4122929E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C0E5C3-F871-4703-BD14-886C4122929E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C0E5C3-F871-4703-BD14-886C4122929E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90A61DCC-4469-4042-B534-C37020F4A7EF}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{24C0E5C3-F871-4703-BD14-886C4122929E} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+	EndGlobalSection
+EndGlobal
