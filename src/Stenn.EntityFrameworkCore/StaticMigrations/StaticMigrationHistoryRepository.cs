@@ -39,12 +39,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         ///     The default name for the Migrations history table.
         /// </summary>
         public const string DefaultTableName = "__StaticMigrationsHistory";
-
-        private string? _hashColumnName;
-        private string? _migrationNameColumnName;
-
         private IModel? _model;
-        private string? _modifiedColumnName;
 
         /// <summary>
         ///     Initializes a new instance of this class.
@@ -83,35 +78,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         /// <summary>
         ///     The name of the column that holds the Static migration identifier.
         /// </summary>
-        protected virtual string MigrationNameColumnName
-            => _migrationNameColumnName ??= EnsureModel()
-                .FindEntityType(typeof(StaticMigrationHistoryRow))
-                .FindProperty(nameof(StaticMigrationHistoryRow.Name))
-                .GetColumnBaseName();
+        protected virtual string MigrationNameColumnName => "Name";
 
         /// <summary>
         ///     The name of the column that holds the Static migration unique hash.
         /// </summary>
-        protected virtual string HashColumnName
-            => _hashColumnName ??= EnsureModel()
-                .FindEntityType(typeof(StaticMigrationHistoryRow))
-                .FindProperty(nameof(StaticMigrationHistoryRow.Hash))
-                .GetColumnBaseName();
+        protected virtual string HashColumnName => "Hash";
 
         /// <summary>
         ///     The max length of hash column
         /// </summary>
         protected virtual int HashColumnMaxLength => 64;
 
-
         /// <summary>
         ///     The name of the column that holds the Static migration last modified.
         /// </summary>
-        protected virtual string ModifiedColumnName
-            => _modifiedColumnName ??= EnsureModel()
-                .FindEntityType(typeof(StaticMigrationHistoryRow))
-                .FindProperty(nameof(StaticMigrationHistoryRow.Modified))
-                .GetColumnBaseName();
+        protected virtual string ModifiedColumnName => "Modified";
 
         /// <summary>
         ///     Overridden by database providers to generate SQL that tests for existence of the history table.

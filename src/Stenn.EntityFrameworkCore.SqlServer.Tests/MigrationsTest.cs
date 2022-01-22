@@ -1,9 +1,13 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.DbContext.Initial;
+using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
@@ -28,11 +32,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             void DbContextConfigure(DbContextOptionsBuilder builder)
             {
-                //builder.ReplaceService<>()
+                builder.ReplaceService<IMigrator, MigratorWithStaticMigrations>();
                 builder.UseSqlServer(connectionString);
                 //builder.UseInMemoryDatabase(dbName);
             }
 
+            services.AddScoped<IStaticMigrationHistoryRepositoryFactory, StaticMigrationHistoryRepositoryFactorySqlServer>();
+            services.AddScoped<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
+            
             services.AddDbContext<InitialDbContext>(DbContextConfigure);
             services.AddDbContext<MainDbContext>(DbContextConfigure);
 
