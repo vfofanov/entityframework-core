@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <RootNamespace>Stenn.EntityFrameworkCore.DbContext.Initial</RootNamespace>
+    <IsPackable>false</IsPackable>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="StaticMigrations" />
+    <EmbeddedResource Include="StaticMigrations\Sql\InitDB.Apply.sql" />
+    <None Remove="StaticMigrations\Sql\TestViews.Create.sql" />
+    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Apply.sql" />
+    <None Remove="StaticMigrations\Sql\TestViews.Drop.sql" />
+    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Revert.sql" />
   </ItemGroup>
 
 </Project>

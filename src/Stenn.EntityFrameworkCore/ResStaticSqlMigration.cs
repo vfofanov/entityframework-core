@@ -1,20 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace Stenn.EntityFrameworkCore
 {
+    [DebuggerDisplay("{Name}")]
     public sealed class ResStaticSqlMigration : IStaticSqlMigration
     {
         private static readonly HashAlgorithm HashAlgorithm = SHA256.Create();
         private readonly Assembly _assembly;
         private readonly string _applyEmbeddedResFileName;
         private readonly string? _revertEmbeddedResFileName;
+        private readonly bool _suppressTransaction;
         private readonly Lazy<byte[]> _hash;
 
-        public ResStaticSqlMigration(string name, Assembly assembly, string applyEmbeddedResFileName, string? revertEmbeddedResFileName)
+        public ResStaticSqlMigration(string name, Assembly assembly, string applyEmbeddedResFileName, string? revertEmbeddedResFileName,
+            bool suppressTransaction)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -34,14 +38,9 @@ namespace Stenn.EntityFrameworkCore
             _assembly = assembly;
             _applyEmbeddedResFileName = applyEmbeddedResFileName;
             _revertEmbeddedResFileName = revertEmbeddedResFileName;
-            
-            _hash = new Lazy<byte[]>(GetHash);
-        }
+            _suppressTransaction = suppressTransaction;
 
-        private byte[] GetHash()
-        {
-            using var stream = _assembly.ReadResStream(_applyEmbeddedResFileName);
-            return HashAlgorithm.ComputeHash(stream);
+            _hash = new Lazy<byte[]>(GetHash);
         }
 
         /// <inheritdoc />
@@ -49,7 +48,13 @@ namespace Stenn.EntityFrameworkCore
 
         /// <inheritdoc />
         public byte[] Hash => _hash.Value;
-
+        private byte[] GetHash()
+        {
+            using var stream = _assembly.ReadResStream(_applyEmbeddedResFileName);
+            return HashAlgorithm.ComputeHash(stream);
+        }
+        
+        
         /// <inheritdoc />
         public bool FillRevertOperations(List<MigrationOperation> operations)
         {
@@ -59,8 +64,8 @@ namespace Stenn.EntityFrameworkCore
             }
             var sql = _assembly.ReadRes(_revertEmbeddedResFileName);
 
-            operations.Add(new SqlOperation { Sql = sql });
-            
+            operations.Add(new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction });
+
             return true;
         }
 
@@ -68,7 +73,7 @@ namespace Stenn.EntityFrameworkCore
         public void FillApplyOperations(List<MigrationOperation> operations, bool isNew)
         {
             var sql = _assembly.ReadRes(_applyEmbeddedResFileName);
-            operations.Add(new SqlOperation { Sql = sql });
+            operations.Add(new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction });
         }
     }
 }

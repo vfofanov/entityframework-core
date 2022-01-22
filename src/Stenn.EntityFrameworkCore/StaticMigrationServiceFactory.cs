@@ -9,16 +9,17 @@ namespace Stenn.EntityFrameworkCore
     public sealed class StaticMigrationServiceFactory : IStaticMigrationServiceFactory
     {
         private readonly IStaticMigrationHistoryRepositoryFactory _historyRepositoryFactory;
-        private readonly IStaticSqlMigration[] _sqlMigrations;
-        private readonly IDictionaryEntityMigration[] _entityMigrations;
+        private readonly IStaticMigrationCollection<IStaticSqlMigration> _sqlMigrations;
+        private readonly IStaticMigrationCollection<IDictionaryEntityMigration> _entityMigrations;
 
 
         public StaticMigrationServiceFactory(IStaticMigrationHistoryRepositoryFactory historyRepositoryFactory, 
-            IEnumerable<IStaticSqlMigration> migrations, IEnumerable<IDictionaryEntityMigration> entityMigrations)
+            IStaticMigrationCollection<IStaticSqlMigration> migrations, 
+            IStaticMigrationCollection<IDictionaryEntityMigration> entityMigrations)
         {
             _historyRepositoryFactory = historyRepositoryFactory;
-            _sqlMigrations = migrations.OrderBy(m => m.Order).ToArray();
-            _entityMigrations = entityMigrations.OrderBy(m => m.Order).ToArray();
+            _sqlMigrations = migrations;
+            _entityMigrations = entityMigrations;
         }
 
         /// <inheritdoc />

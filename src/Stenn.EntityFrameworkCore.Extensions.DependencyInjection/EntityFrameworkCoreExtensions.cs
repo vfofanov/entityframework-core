@@ -31,8 +31,9 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
             services.TryAddTransient<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
             
-            var builder = new StaticMigrationBuilder(services);
+            var builder = new StaticMigrationBuilder();
             initMigrations.Invoke(builder);
+            builder.Build(services);
 
             return services;
         }

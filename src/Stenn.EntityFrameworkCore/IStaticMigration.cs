@@ -5,10 +5,5 @@
         string Name { get; }
 
         byte[] Hash { get; }
-
-        /// <summary>
-        /// Migration's order
-        /// </summary>
-        int Order => 0;
     }
 }

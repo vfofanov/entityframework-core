@@ -13,11 +13,11 @@ namespace Stenn.EntityFrameworkCore
     {
         private readonly StaticMigrationHistoryRepository _historyRepository;
         private readonly DbContext _dbContext;
-        private readonly IStaticSqlMigration[] _sqlMigrations;
-        private readonly IDictionaryEntityMigration[] _entityMigrations;
+        private readonly IStaticMigrationCollection<IStaticSqlMigration> _sqlMigrations;
+        private readonly IStaticMigrationCollection<IDictionaryEntityMigration> _entityMigrations;
 
-        public StaticMigrationService(StaticMigrationHistoryRepository historyRepository, DbContext dbContext, IStaticSqlMigration[] sqlMigrations,
-            IDictionaryEntityMigration[] entityMigrations)
+        public StaticMigrationService(StaticMigrationHistoryRepository historyRepository, DbContext dbContext, IStaticMigrationCollection<IStaticSqlMigration> sqlMigrations,
+            IStaticMigrationCollection<IDictionaryEntityMigration> entityMigrations)
         {
             _historyRepository = historyRepository;
             _dbContext = dbContext;
@@ -38,7 +38,7 @@ namespace Stenn.EntityFrameworkCore
             var historyRows = _historyRepository.GetAppliedMigrations();
 
             var rowsForDelete = new List<StaticMigrationHistoryRow>(historyRows.Count);
-            for (var i = _sqlMigrations.Length - 1; i >= 0; i--)
+            for (var i = _sqlMigrations.Count - 1; i >= 0; i--)
             {
                 var sqlMigration = _sqlMigrations[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == sqlMigration.Name);

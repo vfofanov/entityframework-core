@@ -44,9 +44,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var connectionString = GetConnectionString(DBName);
 
             services.AddStaticMigrations<SqlServerMigrations>(init);
-            services.AddTransient<IStaticMigrationHistoryRepositoryFactory, StaticMigrationHistoryRepositoryFactorySqlServer>();
-            services.AddTransient<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
-
+            
             services.AddDbContext<TDbContext>((provider, builder) =>
             {
                 builder.UseStaticMigrations(provider);
