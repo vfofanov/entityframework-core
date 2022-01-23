@@ -83,7 +83,7 @@ namespace Stenn.EntityFrameworkCore
             var service = GetStaticMigrationsService();
             if (service == null)
             {
-                await base.MigrateAsync(targetMigration, cancellationToken);
+                await base.MigrateAsync(targetMigration, cancellationToken).ConfigureAwait(false);
                 return;
             }
 
@@ -97,19 +97,19 @@ namespace Stenn.EntityFrameworkCore
                 if (await _historyRepository.ExistsAsync(cancellationToken) &&
                     await _databaseCreator.ExistsAsync(cancellationToken))
                 {
-                    await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(true, cancellationToken), cancellationToken);
+                    await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(true, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
                 }
 
-                await base.MigrateAsync(string.Empty, cancellationToken);
+                await base.MigrateAsync(string.Empty, cancellationToken).ConfigureAwait(false);
 
-                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(true, cancellationToken), cancellationToken);
+                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(true, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(false, cancellationToken), cancellationToken);
-                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(false, cancellationToken), cancellationToken);
+                await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(false, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(false, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
             }
-            await service.MigrateDictionaryEntitiesAsync(cancellationToken);
+            await service.MigrateDictionaryEntitiesAsync(cancellationToken).ConfigureAwait(false);
         }
 
         private IStaticMigrationService? GetStaticMigrationsService()
@@ -137,7 +137,7 @@ namespace Stenn.EntityFrameworkCore
         private async Task ExecuteAsync(IReadOnlyList<MigrationOperation> operations, CancellationToken cancellationToken = default)
         {
             var commands = _migrationsSqlGenerator.Generate(operations);
-            await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken);
+            await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken).ConfigureAwait(false);
         }
     }
 }

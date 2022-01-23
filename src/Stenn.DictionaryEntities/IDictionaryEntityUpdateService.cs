@@ -1,8 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Onboarding.Domain.DictionaryEntities.Services;
 
-namespace Onboarding.DAL.DictionaryEntities.Services
+namespace Stenn.DictionaryEntities
 {
     public interface IDictionaryEntityUpdateService
     {
@@ -10,6 +9,6 @@ namespace Onboarding.DAL.DictionaryEntities.Services
         int Version { get; }
         int Order { get; }
 
-        Task Update(IDictionaryEntityContext dbContext, CancellationToken cancellationToken);
+        Task Update(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken);
     }
 }

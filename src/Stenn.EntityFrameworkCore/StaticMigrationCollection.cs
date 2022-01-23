@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Stenn.EntityFrameworkCore
 {
@@ -8,19 +11,14 @@ namespace Stenn.EntityFrameworkCore
     public class StaticMigrationCollection<T> : IStaticMigrationCollection<T>
         where T : IStaticMigration
     {
-        private readonly List<T> _items;
+        private readonly List<StaticMigrationItemFactory<T>> _items = new();
 
-        public StaticMigrationCollection(List<T> items)
-        {
-            _items = items;
-        }
-
-        public T this[int index] => _items[index];
+        public StaticMigrationItemFactory<T> this[int index] => _items[index];
 
         public int Count => _items.Count;
 
         /// <inheritdoc />
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<StaticMigrationItemFactory<T>> GetEnumerator()
         {
             return _items.GetEnumerator();
         }
@@ -30,12 +28,40 @@ namespace Stenn.EntityFrameworkCore
         {
             return GetEnumerator();
         }
+
+        public void Add(string name, Func<DbContext, T> factory)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            Add(new StaticMigrationItemFactory<T>(name, factory));
+        }
+
+        public void Add(StaticMigrationItemFactory<T> item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            if (_items.Any(itm => itm.Name == item.Name))
+            {
+                throw new ArgumentException($"Migration name '{item.Name}' used twice. Static migration name must be unique");
+            }
+            _items.Add(item);
+        }
     }
 
 
-    public interface IStaticMigrationCollection<out T> : IEnumerable<T>
+    public interface IStaticMigrationCollection<T> : IEnumerable<StaticMigrationItemFactory<T>>
     {
-        T this[int index] { get; }
+        StaticMigrationItemFactory<T> this[int index] { get; }
         int Count { get; }
     }
 }

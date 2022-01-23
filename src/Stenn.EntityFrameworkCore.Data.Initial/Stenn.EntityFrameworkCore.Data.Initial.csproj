@@ -27,4 +27,8 @@
     <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Revert.sql" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="StaticMigrations\DictEntities" />
+  </ItemGroup>
+
 </Project>

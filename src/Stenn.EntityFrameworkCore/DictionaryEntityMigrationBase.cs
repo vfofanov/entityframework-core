@@ -1,26 +1,26 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Stenn.DictionaryEntities;
+using Stenn.DictionaryEntities.Contracts;
 
 namespace Stenn.EntityFrameworkCore
 {
     public abstract class DictionaryEntityMigrationBase<T> : StaticMigration, IDictionaryEntityMigration
+        where T : class, IDictionaryEntity<T>
     {
-        protected DictionaryEntityMigrationBase(string name)
-            : base(name)
+        /// <inheritdoc />
+        public void Update(IDictionaryEntityMigrator migrator)
         {
+            migrator.Apply(GetActual());
         }
 
         /// <inheritdoc />
-        public Task Update(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken)
+        public async Task UpdateAsync(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken)
         {
-            return null;
+            await migrator.ApplyAsync(GetActual(), cancellationToken);
         }
 
-        /// <inheritdoc />
-        public Task UpdateAsync(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken)
-        {
-            return null;
-        }
+        protected abstract List<T> GetActual();
     }
 }

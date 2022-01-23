@@ -1,34 +1,34 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Stenn.DictionaryEntities;
+using System.Collections.Generic;
+using System.Text.Json;
+using Stenn.DictionaryEntities.Contracts;
 
 namespace Stenn.EntityFrameworkCore
 {
-    public sealed class DictionaryEntityMigration<T> : IDictionaryEntityMigration
+    public sealed class DictionaryEntityMigration<T> : DictionaryEntityMigrationBase<T>
+        where T : class, IDictionaryEntity<T>
     {
-        protected DictionaryEntityMigrationBase(string name, Func<T> getItems)
+        private readonly Func<List<T>> _getItems;
+        private List<T>? _items;
+
+        public DictionaryEntityMigration(Func<List<T>> getItems)
         {
-            Name = name;
-            Hash = hash;
+            _getItems = getItems ?? throw new ArgumentNullException(nameof(getItems));
+        }
+
+        private List<T> Items => _items ??= _getItems();
+
+        /// <inheritdoc />
+        protected override byte[] GetHash()
+        {
+            var itemsArray = JsonSerializer.SerializeToUtf8Bytes(Items);
+            return HashAlgorithm.ComputeHash(itemsArray);
         }
 
         /// <inheritdoc />
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public byte[] Hash { get; }
-
-        /// <inheritdoc />
-        public Task Update(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken)
+        protected override List<T> GetActual()
         {
-            return null;
-        }
-
-        /// <inheritdoc />
-        public Task UpdateAsync(IDictionaryEntityMigrator migrator, CancellationToken cancellationToken)
-        {
-            return null;
+            return Items;
         }
     }
 }

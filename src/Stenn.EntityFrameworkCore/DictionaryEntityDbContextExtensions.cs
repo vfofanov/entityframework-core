@@ -2,9 +2,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Onboarding.Domain.DictionaryEntities.Services;
+using Stenn.DictionaryEntities;
 
-namespace Onboarding.DAL.DictionaryEntities.Services
+namespace Stenn.EntityFrameworkCore
 {
     public static class DictionaryEntityDbContextExtensions
     {
@@ -34,6 +34,13 @@ namespace Onboarding.DAL.DictionaryEntities.Services
                 where T : class
             {
                 await _context.AddAsync(entity, cancellationToken);
+            }
+
+            /// <inheritdoc />
+            public void Add<T>(T entity)
+                where T : class
+            {
+                _context.Add(entity);
             }
 
             /// <inheritdoc />

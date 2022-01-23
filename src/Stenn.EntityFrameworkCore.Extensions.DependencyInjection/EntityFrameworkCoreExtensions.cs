@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Stenn.DictionaryEntities;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -30,6 +31,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             providerRegistrator.RegisterServices(services);
 
             services.TryAddTransient<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
+            services.TryAddTransient<IDictionaryEntityMigratorFactory, DictionaryEntityMigratorFactory>();
             
             var builder = new StaticMigrationBuilder();
             initMigrations.Invoke(builder);

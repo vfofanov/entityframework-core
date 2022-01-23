@@ -1,29 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace Stenn.EntityFrameworkCore
 {
-    [DebuggerDisplay("{Name}")]
-    public sealed class ResStaticSqlMigration : IStaticSqlMigration
+    public sealed class ResStaticSqlMigration : StaticMigration, IStaticSqlMigration
     {
-        private static readonly HashAlgorithm HashAlgorithm = SHA256.Create();
         private readonly Assembly _assembly;
         private readonly string _applyEmbeddedResFileName;
         private readonly string? _revertEmbeddedResFileName;
         private readonly bool _suppressTransaction;
-        private readonly Lazy<byte[]> _hash;
 
-        public ResStaticSqlMigration(string name, Assembly assembly, string applyEmbeddedResFileName, string? revertEmbeddedResFileName,
-            bool suppressTransaction)
+        public ResStaticSqlMigration(Assembly assembly, string applyEmbeddedResFileName, string? revertEmbeddedResFileName, bool suppressTransaction)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Value cannot be null or empty.", nameof(name));
-            }
             if (assembly == null)
             {
                 throw new ArgumentNullException(nameof(assembly));
@@ -33,22 +23,12 @@ namespace Stenn.EntityFrameworkCore
                 throw new ArgumentException("Value cannot be null or empty.", nameof(applyEmbeddedResFileName));
             }
 
-            Name = name;
-
             _assembly = assembly;
             _applyEmbeddedResFileName = applyEmbeddedResFileName;
             _revertEmbeddedResFileName = revertEmbeddedResFileName;
             _suppressTransaction = suppressTransaction;
-
-            _hash = new Lazy<byte[]>(GetHash);
         }
-
-        /// <inheritdoc />
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public byte[] Hash => _hash.Value;
-        private byte[] GetHash()
+        protected override byte[] GetHash()
         {
             using var stream = _assembly.ReadResStream(_applyEmbeddedResFileName);
             return HashAlgorithm.ComputeHash(stream);

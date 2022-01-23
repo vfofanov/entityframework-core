@@ -1,14 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.DbContext.Initial;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
-using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
@@ -74,25 +71,19 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [Test]
         public async Task InitialAndMainMigration()
         {
-            await RunMigrations(_dbContextInitial, false);
-            await RunMigrations(_dbContextMain);
+            await RunMigrations(_dbContextInitial);
+            await RunMigrations(_dbContextMain, false);
             Assert.Pass();
         }
 
         private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;
-            try
+            if (deleteDb)
             {
-                await database.MigrateAsync();
+                await database.EnsureDeletedAsync();
             }
-            finally
-            {
-                if (deleteDb)
-                {
-                    await database.EnsureDeletedAsync();
-                }
-            }
+            await database.MigrateAsync();
         }
     }
 }

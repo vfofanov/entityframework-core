@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Onboarding.Domain.DictionaryEntities.Services
+namespace Stenn.DictionaryEntities
 {
     public interface IDictionaryEntityContext
     {
@@ -10,11 +10,15 @@ namespace Onboarding.Domain.DictionaryEntities.Services
             where T : class;
         Task AddAsync<T>(T entity, CancellationToken cancellationToken)
             where T : class;
+        void Add<T>(T entity) 
+            where T : class;
         
         void Remove<T>(T entity)
             where T : class;
 
         void Update<T>(T entity) 
             where T : class;
+
+        
     }
 }

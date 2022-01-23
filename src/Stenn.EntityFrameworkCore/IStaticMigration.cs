@@ -2,8 +2,6 @@
 {
     public interface IStaticMigration
     {
-        string Name { get; }
-
         byte[] Hash { get; }
     }
 }
