@@ -28,32 +28,30 @@ namespace Stenn.EntityFrameworkCore
             _revertEmbeddedResFileName = revertEmbeddedResFileName;
             _suppressTransaction = suppressTransaction;
         }
+
         protected override byte[] GetHash()
         {
             using var stream = _assembly.ReadResStream(_applyEmbeddedResFileName);
             return HashAlgorithm.ComputeHash(stream);
         }
-        
-        
+
+
         /// <inheritdoc />
-        public bool FillRevertOperations(List<MigrationOperation> operations)
+        public IEnumerable<MigrationOperation> GetRevertOperations()
         {
             if (string.IsNullOrEmpty(_revertEmbeddedResFileName))
             {
-                return false;
+                yield break;
             }
             var sql = _assembly.ReadRes(_revertEmbeddedResFileName);
-
-            operations.Add(new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction });
-
-            return true;
+            yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
         }
 
         /// <inheritdoc />
-        public void FillApplyOperations(List<MigrationOperation> operations, bool isNew)
+        public IEnumerable<MigrationOperation> GetApplyOperations(bool isNew)
         {
             var sql = _assembly.ReadRes(_applyEmbeddedResFileName);
-            operations.Add(new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction });
+            yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
         }
     }
 }

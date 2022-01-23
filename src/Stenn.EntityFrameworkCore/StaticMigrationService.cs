@@ -33,49 +33,43 @@ namespace Stenn.EntityFrameworkCore
         }
         
         private DateTime Modified => _modifiedDate ??= DateTime.UtcNow;
-        
+
         /// <inheritdoc />
-        public IReadOnlyList<MigrationOperation> GetDropOperationsBeforeMigrations(bool force)
+        public IEnumerable<MigrationOperation> GetRevertOperations(bool force)
         {
             if (!_historyRepository.Exists())
             {
-                return ArraySegment<MigrationOperation>.Empty;
+                yield break;
             }
-
-            var result = new List<MigrationOperation>();
-
             var historyRows = _historyRepository.GetAppliedMigrations();
-
-            var rowsForDelete = new List<StaticMigrationHistoryRow>(historyRows.Count);
             for (var i = _sqlMigrations.Length - 1; i >= 0; i--)
             {
                 var migrationItem = _sqlMigrations[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row == null)
+                if (row == null || !force && row.Hash.SequenceEqual(migrationItem.Hash))
                 {
                     continue;
                 }
-                if (!force && row.Hash.SequenceEqual(migrationItem.Hash))
+                var deleteRow = false;
+                foreach (var operation in migrationItem.Migration.GetRevertOperations())
                 {
-                    continue;
+                    deleteRow = true;
+                    yield return operation;
+
                 }
-                if (migrationItem.Migration.FillRevertOperations(result))
+                if (deleteRow)
                 {
-                    rowsForDelete.Add(row);
+                    yield return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
                 }
             }
-
-            result.AddRange(rowsForDelete.Select(row => new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) }));
-
-            return result;
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<MigrationOperation> GetCreateOperationsAfterMigrations(bool force)
+        public IEnumerable<MigrationOperation> GetApplyOperations(bool force)
         {
-            var result = CreateMigrationOperations();
+            yield return CreateIfNotExistsHistoryTable();
             var historyRows = _historyRepository.GetAppliedMigrations();
-            
+
             foreach (var migrationItem in _sqlMigrations)
             {
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
@@ -85,21 +79,19 @@ namespace Stenn.EntityFrameworkCore
                 }
                 if (row != null)
                 {
-                    result.Add(DeleteHistoryRow(row));
+                    yield return DeleteHistoryRow(row);
                 }
-                migrationItem.Migration.FillApplyOperations(result, row == null);
-                result.Add(InsertHistoryRow(migrationItem));
+                foreach (var operation in migrationItem.Migration.GetApplyOperations(row == null))
+                {
+                    yield return operation;
+                }
+                yield return InsertHistoryRow(migrationItem);
             }
-            return result;
         }
 
-        private List<MigrationOperation> CreateMigrationOperations()
+        private SqlOperation CreateIfNotExistsHistoryTable()
         {
-            var result = new List<MigrationOperation>
-            {
-                new SqlOperation { Sql = _historyRepository.GetCreateIfNotExistsScript() }
-            };
-            return result;
+            return new SqlOperation { Sql = _historyRepository.GetCreateIfNotExistsScript() };
         }
         private SqlOperation InsertHistoryRow<T>(StaticMigrationItem<T> migration) 
             where T : IStaticMigration
@@ -115,7 +107,8 @@ namespace Stenn.EntityFrameworkCore
         /// <inheritdoc />
         public IReadOnlyList<MigrationOperation> MigrateDictionaryEntities(bool force = false)
         {
-            var result = CreateMigrationOperations();
+            var result = new List<MigrationOperation> { CreateIfNotExistsHistoryTable() };
+
             var historyRows = _historyRepository.GetAppliedMigrations();
             var changed = false;
                 
@@ -142,24 +135,24 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public Task<IReadOnlyList<MigrationOperation>> GetDropOperationsBeforeMigrationsAsync(bool force, CancellationToken cancellationToken)
+        public Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(bool force, CancellationToken cancellationToken)
         {
-            var result = GetDropOperationsBeforeMigrations(force);
+            var result = GetRevertOperations(force);
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task<IReadOnlyList<MigrationOperation>> GetCreateOperationsAfterMigrationsAsync(bool force, CancellationToken cancellationToken)
+        public Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(bool force, CancellationToken cancellationToken)
         {
-            var result = GetCreateOperationsAfterMigrations(force);
+            var result = GetApplyOperations(force);
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task MigrateDictionaryEntitiesAsync(CancellationToken cancellationToken, bool force = false)
+        public Task<IReadOnlyList<MigrationOperation>> MigrateDictionaryEntitiesAsync(CancellationToken cancellationToken, bool force = false)
         {
-            MigrateDictionaryEntities();
-            return Task.CompletedTask;
+            var result = MigrateDictionaryEntities();
+            return Task.FromResult(result);
         }
     }
 }

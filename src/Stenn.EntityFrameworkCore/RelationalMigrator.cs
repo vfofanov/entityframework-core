@@ -17,13 +17,34 @@ namespace Stenn.EntityFrameworkCore
     #pragma warning disable EF1001
     public class MigratorWithStaticMigrations : Migrator
     {
+        protected class MigrateContext
+        {
+            public MigrateContext()
+            {
+                FirstMigrationId = string.Empty;
+                LastMigrationId = string.Empty;
+                HasMigrations = false;
+            }
+            public MigrateContext(string firstMigrationId, string lastMigrationId)
+            {
+                FirstMigrationId = firstMigrationId;
+                LastMigrationId = lastMigrationId;
+                HasMigrations = true;
+            }
+            public string FirstMigrationId { get; }
+            public string LastMigrationId { get; }
+            public bool HasMigrations { get; }
+        }
+
         private readonly IHistoryRepository _historyRepository;
         private readonly IMigrationsSqlGenerator _migrationsSqlGenerator;
         private readonly IMigrationCommandExecutor _migrationCommandExecutor;
         private readonly IRelationalConnection _connection;
         private readonly ICurrentDbContext _currentContext;
-        private readonly IRelationalDatabaseCreator _databaseCreator;
         private readonly HistoryRepositoryDependencies _dependencies;
+        private IStaticMigrationService? _staticMigrationsService;
+
+        private MigrateContext? _migrateContext;
 
         /// <inheritdoc />
         public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
@@ -31,7 +52,7 @@ namespace Stenn.EntityFrameworkCore
             IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
             IConventionSetBuilder conventionSetBuilder, IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
             IDiagnosticsLogger<DbLoggerCategory.Database.Command> commandLogger, IDatabaseProvider databaseProvider,
-            IRelationalDatabaseCreator databaseCreator2, HistoryRepositoryDependencies dependencies)
+            HistoryRepositoryDependencies dependencies)
             : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
                 rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, conventionSetBuilder, logger, commandLogger,
                 databaseProvider)
@@ -41,83 +62,87 @@ namespace Stenn.EntityFrameworkCore
             _migrationCommandExecutor = migrationCommandExecutor;
             _connection = connection;
             _currentContext = currentContext;
-            _databaseCreator = databaseCreator2;
             _dependencies = dependencies;
         }
 
         /// <inheritdoc />
         public override void Migrate(string? targetMigration = null)
         {
-            var service = GetStaticMigrationsService();
-            if (service == null)
+            MigrateGuard(targetMigration);
+            try
             {
-                base.Migrate(targetMigration);
-                return;
-            }
-            
-            if (targetMigration != null)
-            {
-                throw new ArgumentException("Migrate to targetMigration not supported", nameof(targetMigration));
-            }
-            
-            if (HasMigrationsToApply(_historyRepository.GetAppliedMigrations()))
-            {
-                if (_historyRepository.Exists() && _databaseCreator.Exists())
+                var appliedMigrations = _historyRepository.GetAppliedMigrations();
+                _migrateContext = GetMigrateContext(appliedMigrations);
+                if (_migrateContext.HasMigrations)
                 {
-                    Execute(service.GetDropOperationsBeforeMigrations(true));
+                    // ReSharper disable once RedundantArgumentDefaultValue
+                    base.Migrate(null);
                 }
-                base.Migrate(targetMigration);
-                Execute(service.GetCreateOperationsAfterMigrations(true));
+                else
+                {
+                    var revertOperations = StaticMigrationsService.GetRevertOperations(false);
+                    var applyOperations = StaticMigrationsService.GetApplyOperations(false);
+                    var operations = revertOperations.Concat(applyOperations).ToList();
+                    Execute(operations);
+                }
             }
-            else
+            finally
             {
-                Execute(service.GetDropOperationsBeforeMigrations(false));
-                Execute(service.GetCreateOperationsAfterMigrations(false));
+                _migrateContext = null;
             }
-            service.MigrateDictionaryEntities();
+            var dictEntityOperations = StaticMigrationsService.MigrateDictionaryEntities();
+            Execute(dictEntityOperations);
         }
 
         /// <inheritdoc />
         public override async Task MigrateAsync(string? targetMigration = null, CancellationToken cancellationToken = default)
         {
-            var service = GetStaticMigrationsService();
-            if (service == null)
+            MigrateGuard(targetMigration);
+            try
             {
-                await base.MigrateAsync(targetMigration, cancellationToken).ConfigureAwait(false);
-                return;
+                var appliedMigrations = await _historyRepository.GetAppliedMigrationsAsync(cancellationToken).ConfigureAwait(false);
+                _migrateContext = GetMigrateContext(appliedMigrations);
+                if (_migrateContext.HasMigrations)
+                {
+                    await base.MigrateAsync(null, cancellationToken);
+                }
+                else
+                {
+                    var revertOperations = await StaticMigrationsService.GetRevertOperationsAsync(false, cancellationToken).ConfigureAwait(false);
+                    var applyOperations = await StaticMigrationsService.GetApplyOperationsAsync(false, cancellationToken).ConfigureAwait(false);
+                    var operations = revertOperations.Concat(applyOperations).ToList();
+                    
+                    await ExecuteAsync(operations, cancellationToken).ConfigureAwait(false);
+                }
             }
+            finally
+            {
+                _migrateContext = null;
+            }
+            var dictEntityOperations = await StaticMigrationsService.MigrateDictionaryEntitiesAsync(cancellationToken).ConfigureAwait(false);
+            await ExecuteAsync(dictEntityOperations, cancellationToken).ConfigureAwait(false);
+        }
 
+        private void MigrateGuard(string? targetMigration)
+        {
             if (targetMigration != null)
             {
                 throw new ArgumentException("Migrate to targetMigration not supported", nameof(targetMigration));
             }
-            
-            if (HasMigrationsToApply(await _historyRepository.GetAppliedMigrationsAsync(cancellationToken).ConfigureAwait(false)))
+            if (_migrateContext != null)
             {
-                if (await _historyRepository.ExistsAsync(cancellationToken) &&
-                    await _databaseCreator.ExistsAsync(cancellationToken))
-                {
-                    await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(true, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
-                }
-
-                await base.MigrateAsync(string.Empty, cancellationToken).ConfigureAwait(false);
-
-                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(true, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
+                throw new ArgumentException("Migration is already running", nameof(targetMigration));
             }
-            else
-            {
-                await ExecuteAsync(await service.GetDropOperationsBeforeMigrationsAsync(false, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
-                await ExecuteAsync(await service.GetCreateOperationsAfterMigrationsAsync(false, cancellationToken).ConfigureAwait(false), cancellationToken).ConfigureAwait(false);
-            }
-            await service.MigrateDictionaryEntitiesAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private IStaticMigrationService? GetStaticMigrationsService()
+
+        private IStaticMigrationService StaticMigrationsService => _staticMigrationsService ??= GetStaticMigrationsService();
+        private IStaticMigrationService GetStaticMigrationsService()
         {
-            return _currentContext.Context.GetService<IStaticMigrationServiceFactory>()?.Create(_currentContext.Context, _dependencies);
+            return _currentContext.Context.GetService<IStaticMigrationServiceFactory>().Create(_currentContext.Context, _dependencies);
         }
-        
-        private bool HasMigrationsToApply(IEnumerable<HistoryRow> appliedMigrationEntries)
+
+        protected virtual MigrateContext GetMigrateContext(IEnumerable<HistoryRow> appliedMigrationEntries)
         {
             PopulateMigrations(appliedMigrationEntries.Select(t => t.MigrationId),
                 string.Empty,
@@ -125,18 +150,62 @@ namespace Stenn.EntityFrameworkCore
                 out _,
                 out _);
 
-            return migrationsToApply.Count != 0;
+            return migrationsToApply.Count == 0
+                ? new MigrateContext(string.Empty, string.Empty)
+                : new MigrateContext(migrationsToApply.First().GetId(), migrationsToApply.Last().GetId());
         }
 
+        /// <inheritdoc />
+        protected override IReadOnlyList<MigrationCommand> GenerateUpSql(Migration migration,
+            MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        {
+            var migrationCommands = base.GenerateUpSql(migration, options);
+            if (_migrateContext == null)
+            {
+                return migrationCommands;
+            }
+            var migrationId = migration.GetId();
+            if (migrationId == _migrateContext.FirstMigrationId &&
+                migrationId == _migrateContext.LastMigrationId)
+            {
+                //NOTE: Add revert static migrations at the beggining of first migration 
+                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(true).ToList());
+                //NOTE: Add apply static migrations at the end of last migration
+                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(true).ToList());
+                return revertCommands.Concat(migrationCommands).Concat(applyCommands).ToList();
+            }
+            if (migrationId == _migrateContext.FirstMigrationId)
+            {
+                //NOTE: Add revert static migrations at the beggining of first migration 
+                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(true).ToList());
+                return revertCommands.Concat(migrationCommands).ToList();
+            }
+            if (migrationId == _migrateContext.LastMigrationId)
+            {
+                //NOTE: Add apply static migrations at the end of last migration
+                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(true).ToList());
+                return migrationCommands.Concat(applyCommands).ToList();
+            }
+            return migrationCommands;
+        }
+
+        
+        private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operations)
+        {
+            return _migrationsSqlGenerator.Generate(operations);
+        }
         private void Execute(IReadOnlyList<MigrationOperation> operations)
         {
-            var commands = _migrationsSqlGenerator.Generate(operations);
+            var commands = GenerateCommands(operations);
             _migrationCommandExecutor.ExecuteNonQuery(commands, _connection);
         }
-
         private async Task ExecuteAsync(IReadOnlyList<MigrationOperation> operations, CancellationToken cancellationToken = default)
         {
-            var commands = _migrationsSqlGenerator.Generate(operations);
+            if (operations.Count == 0)
+            {
+                return;
+            }
+            var commands = GenerateCommands(operations);
             await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken).ConfigureAwait(false);
         }
     }

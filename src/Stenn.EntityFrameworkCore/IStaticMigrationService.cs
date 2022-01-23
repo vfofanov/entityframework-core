@@ -7,12 +7,12 @@ namespace Stenn.EntityFrameworkCore
 {
     public interface IStaticMigrationService
     {
-        IReadOnlyList<MigrationOperation> GetDropOperationsBeforeMigrations(bool force);
-        IReadOnlyList<MigrationOperation> GetCreateOperationsAfterMigrations(bool force);
+        IEnumerable<MigrationOperation> GetRevertOperations(bool force);
+        IEnumerable<MigrationOperation> GetApplyOperations(bool force);
         IReadOnlyList<MigrationOperation> MigrateDictionaryEntities(bool force = false);
         
-        Task<IReadOnlyList<MigrationOperation>> GetDropOperationsBeforeMigrationsAsync(bool force, CancellationToken cancellationToken);
-        Task<IReadOnlyList<MigrationOperation>> GetCreateOperationsAfterMigrationsAsync(bool force, CancellationToken cancellationToken);
-        Task MigrateDictionaryEntitiesAsync(CancellationToken cancellationToken, bool force = false);
+        Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(bool force, CancellationToken cancellationToken);
+        Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(bool force, CancellationToken cancellationToken);
+        Task<IReadOnlyList<MigrationOperation>> MigrateDictionaryEntitiesAsync(CancellationToken cancellationToken, bool force = false);
     }
 }
