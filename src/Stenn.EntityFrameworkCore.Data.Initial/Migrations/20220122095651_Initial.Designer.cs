@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.DbContext.Initial;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations

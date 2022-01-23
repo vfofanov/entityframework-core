@@ -16,7 +16,8 @@ namespace Stenn.EntityFrameworkCore
             _getItems = getItems ?? throw new ArgumentNullException(nameof(getItems));
         }
 
-        private List<T> Items => _items ??= _getItems();
+        // ReSharper disable once ConstantNullCoalescingCondition
+        private List<T> Items => _items ??= _getItems() ?? new List<T>();
 
         /// <inheritdoc />
         protected override byte[] GetHash()

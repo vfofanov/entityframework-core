@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.Data.Configurations;
 
-namespace Stenn.EntityFrameworkCore.DbContext.Initial
+namespace Stenn.EntityFrameworkCore.Data.Initial
 {
     public class InitialDbContext: Microsoft.EntityFrameworkCore.DbContext
     {

@@ -43,8 +43,11 @@ namespace Stenn.DictionaryEntities
         }
 
         /// <inheritdoc />
-        public List<T> AddOrUpdate<T>(List<T> actualList) where T : class, IDictionaryEntity<T>
+        public List<T> AddOrUpdate<T>(List<T> actualList) 
+            where T : class, IDictionaryEntity<T>
         {
+            actualList ??= new List<T>();
+            
             var currentList = _context.GetCurrent<T>().ToList();
             foreach (var actual in actualList)
             {

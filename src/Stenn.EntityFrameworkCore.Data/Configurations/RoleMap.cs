@@ -8,8 +8,10 @@ namespace Stenn.EntityFrameworkCore.Data.Configurations
         /// <inheritdoc />
         public void Configure(EntityTypeBuilder<Role> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).IsRequired();
             builder.Property(x => x.Name).IsRequired();
+            
+            builder.HasKey(x => x.Id);
         }
     }
 }

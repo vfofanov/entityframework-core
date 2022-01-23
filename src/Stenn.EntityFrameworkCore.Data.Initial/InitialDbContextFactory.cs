@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Stenn.EntityFrameworkCore.DbContext.Initial
+namespace Stenn.EntityFrameworkCore.Data.Initial
 {
     // ReSharper disable once UnusedType.Global
     public class InitialDbContextFactory : IDesignTimeDbContextFactory<InitialDbContext>

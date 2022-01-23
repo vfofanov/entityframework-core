@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Stenn.EntityFrameworkCore.Data.Initial;
+using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.DbContext.Initial;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
@@ -51,8 +53,6 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             return services.BuildServiceProvider();
         }
-
-        
 
         [Test]
         public async Task InitialMigration()
