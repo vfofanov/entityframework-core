@@ -57,10 +57,16 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             where T : class, IDictionaryEntity<T>
         {
             var migration = new DictionaryEntityMigration<T>(getActual);
-            AddDictionaryEntityFactory(name, _ => migration);
+            AddDictionaryEntityMigration(name, _ => migration);
         }
 
-        public void AddDictionaryEntityFactory(string name, Func<DbContext, IDictionaryEntityMigration> migrationFactory)
+        public void AddDictionaryEntityMigration<TMigration>(string name)
+        where TMigration: IDictionaryEntityMigration, new()
+        {
+            AddDictionaryEntityMigration(name,_ => new TMigration());
+        }
+        
+        public void AddDictionaryEntityMigration(string name, Func<DbContext, IDictionaryEntityMigration> migrationFactory)
         {
             _dictEntityMigrations.Add(name, migrationFactory);
         }
