@@ -22,8 +22,7 @@ namespace Stenn.EntityFrameworkCore
         /// <inheritdoc />
         protected override byte[] GetHash()
         {
-            var itemsArray = JsonSerializer.SerializeToUtf8Bytes(Items);
-            return HashAlgorithm.ComputeHash(itemsArray);
+            return GetHash(Items);
         }
 
         /// <inheritdoc />
