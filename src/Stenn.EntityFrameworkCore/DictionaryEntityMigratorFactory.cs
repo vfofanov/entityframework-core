@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Stenn.DictionaryEntities;
-using Stenn.DictionaryEntities.Contracts;
 
 namespace Stenn.EntityFrameworkCore
 {

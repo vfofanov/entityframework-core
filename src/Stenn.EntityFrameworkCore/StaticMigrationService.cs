@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.DictionaryEntities;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore
 {
@@ -22,8 +23,8 @@ namespace Stenn.EntityFrameworkCore
         public StaticMigrationsService(StaticMigrationHistoryRepository historyRepository,
             ICurrentDbContext currentDbContext,
             IDictionaryEntityMigrator migrator,
-            IStaticMigrationCollection<IStaticSqlMigration> sqlMigrations,
-            IStaticMigrationCollection<IDictionaryEntityMigration> entityMigrations)
+            IStaticMigrationCollection<IStaticSqlMigration, DbContext> sqlMigrations,
+            IStaticMigrationCollection<IDictionaryEntityMigration, DbContext> entityMigrations)
         {
             _historyRepository = historyRepository;
             _dbContext = currentDbContext.Context;

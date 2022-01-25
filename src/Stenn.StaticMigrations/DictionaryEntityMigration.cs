@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
-using Stenn.DictionaryEntities.Contracts;
+using Stenn.DictionaryEntities;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.StaticMigrations
 {
     public sealed class DictionaryEntityMigration<T> : DictionaryEntityMigrationBase<T>
         where T : class, IDictionaryEntity<T>

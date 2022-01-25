@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore
 {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Stenn.DictionaryEntities;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.StaticMigrations
 {
     public interface IDictionaryEntityMigration : IStaticMigration
     {

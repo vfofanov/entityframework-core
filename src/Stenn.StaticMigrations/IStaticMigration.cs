@@ -1,4 +1,4 @@
-﻿namespace Stenn.EntityFrameworkCore
+﻿namespace Stenn.StaticMigrations
 {
     public interface IStaticMigration
     {

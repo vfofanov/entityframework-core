@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Stenn.DictionaryEntities;
-using Stenn.DictionaryEntities.Contracts;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.StaticMigrations
 {
     public abstract class DictionaryEntityMigrationBase<T> : StaticMigration, IDictionaryEntityMigration
         where T : class, IDictionaryEntity<T>

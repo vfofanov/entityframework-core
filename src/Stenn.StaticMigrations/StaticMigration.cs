@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.StaticMigrations
 {
     public abstract class StaticMigration : IStaticMigration
     {

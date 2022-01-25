@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Stenn.DictionaryEntities.Contracts;
 
 namespace Stenn.DictionaryEntities
 {
@@ -19,7 +17,7 @@ namespace Stenn.DictionaryEntities
         public async Task<List<T>> AddOrUpdateAsync<T>(List<T> actualList, CancellationToken cancellationToken)
             where T : class, IDictionaryEntity<T>
         {
-            var currentList = await _context.GetCurrent<T>().ToListAsync(cancellationToken);
+            var currentList = await _context.GetCurrentAsync<T>(cancellationToken);
             foreach (var actual in actualList)
             {
                 var current = currentList.FirstOrDefault(actual.EqualsByKey);
@@ -46,6 +44,7 @@ namespace Stenn.DictionaryEntities
         public List<T> AddOrUpdate<T>(List<T> actualList) 
             where T : class, IDictionaryEntity<T>
         {
+            // ReSharper disable once ConstantNullCoalescingCondition
             actualList ??= new List<T>();
             
             var currentList = _context.GetCurrent<T>().ToList();

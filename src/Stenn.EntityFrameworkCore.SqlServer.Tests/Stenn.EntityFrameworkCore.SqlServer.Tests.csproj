@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj" />
     <ProjectReference Include="..\Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj" />

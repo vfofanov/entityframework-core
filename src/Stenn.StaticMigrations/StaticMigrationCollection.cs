@@ -3,22 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.StaticMigrations
 {
     [DebuggerDisplay("Count={Count}")]
-    public class StaticMigrationCollection<T> : IStaticMigrationCollection<T>
+    public class StaticMigrationCollection<T, TContext> : IStaticMigrationCollection<T, TContext>
         where T : IStaticMigration
     {
-        private readonly List<StaticMigrationItemFactory<T>> _items = new();
+        private readonly List<StaticMigrationItemFactory<T, TContext>> _items = new();
 
-        public StaticMigrationItemFactory<T> this[int index] => _items[index];
+        public StaticMigrationItemFactory<T, TContext> this[int index] => _items[index];
 
         public int Count => _items.Count;
 
         /// <inheritdoc />
-        public IEnumerator<StaticMigrationItemFactory<T>> GetEnumerator()
+        public IEnumerator<StaticMigrationItemFactory<T, TContext>> GetEnumerator()
         {
             return _items.GetEnumerator();
         }
@@ -29,7 +28,7 @@ namespace Stenn.EntityFrameworkCore
             return GetEnumerator();
         }
 
-        public void Add(string name, Func<DbContext, T> factory)
+        public void Add(string name, Func<TContext, T> factory)
         {
             if (name == null)
             {
@@ -40,10 +39,10 @@ namespace Stenn.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Add(new StaticMigrationItemFactory<T>(name, factory));
+            Add(new StaticMigrationItemFactory<T,TContext>(name, factory));
         }
 
-        public void Add(StaticMigrationItemFactory<T> item)
+        public void Add(StaticMigrationItemFactory<T,TContext> item)
         {
             if (item == null)
             {
@@ -56,12 +55,5 @@ namespace Stenn.EntityFrameworkCore
             }
             _items.Add(item);
         }
-    }
-
-
-    public interface IStaticMigrationCollection<T> : IEnumerable<StaticMigrationItemFactory<T>>
-    {
-        StaticMigrationItemFactory<T> this[int index] { get; }
-        int Count { get; }
     }
 }

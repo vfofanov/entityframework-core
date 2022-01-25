@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Stenn.DictionaryEntities.Contracts;
 
 namespace Stenn.DictionaryEntities
 {

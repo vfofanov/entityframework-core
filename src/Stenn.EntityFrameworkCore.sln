@@ -11,8 +11,6 @@ ProjectSection(SolutionItems) = preProject
 	.msbuild\version.props = .msbuild\version.props
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.DictionaryEntities.Contracts", "Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj", "{BDBEA802-3D20-4426-982D-F1A5613EAE14}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore", "Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj", "{3762C10B-20AE-432E-AE0A-6261886D4A54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer", "Stenn.EntityFrameworkCore.SqlServer\Stenn.EntityFrameworkCore.SqlServer.csproj", "{3416A707-49CC-45BA-A488-9C6A823BAA18}"
@@ -38,16 +36,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj", "{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.StaticMigrations", "Stenn.StaticMigrations\Stenn.StaticMigrations.csproj", "{863A163D-F238-4EA3-83A0-64DA8F01E05C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDBEA802-3D20-4426-982D-F1A5613EAE14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3762C10B-20AE-432E-AE0A-6261886D4A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -84,6 +80,10 @@ Global
 		{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}.Release|Any CPU.Build.0 = Release|Any CPU
+		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

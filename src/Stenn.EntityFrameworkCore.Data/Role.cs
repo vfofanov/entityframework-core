@@ -1,4 +1,4 @@
-﻿using Stenn.DictionaryEntities.Contracts;
+﻿using Stenn.DictionaryEntities;
 
 namespace Stenn.EntityFrameworkCore.Data
 {

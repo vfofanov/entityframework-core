@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Stenn.DictionaryEntities.Contracts;
+using Stenn.DictionaryEntities;
+using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -12,8 +13,8 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     /// </summary>
     public sealed class StaticMigrationBuilder
     {
-        private readonly StaticMigrationCollection<IDictionaryEntityMigration> _dictEntityMigrations = new();
-        private readonly StaticMigrationCollection<IStaticSqlMigration> _sqlMigrations = new();
+        private readonly StaticMigrationCollection<IDictionaryEntityMigration, DbContext> _dictEntityMigrations = new();
+        private readonly StaticMigrationCollection<IStaticSqlMigration, DbContext> _sqlMigrations = new();
         private Action<IServiceCollection>? _replaceServices;
 
         /// <summary>
@@ -109,8 +110,8 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         {
             _replaceServices?.Invoke(services);
 
-            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration>), _sqlMigrations));
-            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration>), _dictEntityMigrations));
+            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration, DbContext>), _sqlMigrations));
+            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>), _dictEntityMigrations));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,10 +24,17 @@ namespace Stenn.EntityFrameworkCore
             }
 
             /// <inheritdoc />
-            public IQueryable<T> GetCurrent<T>()
+            public List<T> GetCurrent<T>()
                 where T : class
             {
-                return _context.Set<T>();
+                return _context.Set<T>().ToList();
+            }
+
+            /// <inheritdoc />
+            public async Task<List<T>> GetCurrentAsync<T>(CancellationToken cancellationToken)
+                where T : class
+            {
+                return await _context.Set<T>().ToListAsync(cancellationToken);
             }
 
             /// <inheritdoc />

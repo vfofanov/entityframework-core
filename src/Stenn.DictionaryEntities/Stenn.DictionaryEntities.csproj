@@ -5,12 +5,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.13" />
-  </ItemGroup>
-
 </Project>

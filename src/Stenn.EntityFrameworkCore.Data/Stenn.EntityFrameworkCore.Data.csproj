@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities.Contracts\Stenn.DictionaryEntities.Contracts.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />
   </ItemGroup>
 

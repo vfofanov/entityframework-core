@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Stenn.DictionaryEntities.Contracts
+namespace Stenn.DictionaryEntities
 {
     public interface IDictionaryEntity
     {
