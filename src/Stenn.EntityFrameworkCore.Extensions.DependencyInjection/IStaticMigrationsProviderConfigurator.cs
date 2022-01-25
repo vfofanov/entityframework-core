@@ -2,7 +2,7 @@
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
-    public interface IProviderRegistrator
+    public interface IStaticMigrationsProviderConfigurator
     {
         void RegisterServices(IServiceCollection services);
     }

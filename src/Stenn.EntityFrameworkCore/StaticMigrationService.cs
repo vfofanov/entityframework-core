@@ -4,38 +4,38 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.DictionaryEntities;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore
 {
-    public sealed class StaticMigrationService : IStaticMigrationService
+    public sealed class StaticMigrationsService : IStaticMigrationsService
     {
-        private readonly StaticMigrationHistoryRepository _historyRepository;
         private readonly DbContext _dbContext;
+        private readonly StaticMigrationItem<IDictionaryEntityMigration>[] _entityMigrations;
+        private readonly StaticMigrationHistoryRepository _historyRepository;
         private readonly IDictionaryEntityMigrator _migrator;
         private readonly StaticMigrationItem<IStaticSqlMigration>[] _sqlMigrations;
-        private readonly StaticMigrationItem<IDictionaryEntityMigration>[] _entityMigrations;
-        private DateTime? _modifiedDate;
 
-        public StaticMigrationService(StaticMigrationHistoryRepository historyRepository, 
-            DbContext dbContext,
+        public StaticMigrationsService(StaticMigrationHistoryRepository historyRepository,
+            ICurrentDbContext currentDbContext,
             IDictionaryEntityMigrator migrator,
-            StaticMigrationItem<IStaticSqlMigration>[] sqlMigrations,
-            StaticMigrationItem<IDictionaryEntityMigration>[] entityMigrations)
+            IStaticMigrationCollection<IStaticSqlMigration> sqlMigrations,
+            IStaticMigrationCollection<IDictionaryEntityMigration> entityMigrations)
         {
             _historyRepository = historyRepository;
-            _dbContext = dbContext;
+            _dbContext = currentDbContext.Context;
             _migrator = migrator;
-            _sqlMigrations = sqlMigrations;
-            _entityMigrations = entityMigrations;
+
+            _sqlMigrations = sqlMigrations.Select(item => new StaticMigrationItem<IStaticSqlMigration>(item.Name, item.Factory(_dbContext))).ToArray();
+            _entityMigrations = entityMigrations.Select(item => new StaticMigrationItem<IDictionaryEntityMigration>(item.Name, item.Factory(_dbContext)))
+                .ToArray();
         }
-        
-        private DateTime Modified => _modifiedDate ??= DateTime.UtcNow;
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetRevertOperations(bool force)
+        public IEnumerable<MigrationOperation> GetRevertOperations(bool force, DateTime migrationDate)
         {
             if (!_historyRepository.Exists())
             {
@@ -55,7 +55,6 @@ namespace Stenn.EntityFrameworkCore
                 {
                     deleteRow = true;
                     yield return operation;
-
                 }
                 if (deleteRow)
                 {
@@ -65,7 +64,7 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetApplyOperations(bool force)
+        public IEnumerable<MigrationOperation> GetApplyOperations(bool force, DateTime migrationDate)
         {
             yield return CreateIfNotExistsHistoryTable();
             var historyRows = _historyRepository.GetAppliedMigrations();
@@ -85,33 +84,20 @@ namespace Stenn.EntityFrameworkCore
                 {
                     yield return operation;
                 }
-                yield return InsertHistoryRow(migrationItem);
+                yield return InsertHistoryRow(migrationItem, migrationDate);
             }
         }
 
-        private SqlOperation CreateIfNotExistsHistoryTable()
-        {
-            return new SqlOperation { Sql = _historyRepository.GetCreateIfNotExistsScript() };
-        }
-        private SqlOperation InsertHistoryRow<T>(StaticMigrationItem<T> migration) 
-            where T : IStaticMigration
-        {
-            return new SqlOperation { Sql = _historyRepository.GetInsertScript(new StaticMigrationHistoryRow(migration.Name, migration.Hash, Modified)) };
-        }
-        private SqlOperation DeleteHistoryRow(StaticMigrationHistoryRow row)
-        {
-            return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
-        }
-
+        /// <param name="migrationDate"></param>
         /// <param name="force"></param>
         /// <inheritdoc />
-        public IReadOnlyList<MigrationOperation> MigrateDictionaryEntities(bool force = false)
+        public IReadOnlyList<MigrationOperation> MigrateDictionaryEntities(DateTime migrationDate, bool force = false)
         {
             var result = new List<MigrationOperation> { CreateIfNotExistsHistoryTable() };
 
             var historyRows = _historyRepository.GetAppliedMigrations();
             var changed = false;
-                
+
             foreach (var migrationItem in _entityMigrations)
             {
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
@@ -125,7 +111,7 @@ namespace Stenn.EntityFrameworkCore
                 }
                 changed = true;
                 migrationItem.Migration.Update(_migrator);
-                result.Add(InsertHistoryRow(migrationItem));
+                result.Add(InsertHistoryRow(migrationItem, migrationDate));
             }
             if (changed)
             {
@@ -135,24 +121,43 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(bool force, CancellationToken cancellationToken)
+        public Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(bool force, DateTime migrationDate,
+            CancellationToken cancellationToken)
         {
-            var result = GetRevertOperations(force);
+            var result = GetRevertOperations(force, migrationDate);
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(bool force, CancellationToken cancellationToken)
+        public Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(bool force, DateTime migrationDate,
+            CancellationToken cancellationToken)
         {
-            var result = GetApplyOperations(force);
+            var result = GetApplyOperations(force, migrationDate);
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task<IReadOnlyList<MigrationOperation>> MigrateDictionaryEntitiesAsync(CancellationToken cancellationToken, bool force = false)
+        public Task<IReadOnlyList<MigrationOperation>> MigrateDictionaryEntitiesAsync(DateTime migrationDate, CancellationToken cancellationToken,
+            bool force = false)
         {
-            var result = MigrateDictionaryEntities();
+            var result = MigrateDictionaryEntities(migrationDate);
             return Task.FromResult(result);
+        }
+
+        private SqlOperation CreateIfNotExistsHistoryTable()
+        {
+            return new SqlOperation { Sql = _historyRepository.GetCreateIfNotExistsScript() };
+        }
+
+        private SqlOperation InsertHistoryRow<T>(StaticMigrationItem<T> migration, DateTime migrationDate)
+            where T : IStaticMigration
+        {
+            return new SqlOperation { Sql = _historyRepository.GetInsertScript(new StaticMigrationHistoryRow(migration.Name, migration.Hash, migrationDate)) };
+        }
+
+        private SqlOperation DeleteHistoryRow(StaticMigrationHistoryRow row)
+        {
+            return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
         }
     }
 }

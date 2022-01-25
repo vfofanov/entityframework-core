@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Main;
-using Stenn.EntityFrameworkCore.DbContext.Initial;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 
@@ -42,13 +41,13 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             var connectionString = GetConnectionString(DBName);
 
-            services.AddStaticMigrations<SqlServerMigrations>(init);
-            
-            services.AddDbContext<TDbContext>((provider, builder) =>
+            services.AddDbContext<TDbContext>(builder =>
             {
-                builder.UseStaticMigrations(provider);
                 builder.UseSqlServer(connectionString);
+                builder.UseStaticMigrationsSqlServer(init);
+
                 //builder.UseInMemoryDatabase(dbName);
+                //builder.UseStaticMigrationsInMemoryDatabase(init);
             });
 
             return services.BuildServiceProvider();

@@ -14,6 +14,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     {
         private readonly StaticMigrationCollection<IDictionaryEntityMigration> _dictEntityMigrations = new();
         private readonly StaticMigrationCollection<IStaticSqlMigration> _sqlMigrations = new();
+        private Action<IServiceCollection>? _replaceServices;
 
         /// <summary>
         ///     Add sql resource static migration
@@ -95,9 +96,19 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             _dictEntityMigrations.Add(name, migrationFactory);
         }
 
+        /// <summary>
+        /// Replace static migrations services
+        /// </summary>
+        /// <param name="replaceServices"></param>
+        public void ReplaceServices(Action<IServiceCollection> replaceServices)
+        {
+            _replaceServices = replaceServices;
+        }
 
         internal void Build(IServiceCollection services)
         {
+            _replaceServices?.Invoke(services);
+
             services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration>), _sqlMigrations));
             services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration>), _dictEntityMigrations));
         }

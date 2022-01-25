@@ -23,9 +23,9 @@ namespace Stenn.EntityFrameworkCore.SqlServer.StaticMigrations
     ///         The implementation does not need to be thread-safe.
     ///     </para>
     /// </summary>
-    public class SqlServerStaticMigrationHistoryRepository : StaticMigrationHistoryRepository
+    public class StaticMigrationHistoryRepositorySqlServer : StaticMigrationHistoryRepository
     {
-        public SqlServerStaticMigrationHistoryRepository(HistoryRepositoryDependencies dependencies)
+        public StaticMigrationHistoryRepositorySqlServer(HistoryRepositoryDependencies dependencies)
             : base(dependencies)
         {
         }

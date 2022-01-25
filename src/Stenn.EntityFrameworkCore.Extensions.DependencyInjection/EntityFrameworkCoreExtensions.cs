@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Stenn.DictionaryEntities;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -12,45 +10,26 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     public static class EntityFrameworkCoreExtensions
     {
         /// <summary>
-        ///     Adds services for static megrations
+        ///     Use static migrations with specified db context
         /// </summary>
-        /// <param name="services">Services' collection</param>
+        /// <param name="optionsBuilder">Db contextoptions builder</param>
         /// <param name="initMigrations">Init static migrations action</param>
-        public static IServiceCollection AddStaticMigrations<TProviderRegistrator>(this IServiceCollection services,
-            Action<StaticMigrationBuilder> initMigrations) where TProviderRegistrator : IProviderRegistrator, new()
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-            if (initMigrations == null)
-            {
-                throw new ArgumentNullException(nameof(initMigrations));
-            }
-            var providerRegistrator = new TProviderRegistrator();
-            providerRegistrator.RegisterServices(services);
-
-            services.TryAddTransient<IStaticMigrationServiceFactory, StaticMigrationServiceFactory>();
-            services.TryAddTransient<IDictionaryEntityMigratorFactory, DictionaryEntityMigratorFactory>();
-            
-            var builder = new StaticMigrationBuilder();
-            initMigrations.Invoke(builder);
-            builder.Build(services);
-
-            return services;
-        }
-
-        /// <summary>
-        /// Use static migrations with specified db context
-        /// </summary>
-        /// <param name="builder">Db contextoptions builder</param>
-        /// <param name="provider">Application service provider</param>
         /// <returns></returns>
-        public static DbContextOptionsBuilder UseStaticMigrations(this DbContextOptionsBuilder builder, IServiceProvider provider)
+        public static DbContextOptionsBuilder UseStaticMigrations<TProviderRegistrator>(DbContextOptionsBuilder optionsBuilder,
+            Action<StaticMigrationBuilder> initMigrations)
+            where TProviderRegistrator : IDbContextOptionsConfigurator, IStaticMigrationsProviderConfigurator, new()
         {
-            var configurator = provider.GetRequiredService<IDbContextOptionsConfigurator>();
-            configurator.Configure(builder);
-            return builder;
+            var configurator = new TProviderRegistrator();
+            configurator.Configure(optionsBuilder);
+
+            var migrationsBuilder = new StaticMigrationBuilder();
+            initMigrations.Invoke(migrationsBuilder);
+
+            var extension = optionsBuilder.Options.FindExtension<StaticMigrationOptionsExtension>() ??
+                            new StaticMigrationOptionsExtension(configurator, migrationsBuilder);
+            ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+
+            return optionsBuilder;
         }
     }
 }

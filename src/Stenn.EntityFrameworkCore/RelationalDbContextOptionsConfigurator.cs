@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Stenn.EntityFrameworkCore
 {
-    public sealed class RelationalDbContextOptionsConfigurator : IDbContextOptionsConfigurator
+    public class RelationalDbContextOptionsConfigurator : IDbContextOptionsConfigurator
     {
         /// <inheritdoc />
         public void Configure(DbContextOptionsBuilder builder)
