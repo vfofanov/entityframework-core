@@ -19,26 +19,50 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         ///     Add sql resource static migration
         /// </summary>
         /// <param name="name">Migration's name</param>
-        /// <param name="applyEmbeddedResFileName">
+        /// <param name="applyRelativeResFilePath">
         ///     Migration's apply script resource file path.
-        ///     It can be absolute path or relative. Relative starts with '/', '\' or '.'
+        ///     It relative for assembly name. If your assembly's root namespace differs from assembly's name use overload
+        ///     <see cref="AddResSql(string,ResFile,ResFile?,bool)" />
         /// </param>
-        /// <param name="revertEmbeddedResFileName">
+        /// <param name="revertRelativeResFilePath">
         ///     Migration's revert script resource file path.
-        ///     It can be absolute path or relative. Relative starts with '/', '\' or '.'
+        ///     It relative for assembly name. If your assembly's root namespace differs from assembly's name use overload
+        ///     <see cref="AddResSql(string,ResFile,ResFile?,bool)" />
         /// </param>
         /// <param name="assembly">Assembly wtih scripts resources. If null calling assembly will be used</param>
         /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
-        public void AddResSql(string name, string applyEmbeddedResFileName, string? revertEmbeddedResFileName, Assembly? assembly = null,
+        public void AddResSql(string name, string applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null,
             bool suppressTransaction = false)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
-            var migration = new ResStaticSqlMigration(assembly,
-                PrepareResPath(assembly, applyEmbeddedResFileName)!,
-                PrepareResPath(assembly, revertEmbeddedResFileName),
-                suppressTransaction);
+            var applyResFile = ResFile.Relative(applyRelativeResFilePath, assembly);
+            var revertResFile = string.IsNullOrEmpty(revertRelativeResFilePath) ? null : ResFile.Relative(revertRelativeResFilePath, assembly);
+            AddResSql(name, applyResFile, revertResFile, suppressTransaction);
+        }
 
+        /// <summary>
+        ///     Add sql resource static migration
+        /// </summary>
+        /// <param name="name">Migration's name</param>
+        /// <param name="applyFile">
+        ///     Migration's apply script resource file path.
+        /// </param>
+        /// <param name="revertFile">
+        ///     Migration's revert script resource file path.
+        /// </param>
+        /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
+        public void AddResSql(string name, ResFile applyFile, ResFile? revertFile, bool suppressTransaction = false)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (applyFile == null)
+            {
+                throw new ArgumentNullException(nameof(applyFile));
+            }
+            var migration = new ResStaticSqlMigration(applyFile, revertFile, suppressTransaction);
             AddStaticSqlFactory(name, _ => migration);
         }
 
@@ -61,33 +85,16 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         }
 
         public void AddDictionaryEntityMigration<TMigration>(string name)
-        where TMigration: IDictionaryEntityMigration, new()
+            where TMigration : IDictionaryEntityMigration, new()
         {
-            AddDictionaryEntityMigration(name,_ => new TMigration());
+            AddDictionaryEntityMigration(name, _ => new TMigration());
         }
-        
+
         public void AddDictionaryEntityMigration(string name, Func<DbContext, IDictionaryEntityMigration> migrationFactory)
         {
             _dictEntityMigrations.Add(name, migrationFactory);
         }
 
-        private static string? PrepareResPath(Assembly assembly, string? resPath)
-        {
-            var assemblyName = assembly.GetName().Name;
-
-            if (resPath == null)
-            {
-                return resPath;
-            }
-
-            resPath = resPath.Replace('\\', '.').Replace('/', '.');
-            if (resPath.StartsWith('.'))
-            {
-                //NOTE: This mean relative path
-                return assemblyName + "." + resPath.TrimStart('.');
-            }
-            return resPath;
-        }
 
         internal void Build(IServiceCollection services)
         {

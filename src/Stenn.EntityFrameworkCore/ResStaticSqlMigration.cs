@@ -7,31 +7,20 @@ namespace Stenn.EntityFrameworkCore
 {
     public sealed class ResStaticSqlMigration : StaticMigration, IStaticSqlMigration
     {
-        private readonly Assembly _assembly;
-        private readonly string _applyEmbeddedResFileName;
-        private readonly string? _revertEmbeddedResFileName;
+        private readonly ResFile _applyResFile;
+        private readonly ResFile? _revertResFile;
         private readonly bool _suppressTransaction;
 
-        public ResStaticSqlMigration(Assembly assembly, string applyEmbeddedResFileName, string? revertEmbeddedResFileName, bool suppressTransaction)
+        public ResStaticSqlMigration(ResFile applyResFile, ResFile? revertResFile, bool suppressTransaction)
         {
-            if (assembly == null)
-            {
-                throw new ArgumentNullException(nameof(assembly));
-            }
-            if (string.IsNullOrEmpty(applyEmbeddedResFileName))
-            {
-                throw new ArgumentException("Value cannot be null or empty.", nameof(applyEmbeddedResFileName));
-            }
-
-            _assembly = assembly;
-            _applyEmbeddedResFileName = applyEmbeddedResFileName;
-            _revertEmbeddedResFileName = revertEmbeddedResFileName;
+            _applyResFile = applyResFile ?? throw new ArgumentNullException(nameof(applyResFile));
+            _revertResFile = revertResFile;
             _suppressTransaction = suppressTransaction;
         }
 
         protected override byte[] GetHash()
         {
-            using var stream = _assembly.ReadResStream(_applyEmbeddedResFileName);
+            using var stream = _applyResFile.ReadStream();
             return HashAlgorithm.ComputeHash(stream);
         }
 
@@ -39,18 +28,18 @@ namespace Stenn.EntityFrameworkCore
         /// <inheritdoc />
         public IEnumerable<MigrationOperation> GetRevertOperations()
         {
-            if (string.IsNullOrEmpty(_revertEmbeddedResFileName))
+            if (_revertResFile == null)
             {
                 yield break;
             }
-            var sql = _assembly.ReadRes(_revertEmbeddedResFileName);
+            var sql = _revertResFile.Read();
             yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
         }
 
         /// <inheritdoc />
         public IEnumerable<MigrationOperation> GetApplyOperations(bool isNew)
         {
-            var sql = _assembly.ReadRes(_applyEmbeddedResFileName);
+            var sql = _applyResFile.Read();
             yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
         }
     }

@@ -1,12 +1,19 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Stenn.EntityFrameworkCore
 {
     public static class AssemblyExtensions
     {
-        public static Stream ReadResStream(this Assembly assembly, string embeddedResFileName)
+        public static bool ResExists(this Assembly assembly, string embeddedResFileName)
+        {
+            var info = assembly.GetManifestResourceInfo(embeddedResFileName);
+            return info != null;
+        }
+        
+        public static Stream ResReadStream(this Assembly assembly, string embeddedResFileName)
         {
             var stream = assembly.GetManifestResourceStream(embeddedResFileName);
             if (stream == null)
@@ -16,10 +23,10 @@ namespace Stenn.EntityFrameworkCore
             return stream;
         }
 
-        public static string ReadRes(this Assembly assembly, string embeddedResFileName)
+        public static string ResRead(this Assembly assembly, string embeddedResFileName, Encoding? encoding = null)
         {
-            using var stream = assembly.ReadResStream(embeddedResFileName);
-            using var reader = new StreamReader(stream);
+            using var stream = assembly.ResReadStream(embeddedResFileName);
+            using var reader = new StreamReader(stream, encoding, true, -1, false);
             return reader.ReadToEnd();
         }
     }
