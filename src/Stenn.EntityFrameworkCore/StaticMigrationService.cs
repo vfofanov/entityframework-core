@@ -38,9 +38,20 @@ namespace Stenn.EntityFrameworkCore
         /// <inheritdoc />
         public IEnumerable<MigrationOperation> GetRevertOperations(bool force, DateTime migrationDate)
         {
-            yield return CreateIfNotExistsHistoryTable();
-            var historyRows = _historyRepository.GetAppliedMigrations();
+            if (!_historyRepository.Exists())
+            {
+                for (var i = _sqlMigrations.Length - 1; i >= 0; i--)
+                {
+                    var migrationItem = _sqlMigrations[i];
+                    foreach (var operation in migrationItem.Migration.GetRevertOperations())
+                    {
+                        yield return operation;
+                    }
+                }
+                yield break;
+            }
             
+            var historyRows = _historyRepository.GetAppliedMigrations();
             for (var i = _sqlMigrations.Length - 1; i >= 0; i--)
             {
                 var migrationItem = _sqlMigrations[i];
