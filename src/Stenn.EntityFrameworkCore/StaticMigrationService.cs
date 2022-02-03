@@ -16,11 +16,11 @@ namespace Stenn.EntityFrameworkCore
     {
         private readonly DbContext _dbContext;
         private readonly StaticMigrationItem<IDictionaryEntityMigration>[] _entityMigrations;
-        private readonly StaticMigrationHistoryRepository _historyRepository;
+        private readonly IStaticMigrationHistoryRepository _historyRepository;
         private readonly IDictionaryEntityMigrator _migrator;
         private readonly StaticMigrationItem<IStaticSqlMigration>[] _sqlMigrations;
 
-        public StaticMigrationsService(StaticMigrationHistoryRepository historyRepository,
+        public StaticMigrationsService(IStaticMigrationHistoryRepository historyRepository,
             ICurrentDbContext currentDbContext,
             IDictionaryEntityMigrator migrator,
             IStaticMigrationCollection<IStaticSqlMigration, DbContext> sqlMigrations,
@@ -36,7 +36,7 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetRevertOperations(bool force, DateTime migrationDate)
+        public IEnumerable<MigrationOperation> GetRevertOperations(DateTime migrationDate, bool force)
         {
             if (!_historyRepository.Exists())
             {
@@ -74,7 +74,7 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetApplyOperations(bool force, DateTime migrationDate)
+        public IEnumerable<MigrationOperation> GetApplyOperations(DateTime migrationDate, bool force)
         {
             yield return CreateIfNotExistsHistoryTable();
             var historyRows = _historyRepository.GetAppliedMigrations();
@@ -131,18 +131,20 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(bool force, DateTime migrationDate,
+        public Task<IEnumerable<MigrationOperation>> GetRevertOperationsAsync(DateTime migrationDate,
+            bool force,
             CancellationToken cancellationToken)
         {
-            var result = GetRevertOperations(force, migrationDate);
+            var result = GetRevertOperations(migrationDate, force);
             return Task.FromResult(result);
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(bool force, DateTime migrationDate,
+        public Task<IEnumerable<MigrationOperation>> GetApplyOperationsAsync(DateTime migrationDate,
+            bool force,
             CancellationToken cancellationToken)
         {
-            var result = GetApplyOperations(force, migrationDate);
+            var result = GetApplyOperations(migrationDate, force);
             return Task.FromResult(result);
         }
 

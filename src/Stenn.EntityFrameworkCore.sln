@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.StaticMigrations", "Stenn.StaticMigrations\Stenn.StaticMigrations.csproj", "{863A163D-F238-4EA3-83A0-64DA8F01E05C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection.csproj", "{47F66573-8405-44C1-A58C-93D9CF3D72F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.InMemory.Tests", "Stenn.EntityFrameworkCore.InMemory.Tests\Stenn.EntityFrameworkCore.InMemory.Tests.csproj", "{A78EA959-6F65-498F-A5B7-5CB07747C0EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +88,14 @@ Global
 		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{863A163D-F238-4EA3-83A0-64DA8F01E05C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47F66573-8405-44C1-A58C-93D9CF3D72F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F66573-8405-44C1-A58C-93D9CF3D72F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47F66573-8405-44C1-A58C-93D9CF3D72F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47F66573-8405-44C1-A58C-93D9CF3D72F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A78EA959-6F65-498F-A5B7-5CB07747C0EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A78EA959-6F65-498F-A5B7-5CB07747C0EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A78EA959-6F65-498F-A5B7-5CB07747C0EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A78EA959-6F65-498F-A5B7-5CB07747C0EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,5 +108,6 @@ Global
 		{24C0E5C3-F871-4703-BD14-886C4122929E} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{4760014A-CF66-4FDA-87D5-4A9CEAF7108B} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{A78EA959-6F65-498F-A5B7-5CB07747C0EA} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 	EndGlobalSection
 EndGlobal

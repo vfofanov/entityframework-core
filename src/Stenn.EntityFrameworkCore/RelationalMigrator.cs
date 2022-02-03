@@ -62,8 +62,8 @@ namespace Stenn.EntityFrameworkCore
                 }
                 else
                 {
-                    var revertOperations = StaticMigrationsService.GetRevertOperations(false, _migrateContext.MigrationDate);
-                    var applyOperations = StaticMigrationsService.GetApplyOperations(false, _migrateContext.MigrationDate);
+                    var revertOperations = StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, false);
+                    var applyOperations = StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, false);
                     var operations = revertOperations.Concat(applyOperations).ToList();
                     Execute(operations);
                 }
@@ -92,9 +92,9 @@ namespace Stenn.EntityFrameworkCore
                 }
                 else
                 {
-                    var revertOperations = await StaticMigrationsService.GetRevertOperationsAsync(false, _migrateContext.MigrationDate, cancellationToken)
+                    var revertOperations = await StaticMigrationsService.GetRevertOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
                         .ConfigureAwait(false);
-                    var applyOperations = await StaticMigrationsService.GetApplyOperationsAsync(false, _migrateContext.MigrationDate, cancellationToken)
+                    var applyOperations = await StaticMigrationsService.GetApplyOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
                         .ConfigureAwait(false);
                     var operations = revertOperations.Concat(applyOperations).ToList();
 
@@ -148,26 +148,25 @@ namespace Stenn.EntityFrameworkCore
                 migrationId == _migrateContext.LastMigrationId)
             {
                 //NOTE: Add revert static migrations at the beggining of first migration 
-                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(true, _migrateContext.MigrationDate).ToList());
+                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
                 //NOTE: Add apply static migrations at the end of last migration
-                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(true, _migrateContext.MigrationDate).ToList());
+                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
                 return revertCommands.Concat(migrationCommands).Concat(applyCommands).ToList();
             }
             if (migrationId == _migrateContext.FirstMigrationId)
             {
                 //NOTE: Add revert static migrations at the beggining of first migration 
-                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(true, _migrateContext.MigrationDate).ToList());
+                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
                 return revertCommands.Concat(migrationCommands).ToList();
             }
             if (migrationId == _migrateContext.LastMigrationId)
             {
                 //NOTE: Add apply static migrations at the end of last migration
-                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(true, _migrateContext.MigrationDate).ToList());
+                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
                 return migrationCommands.Concat(applyCommands).ToList();
             }
             return migrationCommands;
         }
-
 
         private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operations)
         {

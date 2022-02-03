@@ -11,7 +11,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
         /// <inheritdoc />
         public void RegisterServices(IServiceCollection services)
         {
-            services.TryAddTransient<StaticMigrationHistoryRepository, StaticMigrationHistoryRepositorySqlServer>();
+            services.TryAddTransient<IStaticMigrationHistoryRepository, StaticMigrationHistoryRepositorySqlServer>();
         }
     }
 }

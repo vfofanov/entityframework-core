@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.DictionaryEntities;
+using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -24,11 +28,71 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         public void ApplyServices(IServiceCollection services)
         {
             _configurator.RegisterServices(services);
-            
+
             _migrationsBuilder.Build(services);
-            
+
             services.TryAddTransient<IStaticMigrationsService, StaticMigrationsService>();
             services.TryAddTransient<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
+
+            var relationalOverrided = OverrideService<IRelationalDatabaseCreator>(services, (provider, creator) =>
+                new RelationalDatabaseCreatorWithStaticMigrations(creator,
+                    provider, 
+                    provider.GetRequiredService<RelationalDatabaseCreatorDependencies>(), 
+                    provider.GetRequiredService<IRelationalConnection>(), 
+                    provider.GetRequiredService<IMigrationCommandExecutor>(), 
+                    provider.GetRequiredService<IMigrationsSqlGenerator>()));
+
+            if (relationalOverrided)
+            {
+                return;
+            }
+
+            services.TryAddScoped<IStaticMigrationHistoryRepository, EmptyStaticMigrationHistoryRepository>();
+            var overrided = OverrideService<IDatabaseCreator>(services, (provider, creator) =>
+                new DatabaseCreatorWithStaticMigrations(creator, provider.GetRequiredService<IStaticMigrationsService>()));
+
+            if (!overrided)
+            {
+                throw new NotSupportedException("Can't use static migrations with this database provider. Can;t find service 'IDatabaseCreator'");
+            }
+        }
+
+        private static bool OverrideService<T>(IServiceCollection services, Func<IServiceProvider, T, T> factory)
+            where T : notnull
+        {
+            var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(T));
+            if (descriptor == null)
+            {
+                return false;
+            }
+            if (descriptor.ImplementationType != null)
+            {
+                services.Add(new ServiceDescriptor(descriptor.ImplementationType, descriptor.ImplementationType, descriptor.Lifetime));
+            }
+            services.Replace(new ServiceDescriptor(typeof(T), provider =>
+            {
+                T baseService;
+                if (descriptor.ImplementationInstance != null)
+                {
+                    baseService = (T)descriptor.ImplementationInstance;
+                }
+                else if (descriptor.ImplementationType != null)
+                {
+                    baseService = (T)provider.GetRequiredService(descriptor.ImplementationType);
+                }
+                else if (descriptor.ImplementationFactory != null)
+                {
+                    baseService = (T)descriptor.ImplementationFactory.Invoke(provider);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+
+                return factory(provider, baseService);
+            }, descriptor.Lifetime));
+
+            return true;
         }
 
         /// <inheritdoc />

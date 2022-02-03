@@ -33,7 +33,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     ///         The implementation does not need to be thread-safe.
     ///     </para>
     /// </summary>
-    public abstract class StaticMigrationHistoryRepository
+    public abstract class StaticMigrationHistoryRepository : IStaticMigrationHistoryRepository
     {
         /// <summary>
         ///     The default name for the Migrations history table.

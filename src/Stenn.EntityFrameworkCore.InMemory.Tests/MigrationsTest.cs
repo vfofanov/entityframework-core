@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -9,23 +8,18 @@ using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
     public class MigrationsTest
     {
-        private const string DBName = "stenn_efcore_tests";
+        private const string DBName = "stenn_efcore_tests_in_memory";
         private InitialDbContext _dbContextInitial;
 
         private MainDbContext _dbContextMain;
         private IServiceProvider _serviceProviderInitial;
         private IServiceProvider _serviceProviderMain;
-
-        private static string GetConnectionString(string dbName)
-        {
-            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
-        }
 
         [SetUp]
         public void Setup()
@@ -42,15 +36,10 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             var services = new ServiceCollection();
 
-            var connectionString = GetConnectionString(DBName);
-
             services.AddDbContext<TDbContext>(builder =>
             {
-                builder.UseSqlServer(connectionString);
-                builder.UseStaticMigrationsSqlServer(init);
-
-                //builder.UseInMemoryDatabase(dbName);
-                //builder.UseStaticMigrationsInMemoryDatabase(init);
+                builder.UseInMemoryDatabase(DBName);
+                builder.UseStaticMigrationsInMemoryDatabase(init);
             });
 
             return services.BuildServiceProvider();
@@ -72,38 +61,6 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await EnsureCreated(_dbContextMain);
             Assert.Pass();
-        }
-        
-        [Test]
-        public async Task InitialMigration()
-        {
-            await RunMigrations(_dbContextInitial);
-            Assert.Pass();
-        }
-
-        [Test]
-        public async Task MainMigration()
-        {
-            await RunMigrations(_dbContextMain);
-            Assert.Pass();
-        }
-
-        [Test]
-        public async Task InitialAndMainMigration()
-        {
-            await RunMigrations(_dbContextInitial);
-            await RunMigrations(_dbContextMain, false);
-            Assert.Pass();
-        }
-
-        private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
-        {
-            var database = dbContext.Database;
-            if (deleteDb)
-            {
-                await database.EnsureDeletedAsync();
-            }
-            await database.MigrateAsync();
         }
         
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
