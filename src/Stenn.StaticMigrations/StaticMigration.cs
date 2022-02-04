@@ -9,9 +9,9 @@ namespace Stenn.StaticMigrations
         private byte[]? _hash;
 
         /// <inheritdoc />
-        public virtual byte[] Hash => _hash ??= GetHash();
+        public virtual byte[] GetHash() => _hash ??= GetHashInternal();
 
-        protected abstract byte[] GetHash();
+        protected abstract byte[] GetHashInternal();
 
         /// <summary>
         /// Gets default hash by using <see cref="System.Text.Json.JsonSerializer"/> and HashAlgorithm

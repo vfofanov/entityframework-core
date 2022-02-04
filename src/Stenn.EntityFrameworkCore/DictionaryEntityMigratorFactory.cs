@@ -16,19 +16,22 @@ namespace Stenn.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public Task<List<T>> AddOrUpdateAsync<T>(List<T> actualList, CancellationToken cancellationToken) where T : class, IDictionaryEntity<T>
+        public Task<List<T>> AddOrUpdateAsync<T>(List<T> actualList, CancellationToken cancellationToken) 
+            where T : class
         {
             return _migrator.AddOrUpdateAsync(actualList, cancellationToken);
         }
 
         /// <inheritdoc />
-        public List<T> AddOrUpdate<T>(List<T> actualList) where T : class, IDictionaryEntity<T>
+        public List<T> AddOrUpdate<T>(List<T> actualList) 
+            where T : class
         {
             return _migrator.AddOrUpdate(actualList);
         }
 
         /// <inheritdoc />
-        public void Remove<T>(List<T> listToRemove) where T : class, IDictionaryEntity<T>
+        public void Remove<T>(List<T> listToRemove) 
+            where T : class
         {
             _migrator.Remove(listToRemove);
         }

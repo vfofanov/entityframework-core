@@ -48,10 +48,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             {
                 builder.UseSqlServer(connectionString);
                 builder.UseStaticMigrationsSqlServer(init);
-
-                //builder.UseInMemoryDatabase(dbName);
-                //builder.UseStaticMigrationsInMemoryDatabase(init);
-            });
+            }, ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             return services.BuildServiceProvider();
         }
@@ -61,41 +58,60 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await EnsureCreated(_dbContextInitial);
 
-            var currencyList = await _dbContextInitial.Set<Currency>().ToListAsync();
-
-            currencyList.Should().HaveCount(1);
-            currencyList.Should().ContainSingle(currency => currency.IsoNumericCode == 1 && currency.Iso3LetterCode == "TST");
+            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]
         public async Task EnsureCreated_Main()
         {
             await EnsureCreated(_dbContextMain);
-            Assert.Pass();
+            
+            var actual = await _dbContextMain.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
+            
+            var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
-        
+
         [Test]
         public async Task InitialMigration()
         {
             await RunMigrations(_dbContextInitial);
-            Assert.Pass();
+
+            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]
         public async Task MainMigration()
         {
-            await RunMigrations(_dbContextMain);
-            Assert.Pass();
+            await MainMigration(true);
         }
 
         [Test]
         public async Task InitialAndMainMigration()
         {
-            await RunMigrations(_dbContextInitial);
-            await RunMigrations(_dbContextMain, false);
-            Assert.Pass();
+            await InitialMigration();
+            await MainMigration(false);
         }
 
+        private async Task MainMigration(bool deleteDb)
+        {
+            await RunMigrations(_dbContextMain, deleteDb);
+            var actual = await _dbContextMain.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
+            
+            var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
+        }
+        
         private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;

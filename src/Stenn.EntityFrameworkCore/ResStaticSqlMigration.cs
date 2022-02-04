@@ -19,7 +19,7 @@ namespace Stenn.EntityFrameworkCore
             _suppressTransaction = suppressTransaction;
         }
 
-        protected override byte[] GetHash()
+        protected override byte[] GetHashInternal()
         {
             using var stream = _applyResFile.ReadStream();
             return HashAlgorithm.ComputeHash(stream);

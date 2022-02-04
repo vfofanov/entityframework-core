@@ -56,7 +56,7 @@ namespace Stenn.EntityFrameworkCore
             {
                 var migrationItem = _sqlMigrations[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row == null || !force && row.Hash.SequenceEqual(migrationItem.Hash))
+                if (row == null || !force && row.Hash.SequenceEqual(migrationItem.GetHash()))
                 {
                     continue;
                 }
@@ -82,7 +82,7 @@ namespace Stenn.EntityFrameworkCore
             foreach (var migrationItem in _sqlMigrations)
             {
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row != null && row.Hash.SequenceEqual(migrationItem.Hash) && !force)
+                if (row != null && row.Hash.SequenceEqual(migrationItem.GetHash()) && !force)
                 {
                     continue;
                 }
@@ -111,7 +111,7 @@ namespace Stenn.EntityFrameworkCore
             foreach (var migrationItem in _entityMigrations)
             {
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row != null && row.Hash.SequenceEqual(migrationItem.Hash) && !force)
+                if (row != null && row.Hash.SequenceEqual(migrationItem.GetHash()) && !force)
                 {
                     continue;
                 }
@@ -164,7 +164,7 @@ namespace Stenn.EntityFrameworkCore
         private SqlOperation InsertHistoryRow<T>(StaticMigrationItem<T> migration, DateTime migrationDate)
             where T : IStaticMigration
         {
-            return new SqlOperation { Sql = _historyRepository.GetInsertScript(new StaticMigrationHistoryRow(migration.Name, migration.Hash, migrationDate)) };
+            return new SqlOperation { Sql = _historyRepository.GetInsertScript(new StaticMigrationHistoryRow(migration.Name, migration.GetHash(), migrationDate)) };
         }
 
         private SqlOperation DeleteHistoryRow(StaticMigrationHistoryRow row)

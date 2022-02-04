@@ -2,6 +2,6 @@
 {
     public interface IStaticMigration
     {
-        byte[] Hash { get; }
+        byte[] GetHash();
     }
 }

@@ -8,7 +8,7 @@ namespace Stenn.EntityFrameworkCore.Data.Configurations
         /// <inheritdoc />
         public void Configure(EntityTypeBuilder<Role> builder)
         {
-            builder.Property(x => x.Id).IsRequired();
+            builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
             builder.Property(x => x.Name).IsRequired();
             
             builder.HasKey(x => x.Id);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Stenn.DictionaryEntities;
 using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
@@ -13,9 +12,8 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     /// </summary>
     public sealed class StaticMigrationBuilder
     {
-        private readonly StaticMigrationCollection<IDictionaryEntityMigration, DbContext> _dictEntityMigrations = new();
-        private readonly StaticMigrationCollection<IStaticSqlMigration, DbContext> _sqlMigrations = new();
-        private Action<IServiceCollection>? _replaceServices;
+        internal StaticMigrationCollection<IDictionaryEntityMigration, DbContext> DictEntityMigrations { get; } = new();
+        internal StaticMigrationCollection<IStaticSqlMigration, DbContext> SQLMigrations { get; } = new();
 
         /// <summary>
         ///     Add sql resource static migration
@@ -70,20 +68,19 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
         public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory)
         {
-            _sqlMigrations.Add(name, migrationFactory);
+            SQLMigrations.Add(name, migrationFactory);
         }
 
         public void AddDictionaryEntity<T>(Func<List<T>> getActual)
-            where T : class, IDictionaryEntity<T>
+            where T : class
         {
             AddDictionaryEntity(typeof(T).Name, getActual);
         }
 
         public void AddDictionaryEntity<T>(string name, Func<List<T>> getActual)
-            where T : class, IDictionaryEntity<T>
+            where T : class
         {
-            var migration = new DictionaryEntityMigration<T>(getActual);
-            AddDictionaryEntityMigration(name, _ => migration);
+            AddDictionaryEntityMigration(name, context => new DictionaryEntityMigration<T>(getActual, context.ToDictionaryEntityContext()));
         }
 
         public void AddDictionaryEntityMigration<TMigration>(string name)
@@ -94,24 +91,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
         public void AddDictionaryEntityMigration(string name, Func<DbContext, IDictionaryEntityMigration> migrationFactory)
         {
-            _dictEntityMigrations.Add(name, migrationFactory);
+            DictEntityMigrations.Add(name, migrationFactory);
         }
 
-        /// <summary>
-        /// Replace static migrations services
-        /// </summary>
-        /// <param name="replaceServices"></param>
-        public void ReplaceServices(Action<IServiceCollection> replaceServices)
-        {
-            _replaceServices = replaceServices;
-        }
-
-        internal void Build(IServiceCollection services)
-        {
-            _replaceServices?.Invoke(services);
-
-            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration, DbContext>), _sqlMigrations));
-            services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>), _dictEntityMigrations));
-        }
+        // internal void Build(IServiceCollection services)
+        // {
+        //     services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration, DbContext>), SQLMigrations));
+        //     services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>), DictEntityMigrations));
+        // }
     }
 }

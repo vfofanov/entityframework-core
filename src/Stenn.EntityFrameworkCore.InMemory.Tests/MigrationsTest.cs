@@ -10,7 +10,7 @@ using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection;
 
-namespace Stenn.EntityFrameworkCore.SqlServer.Tests
+namespace Stenn.EntityFrameworkCore.InMemory.Tests
 {
     public class MigrationsTest
     {
@@ -50,17 +50,23 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await EnsureCreated(_dbContextInitial);
 
-            var currencyList = await _dbContextInitial.Set<Currency>().ToListAsync();
-
-            currencyList.Should().HaveCount(1);
-            currencyList.Should().ContainSingle(currency => currency.IsoNumericCode == 1 && currency.Iso3LetterCode == "TST");
+            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]
         public async Task EnsureCreated_Main()
         {
             await EnsureCreated(_dbContextMain);
-            Assert.Pass();
+            
+            var actual = await _dbContextMain.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
+            
+            var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
         
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)

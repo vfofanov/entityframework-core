@@ -17,10 +17,15 @@ namespace Stenn.EntityFrameworkCore
         private sealed class DictionaryEntityDbContext : IDictionaryEntityContext
         {
             private readonly DbContext _context;
-
             public DictionaryEntityDbContext(DbContext context)
             {
                 _context = context;
+            }
+
+            /// <inheritdoc />
+            public DictionaryEntityInfo<T> GetInfo<T>()
+            {
+                return DictionaryEntityInfoFactory.Create<T>(_context.Model);
             }
 
             /// <inheritdoc />

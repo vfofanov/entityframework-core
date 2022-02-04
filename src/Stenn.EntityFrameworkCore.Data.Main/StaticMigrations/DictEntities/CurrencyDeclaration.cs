@@ -6,7 +6,10 @@ namespace Stenn.EntityFrameworkCore.Data.Main.StaticMigrations.DictEntities
     {
         public static List<Currency> GetActual()
         {
-            return null;
+            return new List<Currency>
+            {
+                new() { IsoNumericCode = 1, Iso3LetterCode = "TST", DecimalDigits = 2, Description = "Test currency Changed" },
+            };
         }
     }
 }

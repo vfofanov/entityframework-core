@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.DictionaryEntities;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -29,10 +32,22 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         {
             _configurator.RegisterServices(services);
 
-            _migrationsBuilder.Build(services);
-
-            services.TryAddTransient<IStaticMigrationsService, StaticMigrationsService>();
-            services.TryAddTransient<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
+            services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
+            
+            //_migrationsBuilder.Build(services);
+            
+#pragma warning disable EF1001
+            services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
+                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
+                    .FindExtension<StaticMigrationOptionsExtension>()._migrationsBuilder.SQLMigrations);
+            
+            services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
+                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
+                    .FindExtension<StaticMigrationOptionsExtension>()._migrationsBuilder.DictEntityMigrations);
+#pragma warning restore EF1001
+            
+            services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
+            services.TryAddScoped<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
 
             var relationalOverrided = OverrideService<IRelationalDatabaseCreator>(services, (provider, creator) =>
                 new RelationalDatabaseCreatorWithStaticMigrations(creator,
