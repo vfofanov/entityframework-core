@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
@@ -93,11 +92,5 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         {
             DictEntityMigrations.Add(name, migrationFactory);
         }
-
-        // internal void Build(IServiceCollection services)
-        // {
-        //     services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IStaticSqlMigration, DbContext>), SQLMigrations));
-        //     services.Add(new ServiceDescriptor(typeof(IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>), DictEntityMigrations));
-        // }
     }
 }

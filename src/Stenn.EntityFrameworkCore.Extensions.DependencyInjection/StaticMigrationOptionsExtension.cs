@@ -34,8 +34,6 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
             
-            //_migrationsBuilder.Build(services);
-            
 #pragma warning disable EF1001
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
                 provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
