@@ -66,7 +66,7 @@ namespace Stenn.EntityFrameworkCore.InMemory.Tests
             
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles);
+            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
         }
         
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)

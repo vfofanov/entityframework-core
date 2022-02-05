@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Stenn.EntityFrameworkCore.Data.Declarations
+﻿namespace Stenn.EntityFrameworkCore.Data.Declarations
 {
     public static class RoleDeclarations
     {
@@ -8,8 +6,8 @@ namespace Stenn.EntityFrameworkCore.Data.Declarations
         {
             return new Role[]
             {
-                new() { Id = Roles.Admin, Name = "Admin" },
-                new() { Id = Roles.Customer, Name = "Customer" }
+                Role.Create(Roles.Admin, "Admin"),
+                Role.Create(Roles.Customer, "Customer")
             };
         }
     }

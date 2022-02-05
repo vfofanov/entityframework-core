@@ -8,9 +8,9 @@ namespace Stenn.EntityFrameworkCore.Data.Main.StaticMigrations.DictEntities
         {
             return new List<Role>
             {
-                new() { Id = Roles.Admin, Name = "Admin" },
-                new() { Id = Roles.Customer, Name = "Customer" },
-                new() { Id = Roles.Support, Name = "Support" }
+                Role.Create(Roles.Admin, "Admin", "Admin desc"),
+                Role.Create(Roles.Customer, "Customer", "Customer desc"),
+                Role.Create(Roles.Support, "Support", "Support desc")
             };
         }
     }

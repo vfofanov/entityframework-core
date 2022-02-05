@@ -8,8 +8,8 @@ namespace Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations.DictEntities
         {
             return new List<Currency>
             {
-                new() { IsoNumericCode = 1, Iso3LetterCode = "TST", DecimalDigits = 2, Description = "Test currency" },
-                new() { IsoNumericCode = 2, Iso3LetterCode = "TS2", DecimalDigits = 2, Description = "Test currency 2" }
+                Currency.Create(1, "TST", 2, "Test currency"),
+                Currency.Create(2, "TS2", 2, "Test currency 2")
             };
         }
     }

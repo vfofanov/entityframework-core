@@ -48,21 +48,20 @@ namespace Stenn.EntityFrameworkCore
                     //Skip property if it doesn't present in model
                     continue;
                 }
+
+                if (modelProperty.IsPrimaryKey() ||
+                    keyProperties.Contains(property.Name) ||
+                    property.GetCustomAttribute<DictionaryEntityKeyAttribute>() != null)
+                {
+                    keys.Add(property);
+                    continue;
+                }
                 if (modelProperty.IsConcurrencyToken || modelProperty.ValueGenerated != ValueGenerated.Never)
                 {
                     //Skip db generated property
                     continue;
                 }
-                if (modelProperty.IsPrimaryKey() || 
-                    keyProperties.Contains(property.Name) ||
-                    property.GetCustomAttribute<DictionaryEntityKeyAttribute>() != null)
-                {
-                    keys.Add(property);
-                }
-                else
-                {
-                    properties.Add(property);
-                }
+                properties.Add(property);
             }
 
             keys.Sort((one, other) => string.CompareOrdinal(one.Name, other.Name));

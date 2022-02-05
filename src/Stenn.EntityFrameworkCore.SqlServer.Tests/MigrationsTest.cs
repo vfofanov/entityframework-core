@@ -74,7 +74,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles);
+            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
         }
 
         [Test]
@@ -106,12 +106,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var actual = await _dbContextMain.Set<Currency>().ToListAsync();
             var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
-            
+
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles);
+            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
         }
-        
+
         private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;
