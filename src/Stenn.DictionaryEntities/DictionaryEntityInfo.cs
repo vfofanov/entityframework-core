@@ -9,14 +9,35 @@ namespace Stenn.DictionaryEntities
     {
         public DictionaryEntityInfo(Type entityType, PropertyInfo[] keys, PropertyInfo[] properties)
         {
-            if (entityType == null)
-            {
-                throw new ArgumentNullException(nameof(entityType));
-            }
             EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
-            
+
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
+            if (keys.Length == 0)
+            {
+                throw new ArgumentException("Value cannot be an empty collection.", nameof(keys));
+            }
+
+            foreach (var key in Keys)
+            {
+                if (key.GetMethod == null)
+                {
+                    throw new NotSupportedException($"Property '{key.Name}' of type '{entityType}' must have get method");
+                }
+            }
+
             Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+
+            foreach (var property in Properties)
+            {
+                if (property.GetMethod == null)
+                {
+                    throw new NotSupportedException($"Property '{property.Name}' of type '{entityType}' must have get method");
+                }
+                if (property.SetMethod == null)
+                {
+                    throw new NotSupportedException($"Property '{property.Name}' of type '{entityType}' must have set method");
+                }
+            }
         }
 
         public Type EntityType { get; }
@@ -30,7 +51,6 @@ namespace Stenn.DictionaryEntities
         public DictionaryEntityInfo(PropertyInfo[] keys, PropertyInfo[] properties) 
             : base(typeof(T), keys, properties)
         {
-            
         }
 
         public bool EqualsByKey(T one, T other)
