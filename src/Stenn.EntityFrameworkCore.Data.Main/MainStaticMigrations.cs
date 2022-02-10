@@ -7,6 +7,9 @@ namespace Stenn.EntityFrameworkCore.Data.Main
     {
         public static void Init(StaticMigrationBuilder migrations)
         {
+            migrations.AddResSql("TestViews", @"\StaticMigrations\Sql\TestViews.Apply.sql", @"StaticMigrations\Sql\TestViews.Revert.sql",
+                suppressTransaction: true);
+            
             migrations.AddDictionaryEntity(CurrencyDeclaration.GetActual);
             migrations.AddDictionaryEntity(RoleDeclaration.GetActual);
         }

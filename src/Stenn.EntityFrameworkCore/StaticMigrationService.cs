@@ -35,6 +35,25 @@ namespace Stenn.EntityFrameworkCore
                 .ToArray();
         }
 
+        private bool GetChanges(bool force, out IReadOnlyList<StaticMigrationHistoryRow> historyRows)
+        {
+            historyRows = _historyRepository.GetAppliedMigrations();
+            if (force)
+            {
+                return true;
+            }
+            for (var i = 0; i < _sqlMigrations.Length; i++)
+            {
+                var migrationItem = _sqlMigrations[i];
+                var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
+                if (row == null || !row.Hash.SequenceEqual(migrationItem.GetHash()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         /// <inheritdoc />
         public IEnumerable<MigrationOperation> GetRevertOperations(DateTime migrationDate, bool force)
         {
@@ -51,17 +70,21 @@ namespace Stenn.EntityFrameworkCore
                 yield break;
             }
             
-            var historyRows = _historyRepository.GetAppliedMigrations();
+            var hasChanges = GetChanges(force, out var historyRows);
+            if (!hasChanges)
+            {
+                yield break;
+            }
             for (var i = _sqlMigrations.Length - 1; i >= 0; i--)
             {
-                var migrationItem = _sqlMigrations[i];
-                var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row == null || !force && row.Hash.SequenceEqual(migrationItem.GetHash()))
+                var (name, migration) = _sqlMigrations[i];
+                var row = historyRows.FirstOrDefault(r => r.Name == name);
+                if (row == null)
                 {
                     continue;
                 }
                 var deleteRow = false;
-                foreach (var operation in migrationItem.Migration.GetRevertOperations())
+                foreach (var operation in migration.GetRevertOperations())
                 {
                     deleteRow = true;
                     yield return operation;
@@ -77,24 +100,25 @@ namespace Stenn.EntityFrameworkCore
         public IEnumerable<MigrationOperation> GetApplyOperations(DateTime migrationDate, bool force)
         {
             yield return CreateIfNotExistsHistoryTable();
-            var historyRows = _historyRepository.GetAppliedMigrations();
-
-            foreach (var migrationItem in _sqlMigrations)
+            var hasChanges = GetChanges(force, out var historyRows);
+            if (!hasChanges)
             {
-                var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row != null && row.Hash.SequenceEqual(migrationItem.GetHash()) && !force)
-                {
-                    continue;
-                }
+                yield break;
+            }
+
+            for (var i = 0; i < _sqlMigrations.Length; i++)
+            {
+                var migration = _sqlMigrations[i];
+                var row = historyRows.FirstOrDefault(r => r.Name == migration.Name);
                 if (row != null)
                 {
                     yield return DeleteHistoryRow(row);
                 }
-                foreach (var operation in migrationItem.Migration.GetApplyOperations(row == null))
+                foreach (var operation in migration.Migration.GetApplyOperations(row == null))
                 {
                     yield return operation;
                 }
-                yield return InsertHistoryRow(migrationItem, migrationDate);
+                yield return InsertHistoryRow(migration, migrationDate);
             }
         }
 

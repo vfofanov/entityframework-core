@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -82,9 +83,31 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await RunMigrations(_dbContextInitial);
 
+            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView", 
+               async reader =>
+               {
+                 var count = 0;
+                 while (await reader.ReadAsync())
+                 {
+                     count++;
+                     reader.GetInt32(0).Should().Be(1);
+                 }
+                 count.Should().Be(1);
+               });
+
+
             var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
             var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        private static async Task CheckSelect(InitialDbContext context, string selectCommand, Func<DbDataReader, Task> check)
+        {
+            await using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = selectCommand;
+            await context.Database.OpenConnectionAsync();
+            await using var reader = await command.ExecuteReaderAsync();
+            await check(reader);
         }
 
         [Test]
@@ -103,6 +126,19 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         private async Task MainMigration(bool deleteDb)
         {
             await RunMigrations(_dbContextMain, deleteDb);
+            
+            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView", 
+                async reader =>
+                {
+                    var count = 0;
+                    while (await reader.ReadAsync())
+                    {
+                        count++;
+                        reader.GetInt32(0).Should().Be(2);
+                    }
+                    count.Should().Be(1);
+                });
+            
             var actual = await _dbContextMain.Set<Currency>().ToListAsync();
             var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);

@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="StaticMigrations\Sql\InitDB.Create.sql" />
-    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Create.sql" />
-    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Drop.sql" />
+    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Apply.sql" />
+    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Revert.sql" />
   </ItemGroup>
 
 </Project>
