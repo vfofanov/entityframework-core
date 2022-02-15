@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Stenn.EntityFrameworkCore.Tests
 {
-    public class MigrationsTest
+    public class FixedQueryTest
     {
         [Test]
         public async Task Empty()
