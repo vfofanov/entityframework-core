@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
 #pragma warning disable EF1001
     public class MigratorWithStaticMigrations : Migrator

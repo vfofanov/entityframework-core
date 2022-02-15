@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.DictionaryEntities;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public class DictionaryEntityInfoFactory
     {

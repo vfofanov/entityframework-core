@@ -19,7 +19,7 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Contact", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Contact", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.ToTable("Contact");
                 });
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Currency", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Currency", b =>
                 {
                     b.Property<string>("Iso3LetterCode")
                         .HasMaxLength(3)
@@ -65,7 +65,7 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.ToTable("Currency");
                 });
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Role", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

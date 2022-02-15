@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Stenn.DictionaryEntities;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public sealed class DbContextDictionaryEntityMigrator : IDictionaryEntityMigrator
     {

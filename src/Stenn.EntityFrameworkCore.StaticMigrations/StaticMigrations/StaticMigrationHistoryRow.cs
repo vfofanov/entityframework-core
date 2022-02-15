@@ -1,6 +1,6 @@
 using System;
 
-namespace Stenn.EntityFrameworkCore.StaticMigrations
+namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
 {
     public class StaticMigrationHistoryRow
     {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public class RelationalDbContextOptionsConfigurator : IDbContextOptionsConfigurator
     {

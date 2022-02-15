@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Stenn.EntityFrameworkCore.StaticMigrations
+namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
 {
     public interface IStaticMigrationHistoryRepository
     {

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public class DatabaseCreatorWithStaticMigrations : IDatabaseCreator
     {

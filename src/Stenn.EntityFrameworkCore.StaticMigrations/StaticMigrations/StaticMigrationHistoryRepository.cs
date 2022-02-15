@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Stenn.EntityFrameworkCore.StaticMigrations
+namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
 {
     /// <summary>
     ///     <para>

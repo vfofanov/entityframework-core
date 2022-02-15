@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.StaticMigrations;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public interface IStaticSqlMigration : IStaticMigration
     {

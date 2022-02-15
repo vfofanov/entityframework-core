@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,7 +19,7 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Currency", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Currency", b =>
                 {
                     b.Property<string>("Iso3LetterCode")
                         .HasMaxLength(3)

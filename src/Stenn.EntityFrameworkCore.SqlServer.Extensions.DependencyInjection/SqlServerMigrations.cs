@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
 {

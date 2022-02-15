@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.DictionaryEntities;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection

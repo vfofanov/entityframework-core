@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.DictionaryEntities;
-using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
 
-namespace Stenn.EntityFrameworkCore
+namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
     public sealed class StaticMigrationsService : IStaticMigrationsService
     {
