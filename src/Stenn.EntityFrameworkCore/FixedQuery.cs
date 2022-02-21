@@ -13,12 +13,14 @@ namespace Stenn.EntityFrameworkCore
     /// <see cref="EntityFrameworkQueryableExtensions.ToListAsync{TSource}"/> or <see cref="EntityFrameworkQueryableExtensions.ToArrayAsync{TSource}"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class FixedQuery<T> : IAsyncEnumerable<T>, IQueryable<T>
+    public sealed class FixedQuery<T> : IAsyncEnumerable<T>, IQueryProvider, IOrderedQueryable<T>
     {
+        private static readonly IReadOnlyList<T> EmptyList = new List<T>().AsReadOnly();
+
         /// <summary>
         /// Empty <see cref="IQueryable{T}"/>
         /// </summary>
-        public static readonly IQueryable<T> Empty = Create(ArraySegment<T>.Empty);
+        public static readonly IQueryable<T> Empty = Create(EmptyList);
 
         /// <summary>
         /// Create  <see cref="IQueryable{T}"/> with fixed items collection
@@ -37,14 +39,19 @@ namespace Stenn.EntityFrameworkCore
         /// <returns></returns>
         public static IQueryable<T> Create(IEnumerable<T>? items)
         {
-            return new FixedQuery<T>(items ?? ArraySegment<T>.Empty).AsQueryable();
+            return new FixedQuery<T>(items ?? EmptyList).AsQueryable();
         }
 
         private readonly IQueryable<T> _items;
 
         private FixedQuery(IEnumerable<T> items)
+            : this((items ?? throw new ArgumentNullException(nameof(items))).AsQueryable())
         {
-            _items = (items ?? throw new ArgumentNullException(nameof(items))).AsQueryable();
+        }
+
+        private FixedQuery(IQueryable<T> items)
+        {
+            _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
         /// <inheritdoc />
@@ -77,6 +84,30 @@ namespace Stenn.EntityFrameworkCore
         public Expression Expression => _items.Expression;
 
         /// <inheritdoc />
-        public IQueryProvider Provider => _items.Provider;
+        public IQueryProvider Provider => this;
+
+        /// <inheritdoc />
+        public IQueryable CreateQuery(Expression expression)
+        {
+            return new FixedQuery<T>(_items.Provider.CreateQuery<T>(expression));
+        }
+
+        /// <inheritdoc />
+        public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
+        {
+            return new FixedQuery<TElement>(_items.Provider.CreateQuery<TElement>(expression));
+        }
+
+        /// <inheritdoc />
+        public object? Execute(Expression expression)
+        {
+            return _items.Provider.Execute(expression);
+        }
+
+        /// <inheritdoc />
+        public TResult Execute<TResult>(Expression expression)
+        {
+            return _items.Provider.Execute<TResult>(expression);
+        }
     }
 }
