@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -130,7 +131,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 out _);
 
             return migrationsToApply.Count == 0
-                ? new MigrateContext(string.Empty, string.Empty, migrationDate)
+                ? new MigrateContext(migrationDate)
                 : new MigrateContext(migrationsToApply.First().GetId(), migrationsToApply.Last().GetId(), migrationDate);
         }
 
@@ -191,11 +192,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
 
         protected class MigrateContext
         {
-            public MigrateContext()
+            public MigrateContext(DateTime migrationDate)
             {
                 FirstMigrationId = string.Empty;
                 LastMigrationId = string.Empty;
                 HasMigrations = false;
+                MigrationDate = migrationDate;
             }
 
             public MigrateContext(string firstMigrationId, string lastMigrationId, DateTime migrationDate)

@@ -79,17 +79,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             {
                 var (name, migration) = _sqlMigrations[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == name);
-                if (row == null)
-                {
-                    continue;
-                }
+
                 var deleteRow = false;
                 foreach (var operation in migration.GetRevertOperations())
                 {
                     deleteRow = true;
                     yield return operation;
                 }
-                if (deleteRow)
+                if (row != null && deleteRow)
                 {
                     yield return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
                 }
