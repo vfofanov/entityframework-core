@@ -13,24 +13,28 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <summary>
         ///     Use static migrations with specified db context
         /// </summary>
+        /// <param name="configurator">Specific provider registration</param>
         /// <param name="optionsBuilder">Db contextoptions builder</param>
         /// <param name="initMigrations">Init static migrations action</param>
         /// <returns></returns>
-        public static DbContextOptionsBuilder UseStaticMigrations<TProviderRegistrator>(DbContextOptionsBuilder optionsBuilder,
+        public static void UseStaticMigrations<TProviderRegistrator>(TProviderRegistrator configurator, DbContextOptionsBuilder optionsBuilder,
             Action<StaticMigrationBuilder> initMigrations)
             where TProviderRegistrator : IDbContextOptionsConfigurator, IStaticMigrationsProviderConfigurator, new()
         {
-            var configurator = new TProviderRegistrator();
+            var extension = optionsBuilder.Options.FindExtension<StaticMigrationOptionsExtension>();
+            if (extension != null)
+            {
+                return;
+            }
             configurator.Configure(optionsBuilder);
 
-            var migrationsBuilder = new StaticMigrationBuilder();
-            initMigrations.Invoke(migrationsBuilder);
-
-            var extension = optionsBuilder.Options.FindExtension<StaticMigrationOptionsExtension>() ??
-                            new StaticMigrationOptionsExtension(configurator, migrationsBuilder);
+            extension = new StaticMigrationOptionsExtension(configurator, () =>
+            {
+                var builder = new StaticMigrationBuilder();
+                initMigrations.Invoke(builder);
+                return builder;
+            });
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
-
-            return optionsBuilder;
         }
     }
 }

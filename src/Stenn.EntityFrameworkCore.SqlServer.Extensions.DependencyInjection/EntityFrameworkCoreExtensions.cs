@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using CommonExtensions = Stenn.EntityFrameworkCore.Extensions.DependencyInjection.EntityFrameworkCoreExtensions;
 
@@ -11,6 +10,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
     /// </summary>
     public static class EntityFrameworkCoreExtensions
     {
+        private static readonly SqlServerMigrations Configurator = new();
+        
         /// <summary>
         ///     Use static migrations with specified db context
         /// </summary>
@@ -20,7 +21,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
         public static DbContextOptionsBuilder UseStaticMigrationsSqlServer(this DbContextOptionsBuilder optionsBuilder,
             Action<StaticMigrationBuilder> initMigrations)
         {
-            CommonExtensions.UseStaticMigrations<SqlServerMigrations>(optionsBuilder, initMigrations);
+            CommonExtensions.UseStaticMigrations(Configurator, optionsBuilder, initMigrations);
             
             return optionsBuilder;
         }

@@ -20,14 +20,17 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     {
         private ExtensionInfo? _info;
         private readonly IStaticMigrationsProviderConfigurator _configurator;
-        private readonly StaticMigrationBuilder _migrationsBuilder;
-        
-        public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator, StaticMigrationBuilder migrationsBuilder)
+        private readonly Func<StaticMigrationBuilder> _migrationsBuilderFunc;
+        private StaticMigrationBuilder? _builder;
+
+        public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator, Func<StaticMigrationBuilder> migrationsBuilderFunc)
         {
             _configurator = configurator ?? throw new ArgumentNullException(nameof(configurator));
-            _migrationsBuilder = migrationsBuilder ?? throw new ArgumentNullException(nameof(migrationsBuilder));
+            _migrationsBuilderFunc = migrationsBuilderFunc ?? throw new ArgumentNullException(nameof(migrationsBuilderFunc));
         }
 
+        private StaticMigrationBuilder Builder => _builder ??= _migrationsBuilderFunc();
+        
         /// <inheritdoc />
         public void ApplyServices(IServiceCollection services)
         {
@@ -38,11 +41,11 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 #pragma warning disable EF1001
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
                 provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>()._migrationsBuilder.SQLMigrations);
+                    .FindExtension<StaticMigrationOptionsExtension>().Builder.SQLMigrations);
             
             services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
                 provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>()._migrationsBuilder.DictEntityMigrations);
+                    .FindExtension<StaticMigrationOptionsExtension>().Builder.DictEntityMigrations);
 #pragma warning restore EF1001
             
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();

@@ -10,6 +10,7 @@ namespace Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection
     /// </summary>
     public static class EntityFrameworkCoreExtensions
     {
+        private static readonly InMemoryMigrations Configurator = new();
         /// <summary>
         ///     Use static migrations with specified db context
         /// </summary>
@@ -19,7 +20,7 @@ namespace Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection
         public static DbContextOptionsBuilder UseStaticMigrationsInMemoryDatabase(this DbContextOptionsBuilder optionsBuilder,
             Action<StaticMigrationBuilder> initMigrations)
         {
-            CommonExtensions.UseStaticMigrations<InMemoryMigrations>(optionsBuilder, initMigrations);
+            CommonExtensions.UseStaticMigrations(Configurator, optionsBuilder, initMigrations);
             
             return optionsBuilder;
         }
