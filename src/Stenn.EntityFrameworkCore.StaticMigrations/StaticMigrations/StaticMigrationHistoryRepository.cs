@@ -129,10 +129,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
 
             // Use public API to remove the convention, issue #214
             ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(DbSetFindingConvention));
-            if (!(AppContext.TryGetSwitch("Microsoft.EntityFrameworkCore.Issue23312", out var enabled) && enabled))
-            {
-                ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(RelationalDbFunctionAttributeConvention));
-            }
+            ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(RelationalDbFunctionAttributeConvention));
 
             var modelBuilder = new ModelBuilder(conventionSet);
             modelBuilder.Entity<StaticMigrationHistoryRow>(
@@ -142,9 +139,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
                     x.ToTable(TableName, TableSchema);
                 });
 
-            _model = modelBuilder.FinalizeModel();
-
-            return _model;
+            return _model = Dependencies.ModelRuntimeInitializer.Initialize((IModel)modelBuilder.Model);
         }
 
         /// <summary>
@@ -174,23 +169,24 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
         /// </returns>
         public virtual async Task<bool> ExistsAsync(CancellationToken cancellationToken = default)
         {
+            var val = await Dependencies.RawSqlCommandBuilder.Build(ExistsSql).ExecuteScalarAsync(
+                new RelationalCommandParameterObject(
+                    Dependencies.Connection,
+                    null,
+                    null,
+                    Dependencies.CurrentContext.Context,
+                    Dependencies.CommandLogger),
+                cancellationToken).ConfigureAwait(false);
+            
             return await Dependencies.DatabaseCreator.ExistsAsync(cancellationToken).ConfigureAwait(false)
-                   && InterpretExistsResult(
-                       await Dependencies.RawSqlCommandBuilder.Build(ExistsSql).ExecuteScalarAsync(
-                           new RelationalCommandParameterObject(
-                               Dependencies.Connection,
-                               null,
-                               null,
-                               Dependencies.CurrentContext.Context,
-                               Dependencies.CommandLogger),
-                           cancellationToken).ConfigureAwait(false));
+                   && InterpretExistsResult(val);
         }
 
         /// <summary>
         ///     Interprets the result of executing <see cref="ExistsSql" />.
         /// </summary>
         /// <returns><see langword="true" /> if the table already exists, <see langword="false" /> otherwise.</returns>
-        protected abstract bool InterpretExistsResult(object value);
+        protected abstract bool InterpretExistsResult(object? value);
 
         /// <summary>
         ///     Overridden by a database provider to generate a SQL script that will create the history table

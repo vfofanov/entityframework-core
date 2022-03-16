@@ -38,15 +38,11 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
             
-#pragma warning disable EF1001
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
-                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>().Builder.SQLMigrations);
+                provider => FindStaticMigrationExtension(provider).Builder.SQLMigrations);
             
             services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
-                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>().Builder.DictEntityMigrations);
-#pragma warning restore EF1001
+                provider => FindStaticMigrationExtension(provider).Builder.DictEntityMigrations);
             
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
             services.TryAddScoped<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
@@ -72,6 +68,19 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             {
                 throw new NotSupportedException("Can't use static migrations with this database provider. Can;t find service 'IDatabaseCreator'");
             }
+        }
+
+        private static StaticMigrationOptionsExtension FindStaticMigrationExtension(IServiceProvider provider)
+        {
+#pragma warning disable EF1001
+            var extension = provider.GetRequiredService<IDbContextServices>().ContextOptions.FindExtension<StaticMigrationOptionsExtension>();
+#pragma warning restore EF1001
+
+            if (extension == null)
+            {
+                throw new InvalidOperationException("Can't find StaticMigrationOptionsExtension. Register it first with HasStaticMigration... extensions");
+            }
+            return extension;
         }
 
         private static bool OverrideService<T>(IServiceCollection services, Func<IServiceProvider, T, T> factory)
@@ -124,7 +133,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         
         private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
         {
-            private long? _serviceProviderHash;
+            private int? _serviceProviderHash;
             private string? _logFragment;
 
             public ExtensionInfo(StaticMigrationOptionsExtension extension)
@@ -153,6 +162,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                 }
             }
 
+            /// <inheritdoc />
+            public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            {
+                return other is ExtensionInfo otherInfo &&
+                       otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
+            }
+
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
                 if (debugInfo == null)
@@ -163,7 +179,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                 debugInfo["Static Migrations: Configurator"] = Extension._configurator.GetType().Name;
             }
 
-            public override long GetServiceProviderHashCode()
+            public override int GetServiceProviderHashCode()
             {
                 if (_serviceProviderHash != null)
                 {
