@@ -151,11 +151,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
-        public void MainExtractEnums()
+        public void ExtractEnums_Main()
         {
             var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
             
-            enumTables.Should().HaveCount(1);
+            enumTables.Should().HaveCount(3);
 
             var table = enumTables.First().Table;
             
