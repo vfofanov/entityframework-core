@@ -35,6 +35,8 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 {
                     table.PrimaryKey("PK_Role", x => x.Id);
                 });
+
+            migrationBuilder.DropColumn("Type", "Currency");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

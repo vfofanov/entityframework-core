@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
+using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
+using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection;
 
@@ -50,7 +52,7 @@ namespace Stenn.EntityFrameworkCore.InMemory.Tests
         {
             await EnsureCreated(_dbContextInitial);
 
-            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var actual = await _dbContextInitial.Set<CurrencyV1>().ToListAsync();
             var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
         }

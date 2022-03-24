@@ -18,6 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />     
   </ItemGroup>
 

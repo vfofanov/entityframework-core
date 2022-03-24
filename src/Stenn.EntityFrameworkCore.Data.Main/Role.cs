@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Stenn.DictionaryEntities;
 
-namespace Stenn.EntityFrameworkCore.Data
+namespace Stenn.EntityFrameworkCore.Data.Main
 {
     [DebuggerDisplay("{Name}, Id = {Id}")]
     [DictionaryEntityIgnoredProperties(nameof(Created))]

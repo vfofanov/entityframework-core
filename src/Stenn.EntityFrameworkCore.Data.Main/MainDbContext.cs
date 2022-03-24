@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Stenn.EntityFrameworkCore.Data.Configurations;
+using Stenn.EntityFrameworkCore.Data.Main.Configurations;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {

@@ -1,4 +1,4 @@
-﻿namespace Stenn.EntityFrameworkCore.Data.Declarations
+﻿namespace Stenn.EntityFrameworkCore.Data.Main.Declarations
 {
     public static class RoleDeclarations
     {

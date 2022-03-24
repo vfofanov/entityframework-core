@@ -1,6 +1,6 @@
 using System;
 
-namespace Stenn.EntityFrameworkCore.Data
+namespace Stenn.EntityFrameworkCore.Data.Main
 {
     public abstract class Entity
     {
