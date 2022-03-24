@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +114,17 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     IsUnicode = true,
                     IsFixedLength = false
                 });
+                tableOp.Columns.Add(new AddColumnOperation
+                {
+                    Schema = tableOp.Schema,
+                    Table = tableOp.Name,
+                    Name = "Description",
+                    ClrType = typeof(string),
+                    MaxLength = 256,
+                    IsNullable = false,
+                    IsUnicode = true,
+                    IsFixedLength = false
+                });
 
                 tableOp.PrimaryKey = new AddPrimaryKeyOperation
                 {
@@ -133,13 +145,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     ColumnTypes = tableOp.Columns.Select(c => c.ColumnType).ToArray()
                 };
 
-                var values = new object[enumTable.Table.Rows.Count, 3];
+                var convert = prop.GetValueConverter()?.ConvertToProvider;
+                var providerClrType = prop.GetProviderClrType();
+                
+                
+                var values = new object?[enumTable.Table.Rows.Count, 4];
                 for (var i = 0; i < enumTable.Table.Rows.Count; i++)
                 {
                     var row = enumTable.Table.Rows[i];
-                    values[i, 0] = row.Value;
+                    values[i, 0] = convert != null
+                        ? convert(row.RawValue)
+                        : providerClrType != null
+                            ? Convert.ChangeType(row.RawValue, providerClrType)
+                            : row.Value;
                     values[i, 1] = row.Name;
                     values[i, 2] = row.DisplayName;
+                    values[i, 3] = row.Description;
                 }
 
                 insertOp.Values = values;
@@ -151,7 +172,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 {
                     var schema = property.DeclaringEntityType.GetSchema();
                     var table = property.DeclaringEntityType.GetTableName();
-                    var columnName = prop.GetColumnName(StoreObjectIdentifier.Table(table, schema));
+                    var columnName = property.GetColumnName(StoreObjectIdentifier.Table(table, schema))
+                                     ?? property.GetColumnBaseName();
 
                     yield return new AddForeignKeyOperation
                     {
@@ -163,7 +185,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                         Columns = new[] { columnName },
                         PrincipalColumns = new[] { KeyColumnName },
                         OnDelete = ReferentialAction.NoAction,
-                        OnUpdate = ReferentialAction.Cascade
+                        OnUpdate = ReferentialAction.NoAction
                     };
                 }
                 #endregion

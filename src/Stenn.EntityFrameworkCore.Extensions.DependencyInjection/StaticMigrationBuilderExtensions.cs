@@ -6,7 +6,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
     public static class StaticMigrationBuilderExtensions
     {
-        public static void AddEnumTables(this StaticMigrationBuilder builder, string name = "Enums", string enumSchemaName = "enum")
+        public static void AddEnumTables(this StaticMigrationBuilder builder, string name = "#Enums", string enumSchemaName = "enum")
         {
             builder.AddStaticSqlFactory(name,
                 context =>
