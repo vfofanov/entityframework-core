@@ -74,7 +74,9 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 var enumTableSuffix = GetTableNameSuffix(tableOp);
 
                 var prop = enumTable.Properties.First();
-                var tableQuilifier = StoreObjectIdentifier.Table(prop.DeclaringEntityType.GetTableName(), prop.DeclaringEntityType.GetSchema());
+                var tableName = prop.DeclaringEntityType.GetTableName() ?? prop.DeclaringEntityType.Name;
+                
+                var tableQuilifier = StoreObjectIdentifier.Table(tableName, prop.DeclaringEntityType.GetSchema());
                 //TODO: Check that all properties have the same type
 
                 tableOp.Columns.Add(new AddColumnOperation
@@ -142,7 +144,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     Schema = tableOp.Schema,
                     Table = tableOp.Name,
                     Columns = tableOp.Columns.Select(c => c.Name).ToArray(),
-                    ColumnTypes = tableOp.Columns.Select(c => c.ColumnType).ToArray()
+                    ColumnTypes = tableOp.Columns.Select(c => c.ColumnType!).ToArray()
                 };
 
                 var convert = prop.GetValueConverter()?.ConvertToProvider;
@@ -171,7 +173,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 foreach (var property in enumTable.Properties)
                 {
                     var schema = property.DeclaringEntityType.GetSchema();
-                    var table = property.DeclaringEntityType.GetTableName();
+                    var table = property.DeclaringEntityType.GetTableName() ?? property.DeclaringEntityType.Name;
                     var columnName = property.GetColumnName(StoreObjectIdentifier.Table(table, schema))
                                      ?? property.GetColumnBaseName();
 
