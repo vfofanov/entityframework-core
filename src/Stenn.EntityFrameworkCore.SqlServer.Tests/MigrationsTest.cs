@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
+using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
+using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
+using Stenn.EntityFrameworkCore.Tests;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
@@ -59,7 +64,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await EnsureCreated(_dbContextInitial);
 
-            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var actual = await _dbContextInitial.Set<CurrencyV1>().ToListAsync();
             var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
         }
@@ -79,7 +84,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
-        public async Task InitialMigration()
+        public async Task Migrate_Initial()
         {
             await RunMigrations(_dbContextInitial);
 
@@ -96,34 +101,31 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                });
 
 
-            var actual = await _dbContextInitial.Set<Currency>().ToListAsync();
+            var actual = await _dbContextInitial.Set<CurrencyV1>().ToListAsync();
             var expected = Data.Initial.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
         }
 
-        private static async Task CheckSelect(InitialDbContext context, string selectCommand, Func<DbDataReader, Task> check)
+        [Test]
+        public async Task Migrate_Main()
         {
-            await using var command = context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = selectCommand;
-            await context.Database.OpenConnectionAsync();
-            await using var reader = await command.ExecuteReaderAsync();
-            await check(reader);
+            await Migrate_Main(true);
         }
 
         [Test]
-        public async Task MainMigration()
+        public async Task Migrate_MainWithoutDeletion()
         {
-            await MainMigration(true);
+            await Migrate_Main(false);
         }
 
         [Test]
-        public async Task InitialAndMainMigration()
+        public async Task Migrate_InitialThenMain()
         {
-            await InitialMigration();
-            await MainMigration(false);
+            await Migrate_Initial();
+            await Migrate_Main(false);
         }
 
-        private async Task MainMigration(bool deleteDb)
+        private async Task Migrate_Main(bool deleteDb)
         {
             await RunMigrations(_dbContextMain, deleteDb);
             
@@ -148,6 +150,33 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
         }
 
+        [Test]
+        public void MainExtractEnums()
+        {
+            var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
+            
+            enumTables.Should().HaveCount(1);
+
+            var table = enumTables.First().Table;
+            
+            table.EnumType.Should().Be<ContactType>();
+            table.ValueType.Should().Be<byte>();
+            table.Rows.Should().HaveCount(2);
+
+            table.Rows[0].RowShouldBe(1, "Person", "Person contact");
+            table.Rows[1].RowShouldBe(2, "Organization", "Organization contact");
+        }
+
+        private static async Task CheckSelect(InitialDbContext context, string selectCommand, Func<DbDataReader, Task> check)
+        {
+            await using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = selectCommand;
+            await context.Database.OpenConnectionAsync();
+            await using var reader = await command.ExecuteReaderAsync();
+            await check(reader);
+        }
+
+        
         private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;

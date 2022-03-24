@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityFrameworkCore.Data.Configurations
+namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
 {
     public class CurrencyMap: IEntityTypeConfiguration<Currency>
     {

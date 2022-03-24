@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Stenn.EntityFrameworkCore.Data.Configurations;
+using Stenn.EntityFrameworkCore.Data.Initial.Configurations;
 
 namespace Stenn.EntityFrameworkCore.Data.Initial
 {
@@ -19,7 +19,7 @@ namespace Stenn.EntityFrameworkCore.Data.Initial
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new CurrencyMap());
+            modelBuilder.ApplyConfiguration(new CurrencyV1Map());
             
             base.OnModelCreating(modelBuilder);
         }
