@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
@@ -11,6 +12,14 @@ namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Name).IsRequired();
             builder.Property(x => x.Type).IsRequired();
+
+            builder.Property(x => x.TypeName).IsRequired()
+                .HasMaxLength(100)
+                .HasConversion(x => Enum.GetName(x), x => Enum.Parse<ContactStrType>(x));
+            
+            builder.Property(x => x.TypeName2).IsRequired()
+                .HasMaxLength(100)
+                .HasConversion<string>();
         }
     }
 }

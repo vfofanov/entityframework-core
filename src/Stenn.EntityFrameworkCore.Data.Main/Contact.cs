@@ -6,5 +6,8 @@
         public string Name { get; set; }
         public string EMail { get; set; }
         public ContactType Type { get; set; }
+        public ContactStrType TypeName { get; set; }
+        
+        public ContactStr2Type TypeName2 { get; set; }
     }
 }

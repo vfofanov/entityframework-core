@@ -9,6 +9,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         public static IEnumerable<ModelEnumTable> ExtractEnumTables(this IModel model)
         {
             foreach (var group in model.GetEntityTypes().SelectMany(e => e.GetProperties())
+                         .Distinct() // For abstract entity and inheritors: Proprty will appears count of inheritors
                          .Where(p => p.ClrType.IsEnum).GroupBy(p => p.ClrType))
             {
                 var table = EnumTable.FromEnum(group.Key);

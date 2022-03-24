@@ -14,7 +14,9 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EMail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<byte>(type: "tinyint", nullable: false)
+                    Type = table.Column<byte>(type: "tinyint", nullable: false),
+                    TypeName = table.Column<string>(maxLength: 100, nullable: false),
+                    TypeName2 = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
