@@ -26,7 +26,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         /// <inheritdoc />
         protected override byte[] GetHashInternal()
         {
-            var items = GetEnumTables().Select(x => new
+            var items = GetEnumTables().OrderBy(x => x.Table.TableName).Select(x => new
             {
                 Schema = SchemaName,
                 Table = new
@@ -36,12 +36,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     ValueType = x.Table.ValueType.FullName,
                     x.Table.Rows
                 },
-                Properties = x.Properties.Select(p => new
-                {
-                    Schema = p.DeclaringEntityType.GetSchema(),
-                    Table = p.DeclaringEntityType.GetTableName(),
-                    p.Name
-                })
+                Properties = x.Properties
+                    .OrderBy(p => p.GetTableName()).ThenBy(p => p.Name)
+                    .Select(p => new
+                    {
+                        Schema = p.DeclaringEntityType.GetSchema(),
+                        Table = p.GetTableName(),
+                        p.Name
+                    })
             });
             return GetHash(items);
         }
@@ -74,7 +76,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 var enumTableSuffix = GetTableNameSuffix(tableOp);
 
                 var prop = enumTable.Properties.First();
-                var tableName = prop.DeclaringEntityType.GetTableName() ?? prop.DeclaringEntityType.Name;
+                var tableName = prop.GetTableName();
                 
                 var tableQuilifier = StoreObjectIdentifier.Table(tableName, prop.DeclaringEntityType.GetSchema());
                 //TODO: Check that all properties have the same type
@@ -173,7 +175,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 foreach (var property in enumTable.Properties)
                 {
                     var schema = property.DeclaringEntityType.GetSchema();
-                    var table = property.DeclaringEntityType.GetTableName() ?? property.DeclaringEntityType.Name;
+                    var table = property.GetTableName();
                     var columnName = property.GetColumnName(StoreObjectIdentifier.Table(table, schema))
                                      ?? property.GetColumnBaseName();
 
