@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 
 namespace Stenn.EntityFrameworkCore.SqlServer
 {

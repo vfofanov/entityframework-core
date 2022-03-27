@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,14 +15,16 @@ namespace Stenn.EntityFrameworkCore.SqlServer
             {
                 var propBuilder = builder.Property(property.Name);
                 
-                if (property.FindAnnotation(ConventionsAnnotationNames.SqlDefault_DateTimeNow) is { })
+                if (property.FindAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime) is { })
                 {
                     propBuilder.HasDefaultValueSql("getdate()");
+                    property.RemoveAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime);
                 }
                 if (property.FindAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault) is { })
                 {
                     var sqlDefault = property.GetAnnotation(RelationalAnnotationNames.DefaultValueSql);
-                    propBuilder.HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate, sqlDefault);
+                    propBuilder.HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate, sqlDefault.Value);
+                    property.RemoveAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault);
                 }
             }
         }

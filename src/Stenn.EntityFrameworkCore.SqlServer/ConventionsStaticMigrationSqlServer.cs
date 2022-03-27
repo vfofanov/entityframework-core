@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
 namespace Stenn.EntityFrameworkCore.SqlServer
@@ -49,15 +50,15 @@ DEALLOCATE conventions_triggers;
         {
             var identifier = entity.GetIdentifier();
             
+            var insertTrigger = new List<(string Column, string? Value)>();
             var updateTrigger = new List<(string Column, string? Value)>();
             string? softDeleteTriggerColumnName = null;
 
             foreach (var property in entity.GetProperties().OrderBy(p => p.Name))
             {
-                
                 if (property.FindAnnotation(ConventionsAnnotationNames.ColumnTriggerInsert) is { } columnTriggerInsert)
                 {
-                    updateTrigger.Add(
+                    insertTrigger.Add(
                         (
                             Column: property.GetFinalColumnName(identifier),
                             Value: columnTriggerInsert.Value?.ToString()
@@ -77,12 +78,12 @@ DEALLOCATE conventions_triggers;
                 }
             }
             #region insert_trigger
-            if (updateTrigger.Count > 0)
+            if (insertTrigger.Count > 0)
             {
                 var suffix = GetSuffix(identifier);
                 var tableName = GetObjectName(identifier);
                 var keyExpressionInsertedStr = GetKeyExpressionStr(entity, identifier, "t", "inserted");
-                var updatingColumnsStr = string.Join(", ", updateTrigger.Select(p => $"u.[{p.Column}] = {p.Value}"));
+                var updatingColumnsStr = string.Join(", ", updateTrigger.Select(p => $"[{p.Column}] = {p.Value}"));
                 
 
                 yield return new SqlOperation
@@ -97,7 +98,7 @@ CREATE TRIGGER [{suffix}_AfterInsert{NameSuffix}]
     UPDATE {tableName}
     SET {updatingColumnsStr}
     FROM {tableName} t
-        INNER JOIN inserted d ON {keyExpressionInsertedStr}"
+        INNER JOIN inserted ON {keyExpressionInsertedStr}"
                 };
             }
             #endregion
@@ -108,7 +109,7 @@ CREATE TRIGGER [{suffix}_AfterInsert{NameSuffix}]
                 var tableName = GetObjectName(identifier);
                 var keyExpressionInsertedStr = GetKeyExpressionStr(entity, identifier, "t", "inserted");
                 var keyExpressionDeletedStr = GetKeyExpressionStr(entity, identifier, "t", "deleted");
-                var updatingColumnsStr = string.Join(", ", updateTrigger.Select(p => $"u.[{p.Column}] = {p.Value}"));
+                var updatingColumnsStr = string.Join(", ", updateTrigger.Select(p => $"[{p.Column}] = {p.Value}"));
                 
 
                 yield return new SqlOperation
@@ -123,8 +124,8 @@ CREATE TRIGGER [{suffix}_AfterUpdate{NameSuffix}]
     UPDATE {tableName}
     SET {updatingColumnsStr}
     FROM {tableName} t
-        INNER JOIN inserted d ON {keyExpressionInsertedStr}
-        INNER JOIN deleted d ON {keyExpressionDeletedStr}"
+        INNER JOIN inserted ON {keyExpressionInsertedStr}
+        INNER JOIN deleted ON {keyExpressionDeletedStr}"
                 };
             }
             #endregion
@@ -157,9 +158,12 @@ CREATE TRIGGER [{suffix}_SoftDelete{NameSuffix}]
         {
             return identifier.Name;
         }
+
         private static string GetObjectName(StoreObjectIdentifier identifier)
         {
-            return $"[{identifier.Schema}].[{identifier.Name}]";
+            return !string.IsNullOrEmpty(identifier.Schema)
+                ? $"[{identifier.Schema}].[{identifier.Name}]"
+                : $"[{identifier.Name}]";
         }
 
         private static string GetKeyExpressionStr(IEntityType entity, StoreObjectIdentifier identifier,

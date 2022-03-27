@@ -4,7 +4,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
@@ -68,7 +67,7 @@ namespace Stenn.EntityFrameworkCore.InMemory.Tests
             
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
         
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)

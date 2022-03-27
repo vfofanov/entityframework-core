@@ -2,8 +2,6 @@
 using System;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Stenn.Conventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.Conventions
@@ -15,13 +13,13 @@ namespace Stenn.EntityFrameworkCore.Conventions
             builder.AddProperty<ICreateAuditedEntity>(x => x.Created,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAdd()
-                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_DateTimeNow, true)
+                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
                     .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'"));
 
             builder.AddProperty<IUpdateAuditedEntity>(x => x.ModifiedAt,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAddOrUpdate()
-                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_DateTimeNow, true)
+                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
                     .HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault, true)
                     .HasComment("Row last modified datetime. Updated by trigger. Configured by convention 'IUpdateAuditedEntity'"));
 
@@ -59,16 +57,13 @@ namespace Stenn.EntityFrameworkCore.Conventions
             });
         }
 
-        public static void ApplyConventions(this ModelBuilder builder,
-            IInfrastructure<IServiceProvider> dbContext,
-            Action<IModelConventionBuilder> init)
+        public static void ApplyConventions(this ModelBuilder builder, Action<IModelConventionBuilder> init)
         {
             var convensionBuilder = new ModelConventionBuilder();
 
             init(convensionBuilder);
 
-            var serviceProvider = dbContext.GetInfrastructure().GetService<IConventionsService>();
-            convensionBuilder.Build(serviceProvider, builder);
+            convensionBuilder.Build(builder);
         }
     }
 }

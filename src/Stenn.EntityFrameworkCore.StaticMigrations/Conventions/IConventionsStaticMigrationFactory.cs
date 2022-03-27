@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Stenn.EntityFrameworkCore.StaticMigrations;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.StaticMigrations.Conventions
 {
     public interface IConventionsStaticMigrationFactory
     {

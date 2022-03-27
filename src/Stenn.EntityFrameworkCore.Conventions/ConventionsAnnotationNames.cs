@@ -7,7 +7,7 @@ namespace Stenn.EntityFrameworkCore.Conventions
         /// <summary>
         /// Set default as <see cref="DateTime.Now"/> for specific provider
         /// </summary>
-        public const string SqlDefault_DateTimeNow = "Default_DateTimeNow";
+        public const string SqlDefault_CurrentDateTime = "SqlDefault_CurrentDateTime";
         /// <summary>
         ///  Set current default as update trigger action
         /// </summary>

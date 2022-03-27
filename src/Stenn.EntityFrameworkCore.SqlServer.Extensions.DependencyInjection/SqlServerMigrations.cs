@@ -4,6 +4,7 @@ using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 
@@ -18,7 +19,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
 
             services.TryAddTransient<IEnumsStaticMigrationFactory, EnumsStaticMigrationFactorySqlServer>();
 
-            services.TryAddTransient<IConventionsService, ConventionsServiceSqlServer>();
+            services.TryAddSingleton<IConventionsService, ConventionsServiceSqlServer>();
             services.TryAddTransient<IConventionsStaticMigrationFactory, ConventionsStaticMigrationFactorySqlServer>();
         }
     }

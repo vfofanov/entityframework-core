@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection

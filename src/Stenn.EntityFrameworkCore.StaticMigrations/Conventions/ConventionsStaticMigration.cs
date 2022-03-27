@@ -5,10 +5,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.StaticMigrations;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.StaticMigrations.Conventions
 {
     public abstract class ConventionsStaticMigration : StaticMigration, IStaticSqlMigration
     {

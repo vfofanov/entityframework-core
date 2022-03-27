@@ -31,7 +31,7 @@ namespace Stenn.EntityFrameworkCore.Conventions
             Add(new PropertyConvention(typeof(TConvention), propInfo, configure));
         }
 
-        public void Build(IConventionsService? providerService, ModelBuilder builder)
+        public void Build(ModelBuilder builder)
         {
             //NOTE: Convensions applying to root classes only
             foreach (var entityType in builder.Model.GetEntityTypes().Where(e => e.BaseType is null))
@@ -43,7 +43,6 @@ namespace Stenn.EntityFrameworkCore.Conventions
                 {
                     convention.Configure(entityBuilder);
                 }
-                providerService?.Configure(entityBuilder);
             }
         }
     }

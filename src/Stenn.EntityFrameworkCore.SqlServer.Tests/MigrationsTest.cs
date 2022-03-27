@@ -80,7 +80,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
 
         [Test]
