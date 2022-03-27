@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stenn.EntityFrameworkCore.Data.Main;
-using Stenn.EntityFrameworkCore.DbContext.Initial;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
@@ -18,28 +17,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Contact", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("EMail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contact");
-                });
 
             modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Currency", b =>
                 {
@@ -63,22 +40,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.HasKey("Iso3LetterCode");
 
                     b.ToTable("Currency");
-                });
-
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Role");
                 });
 #pragma warning restore 612, 618
         }
