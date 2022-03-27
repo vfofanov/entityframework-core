@@ -37,7 +37,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         }
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetApplyOperations(bool isNew)
+        public IEnumerable<MigrationOperation> GetApplyOperations()
         {
             var sql = _applyResFile.Read();
             yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };

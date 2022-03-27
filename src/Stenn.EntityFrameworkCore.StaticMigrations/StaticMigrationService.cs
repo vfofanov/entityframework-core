@@ -111,7 +111,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 {
                     yield return DeleteHistoryRow(row);
                 }
-                foreach (var operation in migration.Migration.GetApplyOperations(row == null))
+                foreach (var operation in migration.Migration.GetApplyOperations())
                 {
                     yield return operation;
                 }

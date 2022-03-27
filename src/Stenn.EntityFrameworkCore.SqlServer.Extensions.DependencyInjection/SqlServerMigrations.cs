@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations;
@@ -14,7 +15,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
         public void RegisterServices(IServiceCollection services)
         {
             services.TryAddTransient<IStaticMigrationHistoryRepository, StaticMigrationHistoryRepositorySqlServer>();
+
             services.TryAddTransient<IEnumsStaticMigrationFactory, EnumsStaticMigrationFactorySqlServer>();
+
+            services.TryAddTransient<IConventionsService, ConventionsServiceSqlServer>();
+            services.TryAddTransient<IConventionsStaticMigrationFactory, ConventionsStaticMigrationFactorySqlServer>();
         }
     }
 }

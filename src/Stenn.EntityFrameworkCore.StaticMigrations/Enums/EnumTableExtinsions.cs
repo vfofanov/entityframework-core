@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
@@ -18,9 +17,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             }
         }
 
-        public static string GetTableName(this IProperty prop)
-        {
-            return prop.DeclaringEntityType.GetTableName() ?? prop.DeclaringEntityType.Name;
-        }
+        
     }
 }

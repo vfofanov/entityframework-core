@@ -13,7 +13,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
     public abstract class EnumsStaticMigration : StaticMigration, IStaticSqlMigration
     {
         protected const string KeyColumnName = "Id";
-        
+
         protected readonly DbContext Context;
         protected readonly string SchemaName;
 
@@ -36,13 +36,16 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     ValueType = x.Table.ValueType.FullName,
                     x.Table.Rows
                 },
-                Properties = x.Properties
-                    .OrderBy(p => p.GetTableName()).ThenBy(p => p.Name)
-                    .Select(p => new
+                Properties = x.Properties.Select(p => new
                     {
-                        Schema = p.DeclaringEntityType.GetSchema(),
-                        Table = p.GetTableName(),
-                        p.Name
+                        Property = p,
+                        Parent = p.DeclaringEntityType.GetIdentifier()
+                    })
+                    .OrderBy(t => t.Parent).ThenBy(p => p.Property.Name)
+                    .Select(t => new
+                    {
+                        t.Parent,
+                        t.Property.Name
                     })
             });
             return GetHash(items);
@@ -52,13 +55,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         public abstract IEnumerable<MigrationOperation> GetRevertOperations();
 
         /// <inheritdoc />
-        public virtual IEnumerable<MigrationOperation> GetApplyOperations(bool isNew)
+        public virtual IEnumerable<MigrationOperation> GetApplyOperations()
         {
             var enumTables = GetEnumTables();
             var duplicates = enumTables.GroupBy(t => t.Table.TableName).Where(g => g.Count() > 1).ToList();
             if (duplicates.Count > 0)
             {
-
                 var duplicatesStr = string.Join(", ", duplicates.Select(g => g.Key));
                 throw new EnumStaticMigrationException($"Enum tables duplicates:'{duplicatesStr}'. Use EnumTableAttribute to specify different name");
             }
@@ -67,24 +69,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             {
                 yield return new EnsureSchemaOperation { Name = SchemaName };
             }
-            
+
             foreach (var enumTable in enumTables)
             {
                 #region Create table
                 var tableOp = GetCreateTableOperation(enumTable);
-
-                var enumTableSuffix = GetTableNameSuffix(tableOp);
+                var table = StoreObjectIdentifier.Table(tableOp.Name, tableOp.Schema);
 
                 var prop = enumTable.Properties.First();
-                var tableName = prop.GetTableName();
-                
-                var tableQuilifier = StoreObjectIdentifier.Table(tableName, prop.DeclaringEntityType.GetSchema());
                 //TODO: Check that all properties have the same type
+                
+                var tableQuilifier = prop.DeclaringEntityType.GetIdentifier();
 
                 tableOp.Columns.Add(new AddColumnOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
+                    Schema = table.Schema,
+                    Table = table.Name,
                     Name = KeyColumnName,
                     ClrType = prop.ClrType,
                     ColumnType = prop.GetColumnType(tableQuilifier),
@@ -98,8 +98,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 
                 tableOp.Columns.Add(new AddColumnOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
+                    Schema = table.Schema,
+                    Table = table.Name,
                     Name = "Name",
                     ClrType = typeof(string),
                     MaxLength = 256,
@@ -109,8 +109,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 });
                 tableOp.Columns.Add(new AddColumnOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
+                    Schema = table.Schema,
+                    Table = table.Name,
                     Name = "DisplayName",
                     ClrType = typeof(string),
                     MaxLength = 256,
@@ -120,8 +120,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 });
                 tableOp.Columns.Add(new AddColumnOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
+                    Schema = table.Schema,
+                    Table = table.Name,
                     Name = "Description",
                     ClrType = typeof(string),
                     MaxLength = 256,
@@ -132,9 +132,9 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 
                 tableOp.PrimaryKey = new AddPrimaryKeyOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
-                    Name = $"PK_{enumTableSuffix}",
+                    Schema = table.Schema,
+                    Table = table.Name,
+                    Name = $"PK_{table.Name}",
                     Columns = new[] { KeyColumnName }
                 };
                 yield return tableOp;
@@ -143,16 +143,16 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 #region Insert data
                 var insertOp = new InsertDataOperation
                 {
-                    Schema = tableOp.Schema,
-                    Table = tableOp.Name,
+                    Schema = table.Schema,
+                    Table = table.Name,
                     Columns = tableOp.Columns.Select(c => c.Name).ToArray(),
                     ColumnTypes = tableOp.Columns.Select(c => c.ColumnType!).ToArray()
                 };
 
                 var convert = prop.GetValueConverter()?.ConvertToProvider;
                 var providerClrType = prop.GetProviderClrType();
-                
-                
+
+
                 var values = new object?[enumTable.Table.Rows.Count, 4];
                 for (var i = 0; i < enumTable.Table.Rows.Count; i++)
                 {
@@ -174,18 +174,16 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 #region Foreign keys
                 foreach (var property in enumTable.Properties)
                 {
-                    var schema = property.DeclaringEntityType.GetSchema();
-                    var table = property.GetTableName();
-                    var columnName = property.GetColumnName(StoreObjectIdentifier.Table(table, schema))
-                                     ?? property.GetColumnBaseName();
+                    var identifier = property.DeclaringEntityType.GetIdentifier();
+                    var columnName = property.GetFinalColumnName();
 
                     yield return new AddForeignKeyOperation
                     {
-                        Name = GetFKName(table, enumTableSuffix, columnName),
-                        Schema = schema,
-                        Table = table,
-                        PrincipalSchema = tableOp.Schema,
-                        PrincipalTable = tableOp.Name,
+                        Name = GetFKName(identifier, table, columnName),
+                        Schema = identifier.Schema,
+                        Table = identifier.Name,
+                        PrincipalSchema = table.Schema,
+                        PrincipalTable = table.Name,
                         Columns = new[] { columnName },
                         PrincipalColumns = new[] { KeyColumnName },
                         OnDelete = ReferentialAction.NoAction,
@@ -194,25 +192,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 }
                 #endregion
             }
-
-
         }
 
         protected bool NeedCreateSchema => true;
-        
-        /// <summary>
-        /// Names' suffix for keys
-        /// </summary>
-        /// <param name="tableOp"></param>
-        /// <returns></returns>
-        protected virtual string GetTableNameSuffix(CreateTableOperation tableOp)
-        {
-            return $"{tableOp.Schema}_{tableOp.Name}";
-        }
 
-        protected virtual string GetFKName(string hostTable, string enumTable, string columnName)
+        protected virtual string GetFKName(StoreObjectIdentifier hostTable, StoreObjectIdentifier enumTable, string columnName)
         {
-            return $"FK_{hostTable}_{enumTable}_{columnName}";
+            return $"FK_{hostTable.Name}_{enumTable.Schema}_{enumTable.Name}_{columnName}";
         }
 
         protected virtual CreateTableOperation GetCreateTableOperation(ModelEnumTable enumTable)
