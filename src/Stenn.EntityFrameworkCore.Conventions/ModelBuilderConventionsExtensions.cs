@@ -8,45 +8,55 @@ namespace Stenn.EntityFrameworkCore.Conventions
 {
     public static class ModelBuilderConventionsExtensions
     {
-        public static void AddCommonConventions(this IModelConventionBuilder builder)
+        private static void AddCommonConventions(this IModelConventionBuilder builder)
         {
-            builder.AddProperty<ICreateAuditedEntity>(x => x.Created,
+            builder.AddInterfaceConventionProperty<ICreateAuditedEntity>(x => x.Created,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAdd()
                     .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
                     .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'"));
 
-            builder.AddProperty<IUpdateAuditedEntity>(x => x.ModifiedAt,
+            builder.AddInterfaceConventionProperty<IUpdateAuditedEntity>(x => x.ModifiedAt,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAddOrUpdate()
                     .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
                     .HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault, true)
                     .HasComment("Row last modified datetime. Updated by trigger. Configured by convention 'IUpdateAuditedEntity'"));
 
-            builder.AddProperty<ISoftDeleteEntity>(x => x.Deleted,
-                (e, _, p) =>
+            builder.AddInterfaceConvention<ISoftDeleteEntity>(
+                e =>
                 {
-                    p.IsRequired(false)
-                        .HasAnnotation(ConventionsAnnotationNames.ColumnTriggerSoftDelete, true)
+                    e.HasAnnotation(ConventionsAnnotationNames.SoftDelete, true);
+
+                    e.Property(typeof(bool), nameof(ISoftDeleteEntity.IsDeleted))
+                        .IsRequired()
+                        .HasDefaultValue(false)
+                        .HasComment(
+                            "Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+
+                    e.Property(typeof(DateTime?), nameof(ISoftDeleteEntity.Deleted))
+                        .IsRequired(false)
                         .HasComment(
                             "Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
 
+                    e.HasIndex(nameof(ISoftDeleteEntity.IsDeleted));
                     
                     var entityParam = Expression.Parameter(e.Metadata.ClrType, "x");
-                    var deletedPropInfo = typeof(ISoftDeleteEntity).GetProperty(nameof(ISoftDeleteEntity.Deleted))!;
+                    var deletedPropInfo = typeof(ISoftDeleteEntity).GetProperty(nameof(ISoftDeleteEntity.IsDeleted))!;
                     var propAccess = Expression.MakeMemberAccess(entityParam, deletedPropInfo);
                     var lambdaExpression = Expression.Lambda(
-                        Expression.MakeBinary(ExpressionType.Equal, propAccess, Expression.Constant(null)),
+                        Expression.MakeBinary(ExpressionType.Equal, propAccess, Expression.Constant(false)),
                         entityParam);
                     e.HasQueryFilter(lambdaExpression);
+                    
                 });
 
-            builder.AddProperty<IConcurrentAuditedEntity>(x => x.RowVersion,
+            builder.AddInterfaceConventionProperty<IConcurrentAuditedEntity>(x => x.RowVersion,
                 (_, _, p) => p.IsRequired()
                     .IsRowVersion()
                     .HasComment("Concurrent token(row version). Configured by convention 'IConcurrentAuditedEntity'"));
 
-            builder.AddProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
+            builder.AddInterfaceConventionProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
             {
                 p.IsRequired()
                     .HasMaxLength(50)
@@ -58,13 +68,18 @@ namespace Stenn.EntityFrameworkCore.Conventions
             });
         }
 
-        
 
-        public static void ApplyConventions(this ModelBuilder builder, Action<IModelConventionBuilder> init)
+        public static void ApplyConventions(this ModelBuilder builder,
+            Action<IModelConventionBuilder>? init = null,
+            bool includeCommonConventions = true)
         {
             var convensionBuilder = new ModelConventionBuilder();
 
-            init(convensionBuilder);
+            if (includeCommonConventions)
+            {
+                convensionBuilder.AddCommonConventions();
+            }
+            init?.Invoke(convensionBuilder);
 
             convensionBuilder.Build(builder);
         }

@@ -9,7 +9,9 @@ namespace Stenn.EntityFrameworkCore.Conventions
     {
         void Add(IEntityConvention convention);
 
-        void AddProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
+        void AddInterfaceConvention<TConvention>(Action<EntityTypeBuilder> configure);
+        
+        void AddInterfaceConventionProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
             Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure);
     }
 }

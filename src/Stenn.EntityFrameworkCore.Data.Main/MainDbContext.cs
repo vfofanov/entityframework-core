@@ -24,10 +24,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main
             modelBuilder.ApplyConfiguration(new RoleMap());
             modelBuilder.ApplyConfiguration(new ContactMap());
 
-            modelBuilder.ApplyConventions(builder =>
-            {
-                builder.AddCommonConventions();
-            });
+            modelBuilder.ApplyConventions();
         }
     }
 }

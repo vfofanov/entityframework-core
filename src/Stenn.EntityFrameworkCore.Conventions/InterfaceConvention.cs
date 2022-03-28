@@ -5,16 +5,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Stenn.EntityFrameworkCore.Conventions
 {
-    public class PropertyConvention : IEntityConvention
+    public class InterfaceConvention : IEntityConvention
     {
         private readonly Type _conventionType;
-        private readonly PropertyInfo _propertyInfo;
-        private readonly Action<EntityTypeBuilder,PropertyInfo, PropertyBuilder> _configure;
+        private readonly Action<EntityTypeBuilder> _configure;
 
-        public PropertyConvention(Type conventionType, PropertyInfo propertyInfo, Action<EntityTypeBuilder,PropertyInfo, PropertyBuilder> configure)
+        public InterfaceConvention(Type conventionType, Action<EntityTypeBuilder> configure)
         {
             _conventionType = conventionType ?? throw new ArgumentNullException(nameof(conventionType));
-            _propertyInfo = propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo));
             _configure = configure ?? throw new ArgumentNullException(nameof(configure));
         }
 
@@ -25,8 +23,7 @@ namespace Stenn.EntityFrameworkCore.Conventions
 
         public void Configure(EntityTypeBuilder builder)
         {
-            var prop = builder.Property(_propertyInfo.PropertyType, _propertyInfo.Name);
-            _configure(builder, _propertyInfo, prop);
+            _configure(builder);
         }
     }
 }

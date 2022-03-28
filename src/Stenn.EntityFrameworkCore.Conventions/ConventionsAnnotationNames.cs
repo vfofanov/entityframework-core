@@ -23,8 +23,8 @@ namespace Stenn.EntityFrameworkCore.Conventions
         public const string ColumnTriggerUpdate = "ColumnTriggerUpdate";
         
         /// <summary>
-        /// Use column as <see cref="DateTime"/> column of soft delete in 'instead of delete' trigger
+        /// Use column as <see cref="DateTime"/> column of soft delete in 'instead of delete' trigger.
         /// </summary>
-        public const string ColumnTriggerSoftDelete = "ColumnTriggerSoftDelete";
+        public const string SoftDelete = "ColumnTriggerSoftDelete";
     }
 }

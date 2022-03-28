@@ -23,12 +23,22 @@ namespace Stenn.EntityFrameworkCore.Conventions
             _conventions.Add(convention);
         }
 
-        public void AddProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
+        /// <inheritdoc />
+        public void AddInterfaceConvention<TConvention>(Action<EntityTypeBuilder> configure)
+        {
+            Add(new InterfaceConvention(typeof(TConvention), configure));
+        }
+
+        public void AddInterfaceConventionProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
             Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure)
         {
             var propInfo = (PropertyInfo)propertyExpression.GetMemberAccess();
-
-            Add(new PropertyConvention(typeof(TConvention), propInfo, configure));
+            Add(new InterfaceConvention(typeof(TConvention),
+                builder =>
+                {
+                    var prop = builder.Property(propInfo.PropertyType, propInfo.Name);
+                    configure(builder, propInfo, prop);
+                }));
         }
 
         public void Build(ModelBuilder builder)

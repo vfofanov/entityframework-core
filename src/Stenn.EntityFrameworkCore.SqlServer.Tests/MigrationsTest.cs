@@ -181,6 +181,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var afterAddCount = _dbContextMain.Set<Role>().Count();
             afterAddCount.Should().Be(originCount + 1);
 
+            await Task.Delay(1000);
+            var modifiedRole = await _dbContextMain.Set<Role>().FirstAsync(x => x.Name == "Customer");
+            modifiedRole.Description = "MODIFIED DESC";
+            await _dbContextMain.SaveChangesAsync();
+            
             var roleToDelete = await _dbContextMain.Set<Role>().SingleAsync(x => x.Id == newRoleDeleteId);
             _dbContextMain.Set<Role>().Remove(roleToDelete);
             await _dbContextMain.SaveChangesAsync();

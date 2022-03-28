@@ -12,7 +12,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main
         ISoftDeleteEntity
     {
         public string Name { get; private set; }
-        public string Description { get; private set; }
+        public string Description { get; set; }
 
         public static Role Create(string id, string name, string desc = null)
         {
