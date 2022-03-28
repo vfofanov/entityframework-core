@@ -6,7 +6,7 @@ using Stenn.Conventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.Conventions
 {
-    public static class DbContextModelBuilderExtensions
+    public static class ModelBuilderConventionsExtensions
     {
         public static void AddCommonConventions(this IModelConventionBuilder builder)
         {
@@ -31,19 +31,20 @@ namespace Stenn.EntityFrameworkCore.Conventions
                         .HasComment(
                             "Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
 
-                    e.HasQueryFilter((Expression<Func<object, bool>>)
-                        (x => EF.Property<DateTime?>(e, nameof(ISoftDeleteEntity.Deleted)) != null));
+                    
+                    var entityParam = Expression.Parameter(e.Metadata.ClrType, "x");
+                    var deletedPropInfo = typeof(ISoftDeleteEntity).GetProperty(nameof(ISoftDeleteEntity.Deleted))!;
+                    var propAccess = Expression.MakeMemberAccess(entityParam, deletedPropInfo);
+                    var lambdaExpression = Expression.Lambda(
+                        Expression.MakeBinary(ExpressionType.Equal, propAccess, Expression.Constant(null)),
+                        entityParam);
+                    e.HasQueryFilter(lambdaExpression);
                 });
 
             builder.AddProperty<IConcurrentAuditedEntity>(x => x.RowVersion,
                 (_, _, p) => p.IsRequired()
                     .IsRowVersion()
                     .HasComment("Concurrent token(row version). Configured by convention 'IConcurrentAuditedEntity'"));
-
-
-            builder.AddProperty<IManualConcurrentAuditedEntity>(x => x.ManualRowVersion,
-                (_, _, p) => p.IsConcurrencyToken()
-                    .HasComment("Manual concurrent token. Configured by convention 'IManualConcurrentAuditedEntity'"));
 
             builder.AddProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
             {
@@ -56,6 +57,8 @@ namespace Stenn.EntityFrameworkCore.Conventions
                 e.HasIndex(i.Name).IsUnique();
             });
         }
+
+        
 
         public static void ApplyConventions(this ModelBuilder builder, Action<IModelConventionBuilder> init)
         {

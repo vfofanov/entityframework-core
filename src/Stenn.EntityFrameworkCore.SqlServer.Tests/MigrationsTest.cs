@@ -167,7 +167,40 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             table.Rows[1].RowShouldBe(2, "Organization", "Organization contact");
         }
 
-        private static async Task CheckSelect(InitialDbContext context, string selectCommand, Func<DbDataReader, Task> check)
+        [Test]
+        public async Task SoftDeleteRoles()
+        {
+            await EnsureCreated_Main();
+
+            var originCount = _dbContextMain.Set<Role>().Count();
+
+            var newRoleDeleteId = Guid.NewGuid();
+            await _dbContextMain.Set<Role>().AddAsync(Role.Create(newRoleDeleteId.ToString(), "ForDelete"));
+            await _dbContextMain.SaveChangesAsync();
+            
+            var afterAddCount = _dbContextMain.Set<Role>().Count();
+            afterAddCount.Should().Be(originCount + 1);
+
+            var roleToDelete = await _dbContextMain.Set<Role>().SingleAsync(x => x.Id == newRoleDeleteId);
+            _dbContextMain.Set<Role>().Remove(roleToDelete);
+            await _dbContextMain.SaveChangesAsync();
+            
+            var afterRemoveCount = _dbContextMain.Set<Role>().Count();
+            afterRemoveCount.Should().Be(originCount);
+            //NOTE: Check that deleted row exists in db(Soft delete)
+            await CheckSelect(_dbContextMain, "SELECT * FROM dbo.Role", 
+                async reader =>
+                {
+                    var count = 0;
+                    while (await reader.ReadAsync())
+                    {
+                        count++;
+                    }
+                    count.Should().Be(afterAddCount);
+                });
+        }
+
+        private static async Task CheckSelect(Microsoft.EntityFrameworkCore.DbContext context, string selectCommand, Func<DbDataReader, Task> check)
         {
             await using var command = context.Database.GetDbConnection().CreateCommand();
             command.CommandText = selectCommand;

@@ -8,7 +8,7 @@ using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
-namespace Stenn.EntityFrameworkCore.SqlServer
+namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
 {
     public class ConventionsStaticMigrationSqlServer : ConventionsStaticMigration
     {
@@ -148,7 +148,7 @@ CREATE TRIGGER [{suffix}_SoftDelete{NameSuffix}]
     UPDATE {tableName}
     SET {softDeleteTriggerColumnName} = GETDATE()
     FROM {tableName} t
-        INNER JOIN deleted d ON {keyExpressionStr}"
+        INNER JOIN deleted ON {keyExpressionStr}"
                 };                
             }
             #endregion

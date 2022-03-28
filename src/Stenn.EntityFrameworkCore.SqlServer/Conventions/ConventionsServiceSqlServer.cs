@@ -1,10 +1,9 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Stenn.EntityFrameworkCore.Conventions;
 
-namespace Stenn.EntityFrameworkCore.SqlServer
+namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
 {
     public class ConventionsServiceSqlServer : IConventionsService
     {

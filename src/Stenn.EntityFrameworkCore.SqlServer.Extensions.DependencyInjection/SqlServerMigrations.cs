@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.EntityFrameworkCore.Conventions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.SqlServer.StaticMigrations;
+using Stenn.EntityFrameworkCore.SqlServer.Conventions;
+using Stenn.EntityFrameworkCore.SqlServer.Enums;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;

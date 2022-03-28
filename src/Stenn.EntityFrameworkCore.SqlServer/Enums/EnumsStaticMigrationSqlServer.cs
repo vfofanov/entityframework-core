@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
-namespace Stenn.EntityFrameworkCore.SqlServer
+namespace Stenn.EntityFrameworkCore.SqlServer.Enums
 {
     public sealed class EnumsStaticMigrationSqlServer : EnumsStaticMigration
     {

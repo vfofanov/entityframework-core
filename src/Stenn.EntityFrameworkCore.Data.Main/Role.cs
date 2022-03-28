@@ -8,7 +8,8 @@ namespace Stenn.EntityFrameworkCore.Data.Main
     public class Role : Entity, 
         ICreateAuditedEntity, 
         IUpdateAuditedEntity,  
-        IEntityWithSourceSystemIdGuid
+        IEntityWithSourceSystemIdGuid,
+        ISoftDeleteEntity
     {
         public string Name { get; private set; }
         public string Description { get; private set; }
