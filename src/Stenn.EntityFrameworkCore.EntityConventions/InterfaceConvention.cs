@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public class InterfaceConvention : IEntityConvention
     {

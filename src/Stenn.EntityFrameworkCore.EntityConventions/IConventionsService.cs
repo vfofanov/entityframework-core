@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     /// <summary>
     /// Db specific service for entity convention

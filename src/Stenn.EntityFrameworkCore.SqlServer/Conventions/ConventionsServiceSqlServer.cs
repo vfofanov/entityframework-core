@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Stenn.EntityFrameworkCore.Conventions;
+using Stenn.EntityFrameworkCore.EntityConventions;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public static class ConventionsAnnotationNames
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Stenn.EntityFrameworkCore.Conventions;
+using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Conventions;
 using Stenn.EntityFrameworkCore.SqlServer.Enums;

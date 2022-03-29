@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stenn.EntityFrameworkCore.Data.Main;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    partial class MainDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220329214635_RoleSourceSystemIdChange")]
+    partial class RoleSourceSystemIdChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,9 +70,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("IsoNumericCode")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Iso3LetterCode");

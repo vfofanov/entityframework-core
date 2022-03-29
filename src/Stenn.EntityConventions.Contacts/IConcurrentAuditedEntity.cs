@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Stenn.Conventions.Contacts
+namespace Stenn.EntityConventions.Contacts
 {
     /// <summary>
     /// Entity with concurrent row version property

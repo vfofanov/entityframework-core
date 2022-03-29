@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public class ModelConventionBuilder : IModelConventionBuilder
     {

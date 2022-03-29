@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public interface IModelConventionBuilder
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Stenn.Conventions.Contacts
+namespace Stenn.EntityConventions.Contacts
 {
     /// <summary>
     /// Entity with creation audited property Created
@@ -12,7 +12,7 @@ namespace Stenn.Conventions.Contacts
         /// </summary>
         /// <returns></returns>
         string GenerateSourceSystemId();
-        
+
         string SourceSystemId => throw new NotSupportedException("This property exists for EF declaration only. For usage explicit declare it in inheritor");
     }
 }

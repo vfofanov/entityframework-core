@@ -112,7 +112,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await Migrate_Main(true);
         }
 
-        [Test]
+        [Test, Explicit]
         public async Task Migrate_MainWithoutDeletion()
         {
             await Migrate_Main(false);
@@ -155,7 +155,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
             
-            enumTables.Should().HaveCount(3);
+            enumTables.Should().HaveCount(4);
 
             var table = enumTables.First().Table;
             

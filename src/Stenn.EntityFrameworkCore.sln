@@ -44,9 +44,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Tests", "Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj", "{B7D95CE3-8FDE-490B-932B-E127F4EC6ADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.Conventions.Contacts", "Stenn.Conventions.Contacts\Stenn.Conventions.Contacts.csproj", "{8FC76529-1E69-46B1-993F-AA3BF252AB7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.Contacts", "Stenn.EntityConventions.Contacts\Stenn.EntityConventions.Contacts.csproj", "{8FC76529-1E69-46B1-993F-AA3BF252AB7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Conventions", "Stenn.EntityFrameworkCore.Conventions\Stenn.EntityFrameworkCore.Conventions.csproj", "{9D173795-BE10-4366-BD34-83BA59B3F486}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions", "Stenn.EntityFrameworkCore.EntityConventions\Stenn.EntityFrameworkCore.EntityConventions.csproj", "{9D173795-BE10-4366-BD34-83BA59B3F486}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{883F8EE3-E05C-4066-BD02-7F23BE62080D}"
 EndProject

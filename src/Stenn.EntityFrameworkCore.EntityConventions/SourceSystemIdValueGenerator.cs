@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
-using Stenn.Conventions.Contacts;
+using Stenn.EntityConventions.Contacts;
 
-namespace Stenn.EntityFrameworkCore.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     internal sealed class SourceSystemIdValueGenerator : ValueGenerator
     {

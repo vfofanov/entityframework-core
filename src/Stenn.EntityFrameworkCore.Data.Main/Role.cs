@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using Stenn.Conventions.Contacts;
+using Stenn.EntityConventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {
     [DebuggerDisplay("{Name}, Id = {Id}")]
-    public class Role : Entity, 
-        ICreateAuditedEntity, 
-        IUpdateAuditedEntity,  
+    [SourceSystemIdOptions(MaxLength = 100, IsUnicode = false, HasIndex = false)]
+    public class Role : Entity,
+        ICreateAuditedEntity,
+        IUpdateAuditedEntity,
         IEntityWithSourceSystemIdGuid,
         ISoftDeleteEntity
     {

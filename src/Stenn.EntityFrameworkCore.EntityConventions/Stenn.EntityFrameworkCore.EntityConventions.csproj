@@ -11,7 +11,7 @@
   </ItemGroup> 
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.Conventions.Contacts\Stenn.Conventions.Contacts.csproj" />
+    <ProjectReference Include="..\Stenn.EntityConventions.Contacts\Stenn.EntityConventions.Contacts.csproj" />
     <ProjectReference Include="..\Stenn.StaticMigrations\Stenn.StaticMigrations.csproj" />
   </ItemGroup>
 

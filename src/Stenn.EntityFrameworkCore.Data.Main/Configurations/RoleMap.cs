@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Stenn.Conventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
 {
