@@ -8,10 +8,9 @@ using System.Text;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 
-namespace Stenn.EntityFrameworkCore.SqlServer.StaticMigrations
+namespace Stenn.EntityFrameworkCore.SqlServer
 {
     /// <summary>
     ///     <para>

@@ -80,7 +80,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await Migrate_Main(true);
         }
 
-        [Test]
+        [Test, Explicit]
         public async Task Migrate_MainWithoutDeletion()
         {
             await Migrate_Main(false);
@@ -147,7 +147,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            actualRoles.Should().BeEquivalentTo(expectedRoles, options => options.Excluding(x => x.Created));
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
             
-            enumTables.Should().HaveCount(3);
+            enumTables.Should().HaveCount(4);
 
             var table = enumTables.First().Table;
             
@@ -167,7 +167,45 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             table.Rows[1].RowShouldBe(2, "Organization", "Organization contact");
         }
 
-        private static async Task CheckSelect(InitialDbContext context, string selectCommand, Func<DbDataReader, Task> check)
+        [Test]
+        public async Task SoftDeleteRoles()
+        {
+            await EnsureCreated_Main();
+
+            var originCount = _dbContextMain.Set<Role>().Count();
+
+            var newRoleDeleteId = Guid.NewGuid();
+            await _dbContextMain.Set<Role>().AddAsync(Role.Create(newRoleDeleteId.ToString(), "ForDelete"));
+            await _dbContextMain.SaveChangesAsync();
+            
+            var afterAddCount = _dbContextMain.Set<Role>().Count();
+            afterAddCount.Should().Be(originCount + 1);
+
+            await Task.Delay(1000);
+            var modifiedRole = await _dbContextMain.Set<Role>().FirstAsync(x => x.Name == "Customer");
+            modifiedRole.Description = "MODIFIED DESC";
+            await _dbContextMain.SaveChangesAsync();
+            
+            var roleToDelete = await _dbContextMain.Set<Role>().SingleAsync(x => x.Id == newRoleDeleteId);
+            _dbContextMain.Set<Role>().Remove(roleToDelete);
+            await _dbContextMain.SaveChangesAsync();
+            
+            var afterRemoveCount = _dbContextMain.Set<Role>().Count();
+            afterRemoveCount.Should().Be(originCount);
+            //NOTE: Check that deleted row exists in db(Soft delete)
+            await CheckSelect(_dbContextMain, "SELECT * FROM dbo.Role", 
+                async reader =>
+                {
+                    var count = 0;
+                    while (await reader.ReadAsync())
+                    {
+                        count++;
+                    }
+                    count.Should().Be(afterAddCount);
+                });
+        }
+
+        private static async Task CheckSelect(Microsoft.EntityFrameworkCore.DbContext context, string selectCommand, Func<DbDataReader, Task> check)
         {
             await using var command = context.Database.GetDbConnection().CreateCommand();
             command.CommandText = selectCommand;

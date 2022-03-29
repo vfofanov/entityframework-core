@@ -8,7 +8,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main.StaticMigrations.DictEntities
         {
             return new List<Currency>
             {
-                Currency.Create(1, "TST", 1, "Test currency Changed")
+                Currency.Create(1, "TST", 1, "Test currency Changed", CurrencyType.Cripto)
             };
         }
     }

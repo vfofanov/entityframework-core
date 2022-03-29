@@ -1,20 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
-namespace Stenn.EntityFrameworkCore.SqlServer
+namespace Stenn.EntityFrameworkCore.SqlServer.Enums
 {
-    public sealed class EnumsStaticMigrationFactorySqlServer : IEnumsStaticMigrationFactory
-    {
-        /// <inheritdoc />
-        public IStaticSqlMigration Create(DbContext context, string schemaName = "enum")
-        {
-            return new EnumsStaticMigrationSqlServer(context, schemaName);
-        }
-    }
-
     public sealed class EnumsStaticMigrationSqlServer : EnumsStaticMigration
     {
         /// <inheritdoc />

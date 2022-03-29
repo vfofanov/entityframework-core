@@ -2,13 +2,16 @@ using System;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {
-    public abstract class Entity
+    public abstract class Entity:Entity<Guid>
     {
         protected Entity()
         {
             Id = Guid.NewGuid();
         }
-
-        public Guid Id { get; protected set; }
+    }
+    
+    public abstract class Entity<TId>
+    {
+        public TId Id { get; protected set; }
     }
 }

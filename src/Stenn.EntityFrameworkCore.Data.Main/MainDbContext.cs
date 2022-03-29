@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.Data.Main.Configurations;
+using Stenn.EntityFrameworkCore.EntityConventions;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {
@@ -23,7 +24,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main
             modelBuilder.ApplyConfiguration(new RoleMap());
             modelBuilder.ApplyConfiguration(new ContactMap());
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyEntityConventions();
         }
     }
 }

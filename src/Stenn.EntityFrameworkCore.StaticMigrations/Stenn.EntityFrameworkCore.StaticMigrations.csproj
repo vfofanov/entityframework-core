@@ -6,13 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions\Stenn.EntityFrameworkCore.EntityConventions.csproj" />
     <ProjectReference Include="..\Stenn.StaticMigrations\Stenn.StaticMigrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.13" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.15" />
   </ItemGroup>
 
 </Project>

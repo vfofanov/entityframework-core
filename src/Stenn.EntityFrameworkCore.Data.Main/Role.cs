@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
-using Newtonsoft.Json;
-using Stenn.DictionaryEntities;
+using Stenn.EntityConventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {
     [DebuggerDisplay("{Name}, Id = {Id}")]
-    [DictionaryEntityIgnoredProperties(nameof(Created))]
-    public class Role : AuditedEntity
+    [SourceSystemIdOptions(MaxLength = 100, IsUnicode = false, HasIndex = false)]
+    public class Role : Entity,
+        ICreateAuditedEntity,
+        IUpdateAuditedEntity,
+        IEntityWithSourceSystemIdGuid,
+        ISoftDeleteEntity
     {
-        public Role()
-        {
-            SourceSystemId = Id.ToString("N");
-        }
-
         public string Name { get; private set; }
-        public string Description { get; private set; }
+        public string Description { get; set; }
 
-        [JsonIgnore]
-        public string SourceSystemId { get; private set; }
-
-        public static Role Create(string id, string name, string desc = null, string sourceSystemId = null)
+        public static Role Create(string id, string name, string desc = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -33,7 +28,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main
 
             id = id.ToUpper();
             var idGuid = Guid.Parse(id);
-            return new Role { Id = idGuid, Name = name, Description = desc, SourceSystemId = sourceSystemId ?? id };
+            return new Role { Id = idGuid, Name = name, Description = desc };
         }
     }
 }

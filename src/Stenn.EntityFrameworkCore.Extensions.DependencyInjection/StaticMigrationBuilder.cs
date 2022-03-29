@@ -52,13 +52,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         ///     Migration's revert script resource file path.
         /// </param>
         /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
-        public void AddResSql(string name, ResFile applyFile, ResFile? revertFile, bool suppressTransaction = false)
+        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile, bool suppressTransaction = false)
         {
             if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            if (applyFile == null)
+            if (applyFile is null && revertFile is null)
             {
                 throw new ArgumentNullException(nameof(applyFile));
             }
