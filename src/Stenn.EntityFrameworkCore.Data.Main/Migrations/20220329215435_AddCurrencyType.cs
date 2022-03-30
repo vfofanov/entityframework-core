@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
@@ -12,6 +13,8 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
+
+            migrationBuilder.DropDefaultConstraint("Currency", "Type");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
