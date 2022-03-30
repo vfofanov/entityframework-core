@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="coverlet.collector" Version="3.1.2">
       <PrivateAssets>all</PrivateAssets>
@@ -24,7 +24,7 @@
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer\Stenn.EntityFrameworkCore.SqlServer.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj" />
   </ItemGroup>
 

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stenn.EntityFrameworkCore.Data.Initial;
-using Stenn.EntityFrameworkCore.DbContext.Initial;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
@@ -16,10 +15,10 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.13")
+                .HasAnnotation("ProductVersion", "5.0.15")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.StaticMigrations.Data.Currency", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Initial.CurrencyV1", b =>
                 {
                     b.Property<string>("Iso3LetterCode")
                         .HasMaxLength(3)
@@ -36,6 +35,9 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("IsoNumericCode")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Iso3LetterCode");

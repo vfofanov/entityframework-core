@@ -14,7 +14,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     IsoNumericCode = table.Column<int>(type: "int", nullable: false),
                     DecimalDigits = table.Column<byte>(type: "tinyint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    Type = table.Column<byte>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

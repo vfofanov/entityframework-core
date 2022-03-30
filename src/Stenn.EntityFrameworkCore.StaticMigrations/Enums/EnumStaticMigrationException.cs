@@ -2,7 +2,7 @@ using System;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 {
-    public class EnumStaticMigrationException : Exception
+    public class EnumStaticMigrationException : StaticMigrationException
     {
         /// <inheritdoc />
         public EnumStaticMigrationException(string? message = null)

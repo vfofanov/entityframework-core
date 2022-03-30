@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions\Stenn.EntityFrameworkCore.EntityConventions.csproj" />
     <ProjectReference Include="..\Stenn.StaticMigrations\Stenn.StaticMigrations.csproj" />
   </ItemGroup>
 

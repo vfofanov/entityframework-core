@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>    
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />    
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
   </ItemGroup>
 

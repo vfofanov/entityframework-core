@@ -18,7 +18,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         }
 
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetApplyOperations(bool isNew)
+        public IEnumerable<MigrationOperation> GetApplyOperations()
         {
             yield break;
         }

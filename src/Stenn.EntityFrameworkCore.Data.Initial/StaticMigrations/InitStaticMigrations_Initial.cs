@@ -9,8 +9,6 @@ namespace Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations
         {
             migrations.AddResSql("InitDB", @"\StaticMigrations\Sql\InitDB.Apply.sql", "", suppressTransaction: true);
             
-            migrations.AddEnumTables();
-            
             migrations.AddResSql("TestViews", @"\StaticMigrations\Sql\TestViews.Apply.sql", @"StaticMigrations\Sql\TestViews.Revert.sql",
                 suppressTransaction: true);
 

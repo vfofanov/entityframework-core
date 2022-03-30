@@ -7,6 +7,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     public interface IStaticSqlMigration : IStaticMigration
     {
         IEnumerable<MigrationOperation> GetRevertOperations();
-        IEnumerable<MigrationOperation> GetApplyOperations(bool isNew);
+        IEnumerable<MigrationOperation> GetApplyOperations();
     }
 }

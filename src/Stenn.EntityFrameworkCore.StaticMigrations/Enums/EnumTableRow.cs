@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
@@ -14,12 +15,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 
             var enumValue = Enum.Parse(enumType, member.Name);
             var value = Convert.ChangeType(enumValue, valueType);
-            var displayName = member.GetCustomAttribute<DisplayAttribute>() ??
-                              new DisplayAttribute { Name = name };
+            var display = member.GetCustomAttribute<DisplayAttribute>();
+            var displayName = member.GetCustomAttribute<DisplayNameAttribute>();
+            var description = member.GetCustomAttribute<DescriptionAttribute>();
 
             return new EnumTableRow(value, enumValue, name,
-                displayName.GetName() ?? name,
-                displayName.GetDescription() ?? string.Empty);
+                display?.GetName() ?? displayName?.DisplayName ?? name,
+                display?.GetDescription() ?? description?.Description ?? string.Empty);
         }
 
         private EnumTableRow(object value, object rawValue, string name, string displayName, string description)
