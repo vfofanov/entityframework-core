@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Stenn.EntityFrameworkCore.EntityConventions
 {
-    public interface IModelConventionBuilder
+    public interface IEntityConventionsBuilder
     {
         void Add(IEntityConvention convention);
 

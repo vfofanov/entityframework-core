@@ -15,10 +15,10 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// </summary>
         /// <param name="configurator">Specific provider registration</param>
         /// <param name="optionsBuilder">Db contextoptions builder</param>
-        /// <param name="initMigrations">Init static migrations action</param>
+        /// <param name="optionsInit">Static migrations options initialization</param>
         /// <returns></returns>
         public static void UseStaticMigrations<TProviderRegistrator>(TProviderRegistrator configurator, DbContextOptionsBuilder optionsBuilder,
-            Action<StaticMigrationBuilder> initMigrations)
+            Action<StaticMigrationsOptions>? optionsInit)
             where TProviderRegistrator : IDbContextOptionsConfigurator, IStaticMigrationsProviderConfigurator, new()
         {
             var extension = optionsBuilder.Options.FindExtension<StaticMigrationOptionsExtension>();
@@ -28,12 +28,11 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             }
             configurator.Configure(optionsBuilder);
 
-            extension = new StaticMigrationOptionsExtension(configurator, () =>
-            {
-                var builder = new StaticMigrationBuilder();
-                initMigrations.Invoke(builder);
-                return builder;
-            });
+            
+            var options = new StaticMigrationsOptions();
+            optionsInit?.Invoke(options);
+            
+            extension = new StaticMigrationOptionsExtension(configurator, options);
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
         }
     }

@@ -36,14 +36,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [SetUp]
         public void Setup()
         {
-            _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init);
+            _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init, false);
             _dbContextInitial = _serviceProviderInitial.GetRequiredService<InitialDbContext>();
 
-            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init);
+            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true);
             _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
         }
 
-        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init)
+        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
@@ -53,7 +53,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             services.AddDbContext<TDbContext>(builder =>
             {
                 builder.UseSqlServer(connectionString);
-                builder.UseStaticMigrationsSqlServer(init);
+                builder.UseStaticMigrationsSqlServer(options =>
+                {
+                    options.InitMigrations = init;
+                    options.IncludeCommonConventions = includeCommonConventions;
+                });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             return services.BuildServiceProvider();

@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Stenn.EntityFrameworkCore.EntityConventions
 {
-    public class ModelConventionBuilder : IModelConventionBuilder
+    public class EntityConventionsBuilder : IEntityConventionsBuilder, IEntityConventionsService
     {
         private readonly List<IEntityConvention> _conventions = new();
 
@@ -41,18 +40,14 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                 }));
         }
 
-        public void Build(ModelBuilder builder)
+        /// <inheritdoc />
+        public bool HasConventions => _conventions.Count > 0;
+
+        public void Configure(EntityTypeBuilder entityBuilder)
         {
-            //NOTE: Convensions applying to root classes only
-            foreach (var entityType in builder.Model.GetEntityTypes().Where(e => e.BaseType is null))
+            foreach (var convention in _conventions.Where(c => c.Allowed(entityBuilder.Metadata)))
             {
-#pragma warning disable EF1001
-                var entityBuilder = new EntityTypeBuilder(entityType);
-#pragma warning restore EF1001
-                foreach (var convention in _conventions.Where(c => c.Allowed(entityType)))
-                {
-                    convention.Configure(entityBuilder);
-                }
+                convention.Configure(entityBuilder);
             }
         }
     }

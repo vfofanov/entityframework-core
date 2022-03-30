@@ -60,16 +60,15 @@ namespace Stenn.EntityFrameworkCore.InMemory.Tests
         [Test]
         public async Task EnsureCreated_Main()
         {
-            Func<Task> act = () => EnsureCreated(_dbContextMain);
-            await act.Should().ThrowAsync<StaticMigrationException>("Db provider doesn't support conventions");
+            await EnsureCreated(_dbContextMain);
+
+            var actual = await _dbContextMain.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
             
-            // var actual = await _dbContextMain.Set<Currency>().ToListAsync();
-            // var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
-            // actual.Should().BeEquivalentTo(expected);
-            //
-            // var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
-            // var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
-            // actualRoles.Should().BeEquivalentTo(expectedRoles);
+            var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
         
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)

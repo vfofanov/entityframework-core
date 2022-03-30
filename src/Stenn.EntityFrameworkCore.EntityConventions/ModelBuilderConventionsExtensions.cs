@@ -1,4 +1,5 @@
 ﻿#nullable enable
+
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,14 +11,28 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public static class ModelBuilderConventionsExtensions
     {
-        private static void AddCommonConventions(this IModelConventionBuilder builder)
+        public static void AddCommonConventions(this IEntityConventionsBuilder builder)
+        {
+            builder
+                .AddCreateAudited()
+                .AddUpdateAudited()
+                .AddSoftDelete()
+                .AddConcurrentAudited()
+                .AddEntityWithSourceSystemId();
+        }
+
+        public static IEntityConventionsBuilder AddCreateAudited(this IEntityConventionsBuilder builder)
         {
             builder.AddInterfaceConventionProperty<ICreateAuditedEntity>(x => x.Created,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAdd()
                     .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
                     .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'"));
+            return builder;
+        }
 
+        public static IEntityConventionsBuilder AddUpdateAudited(this IEntityConventionsBuilder builder)
+        {
             builder.AddInterfaceConventionProperty<IUpdateAuditedEntity>(x => x.ModifiedAt,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAddOrUpdate()
@@ -25,6 +40,11 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     .HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault, true)
                     .HasComment("Row last modified datetime. Updated by trigger. Configured by convention 'IUpdateAuditedEntity'"));
 
+            return builder;
+        }
+
+        public static IEntityConventionsBuilder AddSoftDelete(this IEntityConventionsBuilder builder)
+        {
             builder.AddInterfaceConvention<ISoftDeleteEntity>(
                 e =>
                 {
@@ -52,11 +72,21 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     e.HasQueryFilter(lambdaExpression);
                 });
 
+            return builder;
+        }
+
+        public static IEntityConventionsBuilder AddConcurrentAudited(this IEntityConventionsBuilder builder)
+        {
             builder.AddInterfaceConventionProperty<IConcurrentAuditedEntity>(x => x.RowVersion,
                 (_, _, p) => p.IsRequired()
                     .IsRowVersion()
                     .HasComment("Concurrent token(row version). Configured by convention 'IConcurrentAuditedEntity'"));
 
+            return builder;
+        }
+
+        public static IEntityConventionsBuilder AddEntityWithSourceSystemId(this IEntityConventionsBuilder builder)
+        {
             builder.AddInterfaceConventionProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
             {
                 p.IsRequired()
@@ -80,22 +110,8 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     e.HasIndex(i.Name).IsUnique();
                 }
             });
-        }
 
-
-        public static void ApplyEntityConventions(this ModelBuilder builder,
-            Action<IModelConventionBuilder>? init = null,
-            bool includeCommonConventions = true)
-        {
-            var convensionBuilder = new ModelConventionBuilder();
-
-            if (includeCommonConventions)
-            {
-                convensionBuilder.AddCommonConventions();
-            }
-            init?.Invoke(convensionBuilder);
-
-            convensionBuilder.Build(builder);
+            return builder;
         }
     }
 }

@@ -5,7 +5,7 @@ using Stenn.EntityFrameworkCore.EntityConventions;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
 {
-    public class ConventionsServiceSqlServer : IConventionsService
+    public class EntityConventionsProviderServiceSqlServer : IEntityConventionsProviderService
     {
         /// <inheritdoc />
         public void Configure(EntityTypeBuilder builder)

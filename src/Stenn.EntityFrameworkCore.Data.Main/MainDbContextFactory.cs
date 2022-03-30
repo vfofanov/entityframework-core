@@ -13,7 +13,11 @@ namespace Stenn.EntityFrameworkCore.Data.Main
             var optionsBuilder = new DbContextOptionsBuilder<MainDbContext>();
             
             optionsBuilder.UseSqlServer();
-            optionsBuilder.UseStaticMigrationsSqlServer(MainStaticMigrations.Init);
+            optionsBuilder.UseStaticMigrationsSqlServer(options =>
+                {
+                    options.InitMigrations = MainStaticMigrations.Init;
+                }
+            );
             
             return new MainDbContext(optionsBuilder.Options);
         }

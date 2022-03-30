@@ -20,7 +20,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
 
             services.TryAddTransient<IEnumsStaticMigrationFactory, EnumsStaticMigrationFactorySqlServer>();
 
-            services.TryAddSingleton<IConventionsService, ConventionsServiceSqlServer>();
+            services.TryAddSingleton<IEntityConventionsProviderService, EntityConventionsProviderServiceSqlServer>();
             services.TryAddTransient<IConventionsStaticMigrationFactory, ConventionsStaticMigrationFactorySqlServer>();
         }
     }

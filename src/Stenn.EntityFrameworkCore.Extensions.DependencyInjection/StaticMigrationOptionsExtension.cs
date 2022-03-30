@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Stenn.DictionaryEntities;
+using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
@@ -20,43 +21,92 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     {
         private ExtensionInfo? _info;
         private readonly IStaticMigrationsProviderConfigurator _configurator;
-        private readonly Func<StaticMigrationBuilder> _migrationsBuilderFunc;
-        private StaticMigrationBuilder? _builder;
+        private readonly StaticMigrationsOptions _options;
 
-        public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator, Func<StaticMigrationBuilder> migrationsBuilderFunc)
+        private StaticMigrationBuilder? _staticMigrationBuilder;
+        private IEntityConventionsService? _entityConventionsService;
+
+        public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator,
+            StaticMigrationsOptions options)
         {
             _configurator = configurator ?? throw new ArgumentNullException(nameof(configurator));
-            _migrationsBuilderFunc = migrationsBuilderFunc ?? throw new ArgumentNullException(nameof(migrationsBuilderFunc));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        private StaticMigrationBuilder Builder => _builder ??= _migrationsBuilderFunc();
-        
+        private static StaticMigrationOptionsExtension GetExtension(IServiceProvider provider)
+        {
+#pragma warning disable EF1001
+            return provider.GetRequiredService<IDbContextServices>().ContextOptions
+                .FindExtension<StaticMigrationOptionsExtension>();
+#pragma warning restore EF1001
+        }
+
+        private StaticMigrationBuilder GetStaticMigrationsBuilder(IServiceProvider provider)
+        {
+            if (_staticMigrationBuilder is { } b)
+            {
+                return b;
+            }
+
+            var builder = new StaticMigrationBuilder();
+
+            var entityConventionsService = provider.GetService<IEntityConventionsService>();
+
+            if (entityConventionsService?.HasConventions == true)
+            {
+                builder.InitConventions();
+            }
+            if (_options.EnableEnumTables)
+            {
+                builder.AddEnumTables();
+            }
+            _options.InitMigrations?.Invoke(builder);
+
+            return _staticMigrationBuilder = builder;
+        }
+
+        private IEntityConventionsService GetEntityConventionsService()
+        {
+            if (_entityConventionsService is { } service)
+            {
+                return service;
+            }
+
+            var builder = new EntityConventionsBuilder();
+            if (_options.IncludeCommonConventions)
+            {
+                builder.AddCommonConventions();
+            }
+            _options.InitEntityConventions?.Invoke(builder);
+
+            return _entityConventionsService = builder;
+        }
+
         /// <inheritdoc />
         public void ApplyServices(IServiceCollection services)
         {
             _configurator.RegisterServices(services);
 
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
-            
-#pragma warning disable EF1001
+
+            services.AddScoped(
+                provider => GetExtension(provider).GetEntityConventionsService());
+
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
-                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>().Builder.SQLMigrations);
-            
+                provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).SQLMigrations);
+
             services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
-                provider => provider.GetRequiredService<IDbContextServices>().ContextOptions
-                    .FindExtension<StaticMigrationOptionsExtension>().Builder.DictEntityMigrations);
-#pragma warning restore EF1001
-            
+                provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).DictEntityMigrations);
+
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
             services.TryAddScoped<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
 
             var relationalOverrided = OverrideService<IRelationalDatabaseCreator>(services, (provider, creator) =>
                 new RelationalDatabaseCreatorWithStaticMigrations(creator,
-                    provider, 
-                    provider.GetRequiredService<RelationalDatabaseCreatorDependencies>(), 
-                    provider.GetRequiredService<IRelationalConnection>(), 
-                    provider.GetRequiredService<IMigrationCommandExecutor>(), 
+                    provider,
+                    provider.GetRequiredService<RelationalDatabaseCreatorDependencies>(),
+                    provider.GetRequiredService<IRelationalConnection>(),
+                    provider.GetRequiredService<IMigrationCommandExecutor>(),
                     provider.GetRequiredService<IMigrationsSqlGenerator>()));
 
             if (relationalOverrided)
@@ -120,8 +170,8 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <inheritdoc />
         public DbContextOptionsExtensionInfo Info
             => _info ??= new ExtensionInfo(this);
-        
-        
+
+
         private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
         {
             private long? _serviceProviderHash;
@@ -145,7 +195,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                         var builder = new StringBuilder();
 
                         builder.Append($"Configurator={Extension._configurator.GetType().Name} ");
-                        
+
                         _logFragment = builder.ToString();
                     }
 
