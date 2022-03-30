@@ -6,6 +6,30 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     public static class MigrationBuilderExtensions
     {
         /// <summary>
+        /// Drop table if exists
+        /// Usually usage for drop temporary table.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="table"></param>
+        /// <param name="schema"></param>
+        public static void DropTableIfExists(this MigrationBuilder builder, string table, string? schema = null)
+        {
+            schema ??= GetProviderDefaultSchema(builder);
+            
+            switch (builder.ActiveProvider)
+            {
+                case "Microsoft.EntityFrameworkCore.SqlServer":
+                    builder.Sql($@"DROP TABLE IF EXISTS [{schema}].[{table}]");
+                    break;
+
+                case "Npgsql.EntityFrameworkCore.PostgreSQL":
+                    throw new NotImplementedException("");
+                default:
+                    throw new StaticMigrationException($"Unexpected provider for DropTableIfExists. Provider:{builder.ActiveProvider}");
+            }
+        }
+
+        /// <summary>
         /// Drop DEFAULT constraint for specific table's column if it exists.
         /// Usually usage for drop temporary DEFAULT after creating NOT NULL column on existed table with data.
         /// </summary>
@@ -13,12 +37,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         /// <param name="table"></param>
         /// <param name="column"></param>
         /// <param name="schema"></param>
-        public static void DropDefaultConstraint(this MigrationBuilder builder, string table, string column, string schema = "dbo")
+        public static void DropDefaultConstraint(this MigrationBuilder builder, string table, string column, string? schema = null)
         {
+            schema ??= GetProviderDefaultSchema(builder);
+
             switch (builder.ActiveProvider)
             {
                 case "Microsoft.EntityFrameworkCore.SqlServer":
-                    
                     builder.Sql($@"DECLARE @Command nvarchar(1000)
 
     SELECT @Command = 'ALTER TABLE [{schema}].[{table}] DROP CONSTRAINT ' + d.name
@@ -34,12 +59,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     ELSE
         PRINT 'Can''t find DEFAULT for column [{column}] in table [{schema}].[{table}]';");
                     break;
-                
+
                 case "Npgsql.EntityFrameworkCore.PostgreSQL":
                     throw new NotImplementedException("");
                 default:
-                    throw new StaticMigrationException("Unexpected provider for DropDefaultConstraint.");
+                    throw new StaticMigrationException($"Unexpected provider for GetProviderDefaultSchema. Provider:{builder.ActiveProvider}");
             }
+        }
+
+        private static string? GetProviderDefaultSchema(this MigrationBuilder builder)
+        {
+            return builder.ActiveProvider switch
+            {
+                "Microsoft.EntityFrameworkCore.SqlServer" => "dbo",
+                "Npgsql.EntityFrameworkCore.PostgreSQL" => "dbo",
+                _ => throw new StaticMigrationException($"Unexpected provider for GetProviderDefaultSchema. Provider:{builder.ActiveProvider}")
+            };
         }
     }
 }

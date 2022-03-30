@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Stenn.EntityFrameworkCore.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
@@ -19,6 +20,22 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 {
                     table.PrimaryKey("PK_Currency", x => x.Iso3LetterCode);
                 });
+            
+            migrationBuilder.CreateTable(
+                name: "CurrencyTemp",
+                columns: table => new
+                {
+                    Iso3LetterCode = table.Column<string>(type: "char(3)", unicode: false, fixedLength: true, maxLength: 3, nullable: false),
+                    IsoNumericCode = table.Column<int>(type: "int", nullable: false),
+                    DecimalDigits = table.Column<byte>(type: "tinyint", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CurrencyTemp", x => x.Iso3LetterCode);
+                });
+            
+            migrationBuilder.DropTableIfExists("CurrencyTemp");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
