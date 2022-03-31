@@ -87,25 +87,32 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
         public static IEntityConventionsBuilder AddEntityWithSourceSystemId(this IEntityConventionsBuilder builder)
         {
+            
+            
             builder.AddInterfaceConventionProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
             {
+                var options = e.Metadata.ClrType.GetCustomAttribute<SourceSystemIdOptions>() ?? builder.DefaultOptions.SourceSystemId;
+                
                 p.IsRequired()
-                    .HasValueGenerator<SourceSystemIdValueGenerator>()
                     .HasComment(
                         "Source system id. Row id for cross services' communication. Uses trigger on row insertion. Configured by convention 'IEntityWithSourceSystemId'");
 
-                var attr = e.Metadata.ClrType.GetCustomAttribute<SourceSystemIdOptionsAttribute>() ?? SourceSystemIdOptionsAttribute.Default;
+                if (options.HasValueGenerator)
+                {
+                    p.HasValueGenerator(options.Generator ?? typeof(SourceSystemIdValueGenerator));
+                }
+
 #pragma warning disable EF1001
                 if (p.Metadata.FindAnnotation(CoreAnnotationNames.MaxLength) is not { })
                 {
-                    p.HasMaxLength(attr.MaxLength);
+                    p.HasMaxLength(options.MaxLength);
                 }
                 if (p.Metadata.FindAnnotation(CoreAnnotationNames.Unicode) is not { })
                 {
-                    p.IsUnicode(attr.IsUnicode);
+                    p.IsUnicode(options.IsUnicode);
                 }
 #pragma warning restore EF1001
-                if (attr.HasIndex)
+                if (options.HasIndex)
                 {
                     e.HasIndex(i.Name).IsUnique();
                 }

@@ -56,7 +56,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                 builder.UseStaticMigrationsSqlServer(options =>
                 {
                     options.InitMigrations = init;
-                    options.IncludeCommonConventions = includeCommonConventions;
+                    options.ConventionsOptions.IncludeCommonConventions = includeCommonConventions;
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
 

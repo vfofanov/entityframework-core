@@ -3,10 +3,8 @@ using System.ComponentModel;
 
 namespace Stenn.EntityConventions.Contacts
 {
-    public sealed class SourceSystemIdOptionsAttribute : Attribute
+    public sealed class SourceSystemIdOptions : Attribute
     {
-        public static readonly SourceSystemIdOptionsAttribute Default = new();
-
         /// <summary>
         /// Max length. Default:50 
         /// </summary>
@@ -24,5 +22,15 @@ namespace Stenn.EntityConventions.Contacts
         /// </summary>
         [DefaultValue(true)]
         public bool HasIndex { get; init; } = true;
+
+        /// <summary>
+        /// Has value generator
+        /// </summary>
+        public bool HasValueGenerator { get; init; } = true;
+
+        /// <summary>
+        /// Value generator type if null standard value generator will be used
+        /// </summary>
+        public Type? Generator { get; init; } = null;
     }
 }
