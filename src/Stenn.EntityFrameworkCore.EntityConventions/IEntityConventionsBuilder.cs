@@ -14,7 +14,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         
         void AddInterfaceConventionProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
             Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure);
-
+        
         EntityConventionsCommonDefaultsOptions DefaultOptions { get; }
     }
 }

@@ -19,6 +19,8 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
             DefaultOptions = defaultOptions;
         }
 
+        
+
         public EntityConventionsCommonDefaultsOptions DefaultOptions { get; }
 
         
@@ -48,7 +50,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     configure(builder, propInfo, prop);
                 }));
         }
-
+        
         /// <inheritdoc />
         public bool HasConventions => _conventions.Count > 0;
 

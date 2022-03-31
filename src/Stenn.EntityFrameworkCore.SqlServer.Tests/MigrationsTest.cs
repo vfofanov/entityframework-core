@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Stenn.EntityConventions.Contacts;
 using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;

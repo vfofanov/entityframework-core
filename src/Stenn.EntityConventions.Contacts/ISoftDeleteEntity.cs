@@ -7,7 +7,7 @@ namespace Stenn.EntityConventions.Contacts
     /// </summary>
     public interface ISoftDeleteEntity
     {
-        bool IsDeleted => throw new NotSupportedException("This property exists for EF declaration only. For usage explicit declare it in inheritor");
-        DateTime? Deleted => throw new NotSupportedException("This property exists for EF declaration only. For usage explicit declare it in inheritor");
+        bool IsDeleted => throw ExceptionHelper.ThrowRegistrationOnly();
+        DateTime? Deleted => throw ExceptionHelper.ThrowRegistrationOnly();
     }
 }
