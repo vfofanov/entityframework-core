@@ -1,5 +1,5 @@
+#nullable enable
 using System;
-using System.Collections.Immutable;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,13 +7,12 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Stenn.EntityConventions.Contacts;
-using Stenn.EntityFrameworkCore.Data;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 using Stenn.EntityFrameworkCore.Tests;
@@ -23,11 +22,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
     public class MigrationsTest
     {
         private const string DBName = "stenn_efcore_tests";
-        private InitialDbContext _dbContextInitial;
+        private InitialDbContext _dbContextInitial = null!;
 
-        private MainDbContext _dbContextMain;
-        private IServiceProvider _serviceProviderInitial;
-        private IServiceProvider _serviceProviderMain;
+        private MainDbContext _dbContextMain = null!;
+        private IServiceProvider _serviceProviderInitial = null!;
+        private IServiceProvider _serviceProviderMain = null!;
 
         private static string GetConnectionString(string dbName)
         {
@@ -40,11 +39,17 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init, false);
             _dbContextInitial = _serviceProviderInitial.GetRequiredService<InitialDbContext>();
 
-            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true);
+            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true, builder =>
+            {
+                //NOTE: Add migrations splitted to separate assemblies
+                builder.AddSplittedMigrations<MainDbContext_Step1>();
+                builder.AddSplittedMigrations<MainDbContext_Step2>();
+            });
             _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
         }
 
-        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions)
+        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions,
+            Action<DbContextOptionsBuilder>? additionalInit=null)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
@@ -52,14 +57,17 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var connectionString = GetConnectionString(DBName);
 
             services.AddDbContext<TDbContext>(builder =>
-            {
-                builder.UseSqlServer(connectionString);
-                builder.UseStaticMigrationsSqlServer(options =>
                 {
-                    options.InitMigrations = init;
-                    options.ConventionsOptions.IncludeCommonConventions = includeCommonConventions;
-                });
-            }, ServiceLifetime.Transient, ServiceLifetime.Transient);
+                    builder.UseSqlServer(connectionString);
+                    builder.UseStaticMigrationsSqlServer(options =>
+                    {
+                        options.InitMigrations = init;
+                        options.ConventionsOptions.IncludeCommonConventions = includeCommonConventions;
+                    });
+                    
+                    additionalInit?.Invoke(builder);
+                },
+                ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             return services.BuildServiceProvider();
         }

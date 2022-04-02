@@ -21,8 +21,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
         public static DbContextOptionsBuilder UseStaticMigrationsSqlServer(this DbContextOptionsBuilder optionsBuilder,
             Action<StaticMigrationBuilder> initMigrations)
         {
-            UseStaticMigrationsSqlServer(optionsBuilder, options => { options.InitMigrations = initMigrations; }
-            );
+            UseStaticMigrationsSqlServer(optionsBuilder, 
+                options => { options.InitMigrations = initMigrations; });
 
             return optionsBuilder;
         }

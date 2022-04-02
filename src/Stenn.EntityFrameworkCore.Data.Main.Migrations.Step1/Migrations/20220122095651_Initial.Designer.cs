@@ -9,7 +9,7 @@ using Stenn.EntityFrameworkCore.DbContext.Initial;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainDbContext_Step1))]
     [Migration("20220122095651_Initial")]
     partial class Initial
     {

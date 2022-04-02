@@ -9,9 +9,9 @@ using Stenn.EntityFrameworkCore.Data.Main;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
-    [Migration("20220328093627_RoleSoftDelete")]
-    partial class RoleSoftDelete
+    [DbContext(typeof(MainDbContext_Step2))]
+    [Migration("20220329214635_RoleSourceSystemIdChange")]
+    partial class RoleSourceSystemIdChange
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -90,11 +90,16 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2")
-                        .HasComment("Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'")
-                        .HasAnnotation("ColumnTriggerSoftDelete", true);
+                        .HasComment("Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasComment("Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
 
                     b.Property<DateTime>("ModifiedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -109,16 +114,19 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.Property<string>("SourceSystemId")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)")
                         .HasComment("Source system id. Row id for cross services' communication. Uses trigger on row insertion. Configured by convention 'IEntityWithSourceSystemId'");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SourceSystemId")
-                        .IsUnique();
+                    b.HasIndex("IsDeleted");
 
                     b.ToTable("Role");
+
+                    b
+                        .HasAnnotation("ColumnTriggerSoftDelete", true);
                 });
 #pragma warning restore 612, 618
         }
