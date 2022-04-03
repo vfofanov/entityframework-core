@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Stenn.EntityConventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.EntityConventions
 {
@@ -13,5 +14,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         
         void AddInterfaceConventionProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
             Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure);
+        
+        EntityConventionsCommonDefaultsOptions DefaultOptions { get; }
     }
 }

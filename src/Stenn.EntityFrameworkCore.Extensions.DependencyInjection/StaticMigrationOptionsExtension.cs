@@ -77,12 +77,12 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                 return service;
             }
 
-            var builder = new EntityConventionsBuilder();
-            if (_options.IncludeCommonConventions)
+            var builder = new EntityConventionsBuilder(_options.ConventionsOptions.Defaults);
+            if (_options.ConventionsOptions.IncludeCommonConventions)
             {
                 builder.AddCommonConventions();
             }
-            _options.InitEntityConventions?.Invoke(builder);
+            _options.ConventionsOptions.InitEntityConventions?.Invoke(builder);
 
             return _entityConventionsService = builder;
         }

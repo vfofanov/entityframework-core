@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj" />

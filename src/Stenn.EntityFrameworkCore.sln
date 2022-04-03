@@ -50,6 +50,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{883F8EE3-E05C-4066-BD02-7F23BE62080D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1", "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1.csproj", "{F19D4945-4921-40EF-90C5-19AB688EB617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2", "Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj", "{400665A8-CA03-4E79-B154-75CF44DDDAE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations", "Stenn.EntityFrameworkCore.SplittedMigrations\Stenn.EntityFrameworkCore.SplittedMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +124,22 @@ Global
 		{9D173795-BE10-4366-BD34-83BA59B3F486}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D173795-BE10-4366-BD34-83BA59B3F486}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D173795-BE10-4366-BD34-83BA59B3F486}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F19D4945-4921-40EF-90C5-19AB688EB617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F19D4945-4921-40EF-90C5-19AB688EB617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F19D4945-4921-40EF-90C5-19AB688EB617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F19D4945-4921-40EF-90C5-19AB688EB617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{400665A8-CA03-4E79-B154-75CF44DDDAE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{400665A8-CA03-4E79-B154-75CF44DDDAE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{400665A8-CA03-4E79-B154-75CF44DDDAE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{400665A8-CA03-4E79-B154-75CF44DDDAE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB1B628-BA84-4AA9-94B8-90CE824A3694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB1B628-BA84-4AA9-94B8-90CE824A3694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB1B628-BA84-4AA9-94B8-90CE824A3694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB1B628-BA84-4AA9-94B8-90CE824A3694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,5 +155,7 @@ Global
 		{B7D95CE3-8FDE-490B-932B-E127F4EC6ADE} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{8FC76529-1E69-46B1-993F-AA3BF252AB7E} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 		{9D173795-BE10-4366-BD34-83BA59B3F486} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{F19D4945-4921-40EF-90C5-19AB688EB617} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{400665A8-CA03-4E79-B154-75CF44DDDAE3} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 	EndGlobalSection
 EndGlobal

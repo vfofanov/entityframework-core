@@ -41,9 +41,8 @@ namespace Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection
             var memoryOptionsInit = (Action<StaticMigrationsOptions>)
                 (options =>
                 {
-                    options.IncludeCommonConventions = false;
                     options.EnableEnumTables = false;
-
+                    options.ConventionsOptions.IncludeCommonConventions = false;
                     optionsInit?.Invoke(options);
                 });
 

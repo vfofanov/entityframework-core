@@ -7,6 +7,6 @@ namespace Stenn.EntityConventions.Contacts
     /// </summary>
     public interface IConcurrentAuditedEntity
     {
-        byte[] RowVersion => throw new NotSupportedException("This property exists for EF declaration only. For usage explicit declare it in inheritor");
+        byte[] RowVersion => throw ExceptionHelper.ThrowRegistrationOnly();
     }
 }

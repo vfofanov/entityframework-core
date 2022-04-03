@@ -9,9 +9,9 @@ using Stenn.EntityFrameworkCore.Data.Main;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
-    [Migration("20220328125549_RoleSoftDelete2")]
-    partial class RoleSoftDelete2
+    [DbContext(typeof(MainDbContext_Step2))]
+    [Migration("20220328093627_RoleSoftDelete")]
+    partial class RoleSoftDelete
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -90,16 +90,11 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.Property<DateTime?>("Deleted")
                         .HasColumnType("datetime2")
-                        .HasComment("Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+                        .HasComment("Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'")
+                        .HasAnnotation("ColumnTriggerSoftDelete", true);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasComment("Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
 
                     b.Property<DateTime>("ModifiedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -120,15 +115,10 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsDeleted");
-
                     b.HasIndex("SourceSystemId")
                         .IsUnique();
 
                     b.ToTable("Role");
-
-                    b
-                        .HasAnnotation("ColumnTriggerSoftDelete", true);
                 });
 #pragma warning restore 612, 618
         }

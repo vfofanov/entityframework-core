@@ -3,58 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Stenn.EntityFrameworkCore.Data.Main;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
-    partial class MainDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(MainDbContext_Step2))]
+    [Migration("20220328125549_RoleSoftDelete2")]
+    partial class RoleSoftDelete2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.15")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Animal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()")
-                        .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)")
-                        .IsFixedLength(false)
-                        .HasComment("Discriminator. Configured by convention 'IEntityWithDiscriminator<>'");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()")
-                        .HasComment("Row last modified datetime. Updated by trigger. Configured by convention 'IUpdateAuditedEntity'")
-                        .HasAnnotation("ColumnTriggerUpdate", "getdate()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Discriminator");
-
-                    b.ToTable("Animal");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Animal");
-                });
 
             modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Contact", b =>
                 {
@@ -107,9 +72,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.Property<int>("IsoNumericCode")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Iso3LetterCode");
 
                     b.ToTable("Currency");
@@ -152,34 +114,21 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.Property<string>("SourceSystemId")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)")
-                        .IsFixedLength(false)
-                        .HasComment("Source system id. Row id for cross services' communication. Configured by convention 'IEntityWithSourceSystemId'");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComment("Source system id. Row id for cross services' communication. Uses trigger on row insertion. Configured by convention 'IEntityWithSourceSystemId'");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted");
 
+                    b.HasIndex("SourceSystemId")
+                        .IsUnique();
+
                     b.ToTable("Role");
 
                     b
                         .HasAnnotation("ColumnTriggerSoftDelete", true);
-                });
-
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Cat", b =>
-                {
-                    b.HasBaseType("Stenn.EntityFrameworkCore.Data.Main.Animal");
-
-                    b.HasDiscriminator().HasValue("Cat");
-                });
-
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Elefant", b =>
-                {
-                    b.HasBaseType("Stenn.EntityFrameworkCore.Data.Main.Animal");
-
-                    b.HasDiscriminator().HasValue("Elefant");
                 });
 #pragma warning restore 612, 618
         }

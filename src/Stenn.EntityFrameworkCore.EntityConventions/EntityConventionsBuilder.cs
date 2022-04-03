@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Stenn.EntityConventions.Contacts;
 
 namespace Stenn.EntityFrameworkCore.EntityConventions
 {
@@ -13,6 +14,16 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
     {
         private readonly List<IEntityConvention> _conventions = new();
 
+        public EntityConventionsBuilder(EntityConventionsCommonDefaultsOptions defaultOptions)
+        {
+            DefaultOptions = defaultOptions;
+        }
+
+        
+
+        public EntityConventionsCommonDefaultsOptions DefaultOptions { get; }
+
+        
         public void Add(IEntityConvention convention)
         {
             if (convention == null)
@@ -39,7 +50,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     configure(builder, propInfo, prop);
                 }));
         }
-
+        
         /// <inheritdoc />
         public bool HasConventions => _conventions.Count > 0;
 

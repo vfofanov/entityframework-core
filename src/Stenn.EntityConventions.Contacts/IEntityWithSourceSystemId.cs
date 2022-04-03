@@ -3,7 +3,7 @@
 namespace Stenn.EntityConventions.Contacts
 {
     /// <summary>
-    /// Entity with creation audited property Created
+    /// Entity with source system id property
     /// </summary>
     public interface IEntityWithSourceSystemId
     {
@@ -13,6 +13,6 @@ namespace Stenn.EntityConventions.Contacts
         /// <returns></returns>
         string GenerateSourceSystemId();
 
-        string SourceSystemId => throw new NotSupportedException("This property exists for EF declaration only. For usage explicit declare it in inheritor");
+        string SourceSystemId => throw ExceptionHelper.ThrowRegistrationOnly();
     }
 }
