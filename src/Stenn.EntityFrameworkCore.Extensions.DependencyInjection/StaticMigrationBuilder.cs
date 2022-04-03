@@ -31,12 +31,12 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// </param>
         /// <param name="assembly">Assembly wtih scripts resources. If null calling assembly will be used</param>
         /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
-        public void AddResSql(string name, string applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null,
+        public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null,
             bool suppressTransaction = false)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
-            var applyResFile = ResFile.Relative(applyRelativeResFilePath, assembly);
+            var applyResFile = string.IsNullOrEmpty(applyRelativeResFilePath) ? null : ResFile.Relative(applyRelativeResFilePath, assembly);
             var revertResFile = string.IsNullOrEmpty(revertRelativeResFilePath) ? null : ResFile.Relative(revertRelativeResFilePath, assembly);
             AddResSql(name, applyResFile, revertResFile, suppressTransaction);
         }
