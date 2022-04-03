@@ -35,7 +35,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInje
 
         private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
         {
-            private long? _serviceProviderHash;
+            private int? _serviceProviderHash;
             private string? _logFragment;
 
             public ExtensionInfo(SplittedMigrationsOptionsExtension extension)
@@ -66,6 +66,13 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInje
                 }
             }
 
+            /// <inheritdoc />
+            public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            {
+                return other is ExtensionInfo otherInfo &&
+                       otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
+            }
+
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
                 if (debugInfo == null)
@@ -76,7 +83,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInje
                 debugInfo["Aggregate Migrations: Assemblies"] = string.Join(";", Extension.Options.Anchors.Select(t => t.FullName));
             }
 
-            public override long GetServiceProviderHashCode()
+            public override int GetServiceProviderHashCode()
             {
                 if (_serviceProviderHash != null)
                 {
