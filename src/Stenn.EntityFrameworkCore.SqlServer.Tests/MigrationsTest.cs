@@ -42,8 +42,9 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true, builder =>
             {
                 //NOTE: Add migrations splitted to separate assemblies
-                builder.AddSplittedMigrations<MainDbContext_Step1>();
-                builder.AddSplittedMigrations<MainDbContext_Step2>();
+                builder.AddSplittedMigrations(
+                    b => b.Add<MainDbContext_Step1>()
+                        .Add<MainDbContext_Step2>());
             });
             _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
         }
@@ -216,6 +217,20 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                     }
                     count.Should().Be(afterAddCount);
                 });
+        }
+
+        [TestCase(1000)]
+        public async Task CreateMultipleRequests(int countOfParallelRequests)
+        {
+            await Migrate_Main();
+            Enumerable.Range(0, countOfParallelRequests).AsParallel().ForAll(i =>
+            {
+                using var scope = _serviceProviderMain.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<MainDbContext>();
+                var currencies = dbContext.Set<Currency>().ToList();
+                Console.WriteLine($"Id: {i}, ContextId:{dbContext.ContextId.InstanceId}, Count:{currencies.Count}");
+            });
+
         }
 
         private static async Task CheckSelect(Microsoft.EntityFrameworkCore.DbContext context, string selectCommand, Func<DbDataReader, Task> check)
