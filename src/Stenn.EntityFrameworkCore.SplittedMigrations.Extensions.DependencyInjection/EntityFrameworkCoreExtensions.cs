@@ -11,31 +11,49 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInje
     /// </summary>
     public static class EntityFrameworkCoreExtensions
     {
-        
         /// <summary>
-        /// Add splitted migrations as migrations for context
+        /// Add splitted migrations
         /// </summary>
         /// <param name="optionsBuilder">Db context options builder</param>
-        /// <typeparam name="TDbConextAnchor">DbContext splitted migrations anchor for assembly with splitted migrations</typeparam>
+        /// <param name="init">Initialize action</param>
         /// <returns></returns>
-        public static DbContextOptionsBuilder AddSplittedMigrations<TDbConextAnchor>(
-            this DbContextOptionsBuilder optionsBuilder)
-        where TDbConextAnchor:DbContext
+        public static DbContextOptionsBuilder AddSplittedMigrations(this DbContextOptionsBuilder optionsBuilder,
+            Action<SplittedMigrationsBuilder> init)
         {
-            optionsBuilder.ReplaceService<IMigrationsAssembly, SplittedMigrationsAssembly>();
-            
-            
             var extension = optionsBuilder.Options.FindExtension<SplittedMigrationsOptionsExtension>();
+            if (extension != null)
+            {
+                throw new InvalidOperationException("Splitted migrations are already registered");
+            }
+            optionsBuilder.ReplaceService<IMigrationsAssembly, SplittedMigrationsAssembly>();
 
-            var anchors = extension == null 
-                ? new List<Type>() 
-                : new List<Type>(extension.Options.Anchors);
-            anchors.Add(typeof(TDbConextAnchor));
-            
-            extension = new SplittedMigrationsOptionsExtension(anchors.ToArray());
+            var builder = new SplittedMigrationsBuilder();
+            init(builder);
+            extension = new SplittedMigrationsOptionsExtension(builder.Anchors.ToArray());
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 
             return optionsBuilder;
+        }
+    }
+
+    public sealed class SplittedMigrationsBuilder
+    {
+        internal List<Type> Anchors { get; }
+
+        internal SplittedMigrationsBuilder()
+        {
+            Anchors = new();
+        }
+
+        /// <summary>
+        /// Add type of splitted migrations' db context
+        /// </summary>
+        /// <typeparam name="TDbConextAnchor"></typeparam>
+        public SplittedMigrationsBuilder Add<TDbConextAnchor>()
+            where TDbConextAnchor : DbContext
+        {
+            Anchors.Add(typeof(TDbConextAnchor));
+            return this;
         }
     }
 }

@@ -20,14 +20,19 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
 
         /// <inheritdoc />
         public SplittedMigrationsAssembly(
-            SplittedMigrationsOptions splittedOptions,
             ICurrentDbContext currentContext,
             IDbContextOptions options,
             IMigrationsIdGenerator idGenerator,
             IDiagnosticsLogger<DbLoggerCategory.Migrations> logger)
             : base(currentContext, options, idGenerator, logger)
         {
-            _splittedOptions = splittedOptions;
+            var splittedMigrationExtension = options.FindExtension<SplittedMigrationsOptionsExtension>();
+            if (splittedMigrationExtension == null)
+            {
+                throw new InvalidOperationException("Can't find SplittedMigrationsOptionsExtension extension");
+            }
+            _splittedOptions = splittedMigrationExtension.Options;
+
             _currentContext = currentContext;
             _options = options;
             _idGenerator = idGenerator;

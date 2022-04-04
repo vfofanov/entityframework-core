@@ -42,9 +42,9 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true, builder =>
             {
                 //NOTE: Add migrations splitted to separate assemblies
-                builder.AddSplittedMigrations(
-                    b => b.Add<MainDbContext_Step1>()
-                        .Add<MainDbContext_Step2>());
+                builder.AddSplittedMigrations(b => b
+                    .Add<MainDbContext_Step1>()
+                    .Add<MainDbContext_Step2>());
             });
             _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
         }

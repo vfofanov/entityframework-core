@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Stenn.EntityFrameworkCore.SplittedMigrations
 {
@@ -25,7 +26,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
             {
                 return true;
             }
-            return Anchors.Equals(other.Anchors);
+            return Anchors.SequenceEqual(Anchors);
         }
 
         /// <inheritdoc />
@@ -49,7 +50,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return Anchors.GetHashCode();
+            return Anchors.Aggregate(0, HashCode.Combine);
         }
     }
 }

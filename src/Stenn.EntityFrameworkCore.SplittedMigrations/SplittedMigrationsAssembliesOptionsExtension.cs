@@ -5,9 +5,9 @@ using System.Text;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection
+namespace Stenn.EntityFrameworkCore.SplittedMigrations
 {
-    internal sealed class SplittedMigrationsOptionsExtension : IDbContextOptionsExtension
+    public sealed class SplittedMigrationsOptionsExtension : IDbContextOptionsExtension
     {
         private ExtensionInfo? _info;
         public SplittedMigrationsOptions Options { get; }
