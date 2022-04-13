@@ -5,8 +5,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj" />
-  </ItemGroup>
-
 </Project>

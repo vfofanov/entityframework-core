@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Stenn.DictionaryEntities;
 using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
@@ -95,11 +94,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
                 provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).SQLMigrations);
 
-            services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
-                provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).DictEntityMigrations);
-
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
-            services.TryAddScoped<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
 
             var relationalOverrided = OverrideService<IRelationalDatabaseCreator>(services, (provider, creator) =>
                 new RelationalDatabaseCreatorWithStaticMigrations(creator,

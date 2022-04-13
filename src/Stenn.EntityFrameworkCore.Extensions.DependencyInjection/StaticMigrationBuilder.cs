@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.StaticMigrations;
@@ -12,7 +11,6 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     /// </summary>
     public sealed class StaticMigrationBuilder
     {
-        internal StaticMigrationCollection<IDictionaryEntityMigration, DbContext> DictEntityMigrations { get; } = new();
         internal StaticMigrationCollection<IStaticSqlMigration, DbContext> SQLMigrations { get; } = new();
 
         public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null)
@@ -91,29 +89,6 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory)
         {
             SQLMigrations.Add(name, migrationFactory);
-        }
-
-        public void AddDictionaryEntity<T>(Func<List<T>> getActual)
-            where T : class
-        {
-            AddDictionaryEntity(typeof(T).Name, getActual);
-        }
-
-        public void AddDictionaryEntity<T>(string name, Func<List<T>> getActual)
-            where T : class
-        {
-            AddDictionaryEntityMigration(name, context => new DictionaryEntityMigration<T>(getActual, context.ToDictionaryEntityContext()));
-        }
-
-        public void AddDictionaryEntityMigration<TMigration>(string name)
-            where TMigration : IDictionaryEntityMigration, new()
-        {
-            AddDictionaryEntityMigration(name, _ => new TMigration());
-        }
-
-        public void AddDictionaryEntityMigration(string name, Func<DbContext, IDictionaryEntityMigration> migrationFactory)
-        {
-            DictEntityMigrations.Add(name, migrationFactory);
         }
     }
 }

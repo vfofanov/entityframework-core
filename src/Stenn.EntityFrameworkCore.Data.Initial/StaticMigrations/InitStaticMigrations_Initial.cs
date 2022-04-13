@@ -10,8 +10,6 @@ namespace Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations
             migrations.AddInitResSql("InitDB", @"\StaticMigrations\Sql\InitDB.Apply.sql", suppressTransaction: true);
 
             migrations.AddResSql("TestViews", @"\StaticMigrations\Sql\TestViews.Apply.sql", @"StaticMigrations\Sql\TestViews.Revert.sql");
-
-            migrations.AddDictionaryEntity(CurrencyDeclaration.GetActual);
         }
     }
 }

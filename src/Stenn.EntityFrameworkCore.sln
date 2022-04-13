@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 		..\.github\workflows\build_and_publish_nuget.yml = ..\.github\workflows\build_and_publish_nuget.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.DictionaryEntities", "Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj", "{D3693447-48B5-4651-8087-FCC6A799457E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{4D0A2092-01C6-4396-A117-31263DD64D57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Tests", "Stenn.EntityFrameworkCore.SqlServer.Tests\Stenn.EntityFrameworkCore.SqlServer.Tests.csproj", "{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}"
@@ -72,10 +70,6 @@ Global
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Release|Any CPU.ActiveCfg = Release|Any CPU

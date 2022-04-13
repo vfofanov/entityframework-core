@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Stenn.EntityFrameworkCore.Data.Initial;
+using Stenn.EntityFrameworkCore.Data.Main;
 
-namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
+namespace Stenn.EntityFrameworkCore.DbContext.Main.Migrations
 {
-    [DbContext(typeof(InitialDbContext))]
-    partial class InitialDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(MainDbContext))]
+    [Migration("20220413194856_AddCurrencyData")]
+    partial class AddCurrencyData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -18,7 +20,7 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                 .HasAnnotation("ProductVersion", "5.0.15")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Initial.CurrencyV1", b =>
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Currency", b =>
                 {
                     b.Property<string>("Iso3LetterCode")
                         .HasMaxLength(3)
