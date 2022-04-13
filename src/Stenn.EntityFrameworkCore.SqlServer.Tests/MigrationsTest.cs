@@ -11,6 +11,7 @@ using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
+using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
@@ -64,6 +65,13 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                     {
                         options.InitMigrations = init;
                         options.ConventionsOptions.IncludeCommonConventions = includeCommonConventions;
+                        options.ConventionsOptions.InitEntityConventions = b =>
+                        {
+                            if (includeCommonConventions)
+                            {
+                                b.AddTriggerBasedCommonConventions();
+                            }
+                        };
                     });
                     
                     additionalInit?.Invoke(builder);
@@ -189,7 +197,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var originCount = _dbContextMain.Set<Role>().Count();
 
             var newRoleDeleteId = Guid.NewGuid();
-            await _dbContextMain.Set<Role>().AddAsync(Role.Create(newRoleDeleteId.ToString(), "ForDelete"));
+            var roleForDelete = Role.Create(newRoleDeleteId.ToString(), "ForDelete");
+            await _dbContextMain.Set<Role>().AddAsync(roleForDelete);
             await _dbContextMain.SaveChangesAsync();
             
             var afterAddCount = _dbContextMain.Set<Role>().Count();

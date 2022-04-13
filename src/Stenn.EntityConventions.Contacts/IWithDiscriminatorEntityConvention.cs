@@ -3,7 +3,7 @@ namespace Stenn.EntityConventions.Contacts
     /// <summary>
     /// Entity with discriminator for inheritance
     /// </summary>
-    public interface IEntityWithDiscriminator<out T> : IEntityWithDiscriminator
+    public interface IWithDiscriminatorEntityConvention<out T> : IWithDiscriminatorEntityConvention
     {
         T Discriminator => throw ExceptionHelper.ThrowRegistrationOnly();
     }
@@ -11,7 +11,7 @@ namespace Stenn.EntityConventions.Contacts
     /// <summary>
     /// Entity with discriminator for inheritance
     /// </summary>
-    public interface IEntityWithDiscriminator
+    public interface IWithDiscriminatorEntityConvention : IEntityConventionContract
     {
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityConventions.Contacts;
+using Stenn.EntityConventions.Contacts.TriggerBased;
 using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
@@ -70,7 +71,7 @@ CREATE TRIGGER [{suffix}_SoftDelete{NameSuffix}]
     AS
     IF @@ROWCOUNT = 0 RETURN;
     UPDATE {tableName}
-    SET {nameof(ISoftDeleteEntity.Deleted)} = GETDATE(), {nameof(ISoftDeleteEntity.IsDeleted)} = 1
+    SET {nameof(ISoftDeleteEntityConvention.Deleted)} = GETDATE(), {nameof(ISoftDeleteEntityConvention.IsDeleted)} = 1
     FROM {tableName} t
         INNER JOIN deleted ON {keyExpressionStr}"
                 };

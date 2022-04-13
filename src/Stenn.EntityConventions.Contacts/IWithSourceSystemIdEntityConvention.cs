@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace Stenn.EntityConventions.Contacts
+﻿namespace Stenn.EntityConventions.Contacts
 {
     /// <summary>
     /// Entity with source system id property
     /// </summary>
-    public interface IEntityWithSourceSystemId
+    public interface IWithSourceSystemIdEntityConvention : IEntityConventionContract
     {
         /// <summary>
         /// Generate source system id
