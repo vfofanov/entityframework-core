@@ -1,6 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,9 +64,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 }
                 else
                 {
+                    var initialOperations = StaticMigrationsService.GetInitialOperations(_migrateContext.MigrationDate, false);
                     var revertOperations = StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, false);
                     var applyOperations = StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, false);
-                    var operations = revertOperations.Concat(applyOperations).ToList();
+                    
+                    var operations = initialOperations.Concat(revertOperations).Concat(applyOperations).ToList();
+                    
                     Execute(operations);
                 }
             }
@@ -75,6 +79,17 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             }
             var dictEntityOperations = StaticMigrationsService.MigrateDictionaryEntities(modified);
             Execute(dictEntityOperations);
+        }
+
+        private void CheckForSuppressTransaction(IEnumerable<Migration> migrations)
+        {
+            foreach (var migration in migrations)
+            {
+                foreach (var operation in migration.UpOperations)
+                { 
+                    StaticMigrationsService.CheckForSuppressTransaction(migration.GetId(), operation);
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -93,11 +108,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 }
                 else
                 {
+                    var initialOperations = await StaticMigrationsService.GetInitialOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
+                        .ConfigureAwait(false);
                     var revertOperations = await StaticMigrationsService.GetRevertOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
                         .ConfigureAwait(false);
                     var applyOperations = await StaticMigrationsService.GetApplyOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
                         .ConfigureAwait(false);
-                    var operations = revertOperations.Concat(applyOperations).ToList();
+                    
+                    var operations = initialOperations.Concat(revertOperations).Concat(applyOperations).ToList();
 
                     await ExecuteAsync(operations, cancellationToken).ConfigureAwait(false);
                 }
@@ -130,9 +148,15 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 out _,
                 out _);
 
-            return migrationsToApply.Count == 0
-                ? new MigrateContext(migrationDate)
-                : new MigrateContext(migrationsToApply.First().GetId(), migrationsToApply.Last().GetId(), migrationDate);
+            if (migrationsToApply is { Count: > 0 })
+            {
+                CheckForSuppressTransaction(migrationsToApply);
+                return new MigrateContext(migrationsToApply.First().GetId(), migrationsToApply.Last().GetId(), migrationDate);
+            }
+            else
+            {
+                return new MigrateContext(migrationDate);
+            }
         }
 
         /// <inheritdoc />
@@ -148,17 +172,24 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             if (migrationId == _migrateContext.FirstMigrationId &&
                 migrationId == _migrateContext.LastMigrationId)
             {
+                //NOTE: Add initial static migrations at the beggining of first migration 
+                var initialCommands = GenerateCommands(StaticMigrationsService.GetInitialOperations(_migrateContext.MigrationDate, true).ToList());
+
                 //NOTE: Add revert static migrations at the beggining of first migration 
                 var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
                 //NOTE: Add apply static migrations at the end of last migration
                 var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
-                return revertCommands.Concat(migrationCommands).Concat(applyCommands).ToList();
+
+                return initialCommands.Concat(revertCommands.Concat(migrationCommands).Concat(applyCommands)).ToList();
             }
             if (migrationId == _migrateContext.FirstMigrationId)
             {
+                //NOTE: Add initial static migrations at the beggining of first migration 
+                var initialCommands = GenerateCommands(StaticMigrationsService.GetInitialOperations(_migrateContext.MigrationDate, true).ToList());
                 //NOTE: Add revert static migrations at the beggining of first migration 
                 var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
-                return revertCommands.Concat(migrationCommands).ToList();
+
+                return initialCommands.Concat(revertCommands.Concat(migrationCommands)).ToList();
             }
             if (migrationId == _migrateContext.LastMigrationId)
             {
@@ -166,7 +197,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
                 return migrationCommands.Concat(applyCommands).ToList();
             }
+
             return migrationCommands;
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        {
+            throw new NotSupportedException("Down migration doesn't supported by migrator with static migrations");
         }
 
         private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operations)

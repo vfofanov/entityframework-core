@@ -7,8 +7,9 @@ namespace Stenn.EntityFrameworkCore.Data.Main.StaticMigrations
     {
         public static void Init(StaticMigrationBuilder migrations)
         {
-            migrations.AddResSql("TestViews", @"\StaticMigrations\Sql\TestViews.Apply.sql", @"StaticMigrations\Sql\TestViews.Revert.sql",
-                suppressTransaction: true);
+            migrations.AddInitResSql("InitDB", @"\StaticMigrations\Sql\InitDB.Apply.sql", suppressTransaction: true);
+            
+            migrations.AddResSql("TestViews", @"\StaticMigrations\Sql\TestViews.Apply.sql", @"StaticMigrations\Sql\TestViews.Revert.sql");
 
             InitDictEntities(migrations);
         }

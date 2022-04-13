@@ -15,30 +15,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         internal StaticMigrationCollection<IDictionaryEntityMigration, DbContext> DictEntityMigrations { get; } = new();
         internal StaticMigrationCollection<IStaticSqlMigration, DbContext> SQLMigrations { get; } = new();
 
-        /// <summary>
-        ///     Add sql resource static migration
-        /// </summary>
-        /// <param name="name">Migration's name</param>
-        /// <param name="applyRelativeResFilePath">
-        ///     Migration's apply script resource file path.
-        ///     It relative for assembly name. If your assembly's root namespace differs from assembly's name use overload
-        ///     <see cref="AddResSql(string,ResFile,ResFile?,bool)" />
-        /// </param>
-        /// <param name="revertRelativeResFilePath">
-        ///     Migration's revert script resource file path.
-        ///     It relative for assembly name. If your assembly's root namespace differs from assembly's name use overload
-        ///     <see cref="AddResSql(string,ResFile,ResFile?,bool)" />
-        /// </param>
-        /// <param name="assembly">Assembly wtih scripts resources. If null calling assembly will be used</param>
-        /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
-        public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null,
-            bool suppressTransaction = false)
+        public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
             var applyResFile = string.IsNullOrEmpty(applyRelativeResFilePath) ? null : ResFile.Relative(applyRelativeResFilePath, assembly);
             var revertResFile = string.IsNullOrEmpty(revertRelativeResFilePath) ? null : ResFile.Relative(revertRelativeResFilePath, assembly);
-            AddResSql(name, applyResFile, revertResFile, suppressTransaction);
+            AddResSql(name, applyResFile, revertResFile);
         }
 
         /// <summary>
@@ -51,8 +34,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="revertFile">
         ///     Migration's revert script resource file path.
         /// </param>
-        /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
-        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile, bool suppressTransaction = false)
+        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile)
         {
             if (name == null)
             {
@@ -62,7 +44,47 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(applyFile));
             }
-            var migration = new ResStaticSqlMigration(applyFile, revertFile, suppressTransaction);
+            var migration = new ResStaticSqlMigration(applyFile, revertFile);
+            AddStaticSqlFactory(name, _ => migration);
+        }
+
+        /// <summary>
+        ///     Add sql resource static migration as initial migration
+        /// </summary>
+        /// <param name="name">Migration's name</param>
+        /// <param name="relativeResFilePath">Migration's apply script resource file path.
+        ///     It relative for assembly name. If your assembly's root namespace differs from assembly's name use overload</param>
+        /// <param name="assembly">Assembly wtih scripts resources. If null calling assembly will be used
+        ///     <see cref="AddInitResSql(string,ResFile,bool)" />
+        /// </param>
+        /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
+        public void AddInitResSql(string name, string relativeResFilePath, Assembly? assembly = null, bool suppressTransaction = false)
+        {
+            if (string.IsNullOrEmpty(relativeResFilePath))
+            {
+                throw new ArgumentException("Value cannot be null or empty.", nameof(relativeResFilePath));
+            }
+            assembly ??= Assembly.GetCallingAssembly();
+
+            var resFile = ResFile.Relative(relativeResFilePath, assembly);
+            AddInitResSql(name, resFile, suppressTransaction);
+        }
+
+        /// <summary>
+        ///     Add sql resource static migration as initial migration
+        /// </summary>
+        /// <param name="name">Migration's name</param>
+        /// <param name="applyFile">
+        ///     Migration's apply script resource file path.
+        /// </param>
+        /// <param name="suppressTransaction">Indicates whether or not transactions will be suppressed while executing the SQL</param>
+        public void AddInitResSql(string name, ResFile applyFile, bool suppressTransaction = false)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            var migration = new InitResStaticSqlMigration(applyFile, suppressTransaction);
             AddStaticSqlFactory(name, _ => migration);
         }
 
