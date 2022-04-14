@@ -11,7 +11,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
         {
             builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
             builder.Property(x => x.Name).IsRequired();
-
+            
             builder.HasKey(x => x.Id);
 
             builder.HasData(RoleDeclaration.GetActual());

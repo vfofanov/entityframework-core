@@ -31,6 +31,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
                     p.IsRequired()
                         .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
+                        .ValueGeneratedOnAdd()
                         .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'");
 
                     if (options.HasValueGenerator)

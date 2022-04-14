@@ -91,7 +91,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     Scale = prop.GetScale(tableQuilifier),
                     Precision = prop.GetPrecision(tableQuilifier),
                     MaxLength = prop.GetMaxLength(tableQuilifier),
-                    IsNullable = prop.IsNullable,
+                    IsNullable = false,
                     IsUnicode = prop.IsUnicode(tableQuilifier),
                     IsFixedLength = prop.IsFixedLength(tableQuilifier)
                 });
