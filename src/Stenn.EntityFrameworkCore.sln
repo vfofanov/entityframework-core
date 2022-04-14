@@ -56,6 +56,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.TriggerBased.Contacts", "Stenn.EntityConventions.TriggerBased.Contacts\Stenn.EntityConventions.TriggerBased.Contacts.csproj", "{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj", "{9834F941-47B0-44CC-9DAE-839BD6F71F65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +138,14 @@ Global
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,5 +163,7 @@ Global
 		{9D173795-BE10-4366-BD34-83BA59B3F486} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 		{F19D4945-4921-40EF-90C5-19AB688EB617} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{400665A8-CA03-4E79-B154-75CF44DDDAE3} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 	EndGlobalSection
 EndGlobal

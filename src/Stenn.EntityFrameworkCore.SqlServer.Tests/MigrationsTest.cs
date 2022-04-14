@@ -12,6 +12,7 @@ using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.EntityConventions;
+using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;

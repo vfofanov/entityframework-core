@@ -9,5 +9,7 @@
         public ContactStrType TypeName { get; set; }
         
         public ContactStr2Type TypeName2 { get; set; }
+        
+        public ContactTypeNullable? TypeNameNullable { get; set; }
     }
 }
