@@ -178,7 +178,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
             
-            enumTables.Should().HaveCount(4);
+            enumTables.Should().HaveCount(5);
 
             var table = enumTables.First().Table;
             
