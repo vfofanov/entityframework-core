@@ -11,4 +11,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.15" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="SplittedMigrationsByAttributeAssembly.cs" />
+    </ItemGroup>
+
 </Project>

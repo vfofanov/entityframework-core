@@ -153,7 +153,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 yield return command;
             }
         }
-
+        
         protected virtual MigrateContext GetMigrateContext(IEnumerable<HistoryRow> appliedMigrationEntries, DateTime migrationDate)
         {
             PopulateMigrations(appliedMigrationEntries.Select(t => t.MigrationId),
@@ -164,7 +164,18 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             
             return new MigrateContext(migrationsToApply, migrationDate);
         }
-        
+
+        /// <inheritdoc />
+        protected override void PopulateMigrations(IEnumerable<string> appliedMigrationEntries,
+            string targetMigration,
+            out IReadOnlyList<Migration> migrationsToApply,
+            out IReadOnlyList<Migration> migrationsToRevert,
+            out Migration actualTargetMigration)
+        {
+            //TODO: Use MigrationsSorter here
+            base.PopulateMigrations(appliedMigrationEntries, targetMigration, out migrationsToApply, out migrationsToRevert, out actualTargetMigration);
+        }
+
         /// <inheritdoc />
         protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {

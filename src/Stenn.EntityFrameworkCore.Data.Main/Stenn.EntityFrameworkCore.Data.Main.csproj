@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
