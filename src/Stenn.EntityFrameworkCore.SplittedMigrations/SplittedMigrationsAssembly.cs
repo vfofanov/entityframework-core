@@ -1,6 +1,9 @@
+﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -9,10 +12,9 @@ using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
 namespace Stenn.EntityFrameworkCore.SplittedMigrations
 {
-    public class SplittedMigrationsAssembly : MigrationsAssembly
+    public class SplittedMigrationsAssembly: MigrationsAssembly
     {
-        private IReadOnlyDictionary<string, TypeInfo>? _migrations;
-        private readonly SplittedMigrationsOptions _splittedOptions;
+        private readonly IHistoryRepository _historyRepository;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDbContextOptions _options;
         private readonly IMigrationsIdGenerator _idGenerator;
@@ -20,19 +22,14 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
 
         /// <inheritdoc />
         public SplittedMigrationsAssembly(
-            ICurrentDbContext currentContext,
-            IDbContextOptions options,
+            ICurrentDbContext currentContext, 
+            IDbContextOptions options, 
             IMigrationsIdGenerator idGenerator,
-            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger)
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger, 
+            IHistoryRepository historyRepository) 
             : base(currentContext, options, idGenerator, logger)
         {
-            var splittedMigrationExtension = options.FindExtension<SplittedMigrationsOptionsExtension>();
-            if (splittedMigrationExtension == null)
-            {
-                throw new InvalidOperationException("Can't find SplittedMigrationsOptionsExtension extension");
-            }
-            _splittedOptions = splittedMigrationExtension.Options;
-
+            _historyRepository = historyRepository;
             _currentContext = currentContext;
             _options = options;
             _idGenerator = idGenerator;
@@ -40,82 +37,127 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
         }
 
         /// <inheritdoc />
-        public override IReadOnlyDictionary<string, TypeInfo> Migrations
+        public override IReadOnlyDictionary<string, TypeInfo> Migrations =>
+            new Dictionary<string, TypeInfo>(PopulateMigrations(_historyRepository.GetAppliedMigrations().Select(t => t.MigrationId)));
+
+        public IEnumerable<KeyValuePair<string, TypeInfo>> PopulateMigrations(IEnumerable<string> appliedMigrationEntries)
         {
-            get
+            var appliedMigrationEntrySet = new HashSet<string>(appliedMigrationEntries, StringComparer.OrdinalIgnoreCase);
+            return PopulateMigrations(base.Migrations, appliedMigrationEntrySet, null);
+        }
+
+        private IEnumerable<KeyValuePair<string, TypeInfo>> PopulateMigrations(IReadOnlyDictionary<string, TypeInfo> migrations,
+            HashSet<string> appliedMigrationEntrySet, List<string>? allMigrationIds)
+        {
+            allMigrationIds ??= new List<string>(migrations.Count);
+            var splittedMigration = migrations.SingleOrDefault(m => m.Value.HasSplittedMigrations());
+            if (splittedMigration is { Value: { } })
             {
-                IReadOnlyDictionary<string, TypeInfo> Create()
+                var splittedMigrationsAttr = splittedMigration.Value.GetSplittedMigrations();
+                var splittedMigrations = GetItems(splittedMigrationsAttr.DbContextType);
+
+                if (splittedMigrationsAttr.Initial)
                 {
-                    var result = new SortedList<string, TypeInfo>();
-
-                    foreach (var anchor in _splittedOptions.Anchors)
+                    var initialMigrationId = splittedMigration.Key;
+                    if (appliedMigrationEntrySet.Count == 0)
                     {
-                        var item = new ItemMigrationsAssembly(anchor, _currentContext, _options, _idGenerator, _logger);
-                        foreach (var (key, migration) in item.Migrations)
+                        //NOTE: Retuns initial migration first 
+                        yield return splittedMigration;
+                        appliedMigrationEntrySet.Add(initialMigrationId);
+                    }
+                    else if (!appliedMigrationEntrySet.Contains(initialMigrationId))
+                    {
+                        //NOTE: Returns all splitted migrations and after remove history rows about them
+                        var allSplittedMigrationIds = new List<string>(splittedMigrations.Count);
+                        foreach (var migration in PopulateMigrations(splittedMigrations, appliedMigrationEntrySet, allSplittedMigrationIds))
                         {
-                            result.Add(key, migration);
+                            yield return migration;
                         }
+                        var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allSplittedMigrationIds.ToArray());
+                        yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
+                        appliedMigrationEntrySet.Add(initialMigrationId);
                     }
-                    foreach (var (key, migration) in base.Migrations)
-                    {
-                        result.Add(key, migration);
-                    }
-                    return result;
                 }
+                else
+                {
+                    foreach (var migration in PopulateMigrations(splittedMigrations, appliedMigrationEntrySet, allMigrationIds))
+                    {
+                        yield return migration;
+                    }
+                }
+            }
 
-                return _migrations ??= Create();
+            foreach (var migration in migrations)
+            {
+                allMigrationIds.Add(migration.Key);
+                if (!appliedMigrationEntrySet.Contains(migration.Key))
+                {
+                    yield return migration;
+                }
             }
         }
 
-        private sealed class ItemMigrationsAssembly : MigrationsAssembly
+        /// <inheritdoc />
+        public override Migration CreateMigration(TypeInfo migrationClass, string activeProvider)
         {
-            /// <summary>
-            /// Set a private Property Value on a given Object. Uses Reflection.
-            /// </summary>
-            /// <typeparam name="T">Type of the Property</typeparam>
-            /// <param name="obj">Object from where the Property Value is returned</param>
-            /// <param name="propName">Propertyname as string.</param>
-            /// <param name="val">the value to set</param>
-            /// <exception cref="ArgumentOutOfRangeException">if the Property is not found</exception>
-            public static void SetPrivateFieldValue<T>(object obj, string propName, T val)
+            if (!migrationClass.IsAssignableTo(typeof(InitialMigrationReplaceBase)))
             {
-                if (obj == null)
-                {
-                    throw new ArgumentNullException(nameof(obj));
-                }
-                var t = obj.GetType();
-                FieldInfo? fi = null;
-                while (fi == null && t != null)
-                {
-                    fi = t.GetField(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    t = t.BaseType;
-                }
-                if (fi == null)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(propName), $"Field {propName} was not found in Type {obj.GetType().FullName}");
-                }
-                fi.SetValue(obj, val);
+                return base.CreateMigration(migrationClass, activeProvider);
             }
+            
+            var removeMigrationRowIds = migrationClass.GetInitialMigration().RemoveMigrationRowIds;
+            var migration = (Migration)Activator.CreateInstance(migrationClass.AsType(), _historyRepository, removeMigrationRowIds)!;
+            migration.ActiveProvider = activeProvider;
 
-            /// <inheritdoc />
-            public ItemMigrationsAssembly(
-                Type dbContextAnchorType,
-                ICurrentDbContext currentContext,
-                IDbContextOptions options,
-                IMigrationsIdGenerator idGenerator,
-                IDiagnosticsLogger<DbLoggerCategory.Migrations> logger)
-                : base(currentContext, options, idGenerator, logger)
+            return migration;
+        }
+
+        private IReadOnlyDictionary<string, TypeInfo> GetItems(Type dbContextType)
+        {
+            var migrationsAssembly = new ItemMigrationsAssembly(dbContextType, _currentContext, _options, _idGenerator, _logger);
+            return migrationsAssembly.Migrations;
+        }
+
+        private static TypeInfo CreateInitialMigrationReplaceType(string migrationId, string[] migrationIds)
+        {
+            var assemblyName = $"Assembly{migrationId}";
+            var aName = new AssemblyName(assemblyName);
+            var ab = AssemblyBuilder.DefineDynamicAssembly(aName, AssemblyBuilderAccess.Run);
+
+            // The module name is usually the same as the assembly name.
+            var mb = ab.DefineDynamicModule(assemblyName);
+
+            var parent = typeof(InitialMigrationReplaceBase);
+            var tb = mb.DefineType("InitialMigration", TypeAttributes.Public, parent);
+
+            #region MigrationAttribute
             {
-                Assembly = dbContextAnchorType.Assembly;
-                SetPrivateFieldValue(this, "_contextType", dbContextAnchorType);
+                var con = typeof(MigrationAttribute).GetConstructor(new[] { typeof(string) })!;
+                tb.SetCustomAttribute(new CustomAttributeBuilder(con, new object?[] { migrationId }));
             }
+            #endregion
+            #region InitialMigrationAttribute
+            {
+                var con = typeof(InitialMigrationAttribute).GetConstructor(new[] { typeof(string[]) })!;
+                tb.SetCustomAttribute(new CustomAttributeBuilder(con, new object?[] { migrationIds }));
+            }
+            #endregion
 
-            /// <inheritdoc />
-            public override Assembly Assembly { get; }
+            Type[] parameterTypes = { typeof(IHistoryRepository), typeof(List<string>) };
+            var ctor1 = tb.DefineConstructor(
+                MethodAttributes.Public,
+                CallingConventions.Standard,
+                parameterTypes);
 
-            /// <inheritdoc />
-            public override ModelSnapshot ModelSnapshot
-                => throw new NotSupportedException("Can't use snapshot from aggregated migrations assembly");
+            var ctor1IL = ctor1.GetILGenerator();
+            ctor1IL.Emit(OpCodes.Ldarg_0);
+            ctor1IL.Emit(OpCodes.Ldarg_1);
+            ctor1IL.Emit(OpCodes.Ldarg_2);
+            ctor1IL.Emit(OpCodes.Call, parent.GetConstructors(BindingFlags.NonPublic|BindingFlags.Instance).First());
+            ctor1IL.Emit(OpCodes.Ret);
+
+            // Finish the type.
+            return tb.CreateType()!.GetTypeInfo();
         }
     }
 }

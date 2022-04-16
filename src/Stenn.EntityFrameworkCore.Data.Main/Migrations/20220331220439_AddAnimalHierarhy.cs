@@ -1,8 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Stenn.EntityFrameworkCore.Data.Main;
+using Stenn.EntityFrameworkCore.SplittedMigrations;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
+    [SplittedMigration(typeof(MainDbContext_Step2))]
     public partial class AddAnimalHierarhy : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

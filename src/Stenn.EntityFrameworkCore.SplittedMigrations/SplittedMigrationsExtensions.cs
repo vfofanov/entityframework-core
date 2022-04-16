@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Stenn.EntityFrameworkCore.SplittedMigrations
 {
-    internal static class SplittedMigrationsExtensions
+    public static class SplittedMigrationsExtensions
     {
         public static bool HasSplittedMigrations(this TypeInfo migration)
         {
@@ -13,6 +13,11 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
         public static SplittedMigrationAttribute GetSplittedMigrations(this TypeInfo migration)
         {
             return migration.GetCustomAttribute<SplittedMigrationAttribute>() ?? throw new InvalidOperationException();
+        }
+        
+        public static InitialMigrationAttribute GetInitialMigration(this TypeInfo migration)
+        {
+            return migration.GetCustomAttribute<InitialMigrationAttribute>() ?? throw new InvalidOperationException();
         }
     }
 }

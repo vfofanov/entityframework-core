@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Stenn.EntityFrameworkCore.SplittedMigrations
 {
-    public abstract class InitialMigrationBase : Migration
+    public abstract class InitialMigrationReplaceBase : Migration
     {
         private readonly IHistoryRepository _historyRepository;
 
         /// <inheritdoc />
-        protected InitialMigrationBase(IHistoryRepository historyRepository, List<string> removeMigrationRowIds)
+        protected InitialMigrationReplaceBase(IHistoryRepository historyRepository, List<string> removeMigrationRowIds)
         {
             _historyRepository = historyRepository;
             RemoveMigrationRowIds = removeMigrationRowIds;

@@ -42,18 +42,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init, false);
             _dbContextInitial = _serviceProviderInitial.GetRequiredService<InitialDbContext>();
 
-            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true, builder =>
-            {
-                //NOTE: Add migrations splitted to separate assemblies
-                builder.AddSplittedMigrations(b => b
-                    .Add<MainDbContext_Step1>()
-                    .Add<MainDbContext_Step2>());
-            });
+            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true);
             _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
         }
 
         private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions,
-            Action<DbContextOptionsBuilder>? additionalInit=null)
+            Action<DbContextOptionsBuilder>? additionalInit = null)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
@@ -75,7 +69,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                             }
                         };
                     });
-                    
+                    builder.UseSplittedMigrations();
+
                     additionalInit?.Invoke(builder);
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
@@ -97,11 +92,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         public async Task EnsureCreated_Main()
         {
             await EnsureCreated(_dbContextMain);
-            
+
             var actual = await _dbContextMain.Set<Currency>().ToListAsync();
             var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
-            
+
             var actualRoles = await _dbContextMain.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
@@ -112,17 +107,17 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await RunMigrations(_dbContextInitial);
 
-            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView", 
-               async reader =>
-               {
-                 var count = 0;
-                 while (await reader.ReadAsync())
-                 {
-                     count++;
-                     reader.GetInt32(0).Should().Be(1);
-                 }
-                 count.Should().Be(1);
-               });
+            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView",
+                async reader =>
+                {
+                    var count = 0;
+                    while (await reader.ReadAsync())
+                    {
+                        count++;
+                        reader.GetInt32(0).Should().Be(1);
+                    }
+                    count.Should().Be(1);
+                });
 
 
             var actual = await _dbContextInitial.Set<CurrencyV1>().ToListAsync();
@@ -152,8 +147,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         private async Task Migrate_Main(bool deleteDb)
         {
             await RunMigrations(_dbContextMain, deleteDb);
-            
-            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView", 
+
+            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView",
                 async reader =>
                 {
                     var count = 0;
@@ -164,7 +159,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                     }
                     count.Should().Be(1);
                 });
-            
+
             var actual = await _dbContextMain.Set<Currency>().ToListAsync();
             var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
@@ -178,11 +173,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         public void ExtractEnums_Main()
         {
             var enumTables = _dbContextMain.Model.ExtractEnumTables().ToList();
-            
+
             enumTables.Should().HaveCount(5);
 
             var table = enumTables.First().Table;
-            
+
             table.EnumType.Should().Be<ContactType>();
             table.ValueType.Should().Be<byte>();
             table.Rows.Should().HaveCount(2);
@@ -202,7 +197,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var roleForDelete = Role.Create(newRoleDeleteId.ToString(), "ForDelete");
             await _dbContextMain.Set<Role>().AddAsync(roleForDelete);
             await _dbContextMain.SaveChangesAsync();
-            
+
             var afterAddCount = _dbContextMain.Set<Role>().Count();
             afterAddCount.Should().Be(originCount + 1);
 
@@ -210,15 +205,15 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var modifiedRole = await _dbContextMain.Set<Role>().FirstAsync(x => x.Name == "Customer");
             modifiedRole.Description = "MODIFIED DESC";
             await _dbContextMain.SaveChangesAsync();
-            
+
             var roleToDelete = await _dbContextMain.Set<Role>().SingleAsync(x => x.Id == newRoleDeleteId);
             _dbContextMain.Set<Role>().Remove(roleToDelete);
             await _dbContextMain.SaveChangesAsync();
-            
+
             var afterRemoveCount = _dbContextMain.Set<Role>().Count();
             afterRemoveCount.Should().Be(originCount);
             //NOTE: Check that deleted row exists in db(Soft delete)
-            await CheckSelect(_dbContextMain, "SELECT * FROM dbo.Role", 
+            await CheckSelect(_dbContextMain, "SELECT * FROM dbo.Role",
                 async reader =>
                 {
                     var count = 0;
@@ -241,7 +236,6 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                 var currencies = dbContext.Set<Currency>().ToList();
                 Console.WriteLine($"Id: {i}, ContextId:{dbContext.ContextId.InstanceId}, Count:{currencies.Count}");
             });
-
         }
 
         private static async Task CheckSelect(Microsoft.EntityFrameworkCore.DbContext context, string selectCommand, Func<DbDataReader, Task> check)
@@ -253,7 +247,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await check(reader);
         }
 
-        
+
         private static async Task RunMigrations(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;
@@ -263,7 +257,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             }
             await database.MigrateAsync();
         }
-        
+
         private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;

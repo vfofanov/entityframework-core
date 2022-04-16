@@ -1,0 +1,1 @@
+dotnet ef migrations add migration -p Stenn.EntityFrameworkCore.Data.Main.SplittedInitial -c SplittedInitialMainDbContext
