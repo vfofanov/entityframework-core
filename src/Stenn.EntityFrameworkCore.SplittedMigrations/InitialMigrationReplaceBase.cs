@@ -8,13 +8,14 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
         private readonly IHistoryRepository _historyRepository;
 
         /// <inheritdoc />
-        protected InitialMigrationReplaceBase(IHistoryRepository historyRepository, List<string> removeMigrationRowIds)
+        protected InitialMigrationReplaceBase(IHistoryRepository historyRepository,
+            IReadOnlyCollection<string> removeMigrationRowIds)
         {
             _historyRepository = historyRepository;
             RemoveMigrationRowIds = removeMigrationRowIds;
         }
 
-        public List<string> RemoveMigrationRowIds { get; }
+        public IReadOnlyCollection<string> RemoveMigrationRowIds { get; }
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

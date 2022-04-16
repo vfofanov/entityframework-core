@@ -143,7 +143,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
             }
             #endregion
 
-            Type[] parameterTypes = { typeof(IHistoryRepository), typeof(List<string>) };
+            Type[] parameterTypes = { typeof(IHistoryRepository), typeof(IReadOnlyCollection<string>) };
             var ctor1 = tb.DefineConstructor(
                 MethodAttributes.Public,
                 CallingConventions.Standard,

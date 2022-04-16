@@ -5,14 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
+using Stenn.EntityFrameworkCore.Data.Main.SplittedInitial;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
-using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection;
@@ -26,10 +25,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
     {
         private const string DBName = "stenn_efcore_tests";
         private InitialDbContext _dbContextInitial = null!;
-
         private MainDbContext _dbContextMain = null!;
+        private SplittedInitialMainDbContext _dbContextMainSplittedInitial = null!;
+
         private IServiceProvider _serviceProviderInitial = null!;
         private IServiceProvider _serviceProviderMain = null!;
+        private IServiceProvider _serviceProviderMainSplittedInitial = null!;
 
         private static string GetConnectionString(string dbName)
         {
@@ -39,20 +40,35 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [SetUp]
         public void Setup()
         {
-            _serviceProviderInitial = GetServices<InitialDbContext>(InitialStaticMigrations.Init, false);
-            _dbContextInitial = _serviceProviderInitial.GetRequiredService<InitialDbContext>();
+            InitDbContext(InitialStaticMigrations.Init, false, 
+                out _serviceProviderInitial, 
+                out _dbContextInitial);
 
-            _serviceProviderMain = GetServices<MainDbContext>(MainStaticMigrations.Init, true);
-            _dbContextMain = _serviceProviderMain.GetRequiredService<MainDbContext>();
+            InitDbContext(MainStaticMigrations.Init, true,
+                out _serviceProviderMain,
+                out _dbContextMain);
+            
+            InitDbContext(MainStaticMigrations.Init, true,
+                out _serviceProviderMainSplittedInitial,
+                out _dbContextMainSplittedInitial);
         }
 
-        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions,
-            Action<DbContextOptionsBuilder>? additionalInit = null)
+        private static void InitDbContext<TContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions, 
+            out IServiceProvider serviceProvider,
+            out TContext dbContext) 
+            where TContext : Microsoft.EntityFrameworkCore.DbContext
+        {
+            serviceProvider = GetServices<TContext>(init, includeCommonConventions);
+            dbContext = serviceProvider.GetRequiredService<TContext>();
+        }
+
+        private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init,
+            bool includeCommonConventions, string dbName = DBName)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
 
-            var connectionString = GetConnectionString(DBName);
+            var connectionString = GetConnectionString(dbName);
 
             services.AddDbContext<TDbContext>(builder =>
                 {
@@ -70,8 +86,6 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                         };
                     });
                     builder.UseSplittedMigrations();
-
-                    additionalInit?.Invoke(builder);
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 
@@ -103,6 +117,21 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
+        public async Task EnsureCreated_MainSplittedInitial()
+        {
+            await EnsureCreated(_dbContextMainSplittedInitial);
+
+            var actual = await _dbContextMainSplittedInitial.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
+
+            var actualRoles = await _dbContextMainSplittedInitial.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
+        }
+
+        
+        [Test]
         public async Task Migrate_Initial()
         {
             await RunMigrations(_dbContextInitial);
@@ -130,6 +159,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await Migrate_Main(true);
         }
+        
+        [Test]
+        public async Task Migrate_MainSplittedInitial()
+        {
+            await Migrate_MainSplittedInitial(true);
+        }
 
         [Test, Explicit]
         public async Task Migrate_MainWithoutDeletion()
@@ -144,11 +179,31 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await Migrate_Main(false);
         }
 
+        [Test]
+        public async Task Migrate_InitialThenMainThenMainSplittedInitial()
+        {
+            await Migrate_Initial();
+            await Migrate_Main(false);
+            await Migrate_MainSplittedInitial(false);
+        }
+        
         private async Task Migrate_Main(bool deleteDb)
         {
             await RunMigrations(_dbContextMain, deleteDb);
 
-            await CheckSelect(_dbContextInitial, "SELECT * FROM dbo.ContactView",
+            await CheckMain(_dbContextMain);
+        }
+
+        private async Task Migrate_MainSplittedInitial(bool deleteDb)
+        {
+            await RunMigrations(_dbContextMainSplittedInitial, deleteDb);
+
+            await CheckMain(_dbContextMainSplittedInitial);
+        }
+        
+        private async Task CheckMain(Microsoft.EntityFrameworkCore.DbContext context)
+        {
+            await CheckSelect(context, "SELECT * FROM dbo.ContactView",
                 async reader =>
                 {
                     var count = 0;
@@ -168,7 +223,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
-
+        
         [Test]
         public void ExtractEnums_Main()
         {
