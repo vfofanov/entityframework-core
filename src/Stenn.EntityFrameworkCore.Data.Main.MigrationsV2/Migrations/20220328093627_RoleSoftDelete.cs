@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Stenn.EntityFrameworkCore.Data.Main;
-using Stenn.EntityFrameworkCore.SplittedMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [SplittedMigration(typeof(MainDbContext_Step1))]
+    [HistoricalMigration(typeof(MainDbContext_Step1))]
     public partial class RoleSoftDelete : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

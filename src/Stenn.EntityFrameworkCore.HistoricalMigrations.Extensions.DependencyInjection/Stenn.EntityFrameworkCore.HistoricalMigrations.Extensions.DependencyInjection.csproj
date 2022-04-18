@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Stenn.EntityFrameworkCore.SplittedMigrations\Stenn.EntityFrameworkCore.SplittedMigrations.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj" />
     </ItemGroup>
 
 </Project>

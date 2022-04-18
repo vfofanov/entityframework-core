@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
     public sealed class ItemMigrationsAssembly : MigrationsAssembly
     {

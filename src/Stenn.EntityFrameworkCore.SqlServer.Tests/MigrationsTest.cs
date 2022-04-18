@@ -10,11 +10,11 @@ using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
-using Stenn.EntityFrameworkCore.Data.Main.SplittedInitial;
+using Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 using Stenn.EntityFrameworkCore.Tests;
@@ -26,11 +26,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         private const string DBName = "stenn_efcore_tests";
         private InitialDbContext _dbContextInitial = null!;
         private MainDbContext _dbContextMain = null!;
-        private SplittedInitialMainDbContext _dbContextMainSplittedInitial = null!;
+        private HistoricalInitialMainDbContext _dbContextMainHistoricalInitial = null!;
 
         private IServiceProvider _serviceProviderInitial = null!;
         private IServiceProvider _serviceProviderMain = null!;
-        private IServiceProvider _serviceProviderMainSplittedInitial = null!;
+        private IServiceProvider _serviceProviderMainHistoricalInitial = null!;
 
         private static string GetConnectionString(string dbName)
         {
@@ -49,8 +49,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                 out _dbContextMain);
             
             InitDbContext(MainStaticMigrations.Init, true,
-                out _serviceProviderMainSplittedInitial,
-                out _dbContextMainSplittedInitial);
+                out _serviceProviderMainHistoricalInitial,
+                out _dbContextMainHistoricalInitial);
         }
 
         private static void InitDbContext<TContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions, 
@@ -85,7 +85,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                             }
                         };
                     });
-                    builder.UseSplittedMigrations();
+                    builder.UseHistoricalMigrations();
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 
@@ -117,15 +117,15 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
-        public async Task EnsureCreated_MainSplittedInitial()
+        public async Task EnsureCreated_MainHistoricalInitial()
         {
-            await EnsureCreated(_dbContextMainSplittedInitial);
+            await EnsureCreated(_dbContextMainHistoricalInitial);
 
-            var actual = await _dbContextMainSplittedInitial.Set<Currency>().ToListAsync();
+            var actual = await _dbContextMainHistoricalInitial.Set<Currency>().ToListAsync();
             var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
 
-            var actualRoles = await _dbContextMainSplittedInitial.Set<Role>().ToListAsync();
+            var actualRoles = await _dbContextMainHistoricalInitial.Set<Role>().ToListAsync();
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
@@ -161,9 +161,9 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
         
         [Test]
-        public async Task Migrate_MainSplittedInitial()
+        public async Task Migrate_MainHistoricalInitial()
         {
-            await Migrate_MainSplittedInitial(true);
+            await Migrate_MainHistoricalInitial(true);
         }
 
         [Test, Explicit]
@@ -180,11 +180,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
-        public async Task Migrate_InitialThenMainThenMainSplittedInitial()
+        public async Task Migrate_InitialThenMainThenMainHistoricalInitial()
         {
             await Migrate_Initial();
             await Migrate_Main(false);
-            await Migrate_MainSplittedInitial(false);
+            await Migrate_MainHistoricalInitial(false);
         }
         
         private async Task Migrate_Main(bool deleteDb)
@@ -194,11 +194,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await CheckMain(_dbContextMain);
         }
 
-        private async Task Migrate_MainSplittedInitial(bool deleteDb)
+        private async Task Migrate_MainHistoricalInitial(bool deleteDb)
         {
-            await RunMigrations(_dbContextMainSplittedInitial, deleteDb);
+            await RunMigrations(_dbContextMainHistoricalInitial, deleteDb);
 
-            await CheckMain(_dbContextMainSplittedInitial);
+            await CheckMain(_dbContextMainHistoricalInitial);
         }
         
         private async Task CheckMain(Microsoft.EntityFrameworkCore.DbContext context)

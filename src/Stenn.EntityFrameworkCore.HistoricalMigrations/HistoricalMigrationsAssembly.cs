@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
-    public class SplittedMigrationsAssembly: MigrationsAssembly
+    public class HistoricalMigrationsAssembly: MigrationsAssembly
     {
         private readonly IHistoryRepository _historyRepository;
         private readonly ICurrentDbContext _currentContext;
@@ -21,7 +21,7 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
 
         /// <inheritdoc />
-        public SplittedMigrationsAssembly(
+        public HistoricalMigrationsAssembly(
             ICurrentDbContext currentContext, 
             IDbContextOptions options, 
             IMigrationsIdGenerator idGenerator,
@@ -50,37 +50,37 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations
             HashSet<string> appliedMigrationEntrySet, List<string>? allMigrationIds)
         {
             allMigrationIds ??= new List<string>(migrations.Count);
-            var splittedMigration = migrations.SingleOrDefault(m => m.Value.HasSplittedMigrations());
-            if (splittedMigration is { Value: { } })
+            var historicalMigration = migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrations());
+            if (historicalMigration is { Value: { } })
             {
-                var splittedMigrationsAttr = splittedMigration.Value.GetSplittedMigrations();
-                var splittedMigrations = GetItems(splittedMigrationsAttr.DbContextType);
+                var historicalMigrationAttribute = historicalMigration.Value.GetHistoricalMigrations();
+                var historicalMigrations = GetItems(historicalMigrationAttribute.DBContextAssemblyAnchorType);
 
-                if (splittedMigrationsAttr.Initial)
+                if (historicalMigrationAttribute.Initial)
                 {
-                    var initialMigrationId = splittedMigration.Key;
+                    var initialMigrationId = historicalMigration.Key;
                     if (appliedMigrationEntrySet.Count == 0)
                     {
                         //NOTE: Retuns initial migration first 
-                        yield return splittedMigration;
+                        yield return historicalMigration;
                         appliedMigrationEntrySet.Add(initialMigrationId);
                     }
                     else if (!appliedMigrationEntrySet.Contains(initialMigrationId))
                     {
-                        //NOTE: Returns all splitted migrations and after remove history rows about them
-                        var allSplittedMigrationIds = new List<string>(splittedMigrations.Count);
-                        foreach (var migration in PopulateMigrations(splittedMigrations, appliedMigrationEntrySet, allSplittedMigrationIds))
+                        //NOTE: Returns all historical migrations and after remove history rows about them
+                        var allHistoricalMigrationIds = new List<string>(historicalMigrations.Count);
+                        foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allHistoricalMigrationIds))
                         {
                             yield return migration;
                         }
-                        var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allSplittedMigrationIds.ToArray());
+                        var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allHistoricalMigrationIds.ToArray());
                         yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
                         appliedMigrationEntrySet.Add(initialMigrationId);
                     }
                 }
                 else
                 {
-                    foreach (var migration in PopulateMigrations(splittedMigrations, appliedMigrationEntrySet, allMigrationIds))
+                    foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allMigrationIds))
                     {
                         yield return migration;
                     }

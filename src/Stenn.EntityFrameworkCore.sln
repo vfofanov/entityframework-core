@@ -52,15 +52,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2", "Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj", "{400665A8-CA03-4E79-B154-75CF44DDDAE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations", "Stenn.EntityFrameworkCore.SplittedMigrations\Stenn.EntityFrameworkCore.SplittedMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations", "Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.TriggerBased.Contacts", "Stenn.EntityConventions.TriggerBased.Contacts\Stenn.EntityConventions.TriggerBased.Contacts.csproj", "{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj", "{9834F941-47B0-44CC-9DAE-839BD6F71F65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.SplittedInitial", "Stenn.EntityFrameworkCore.Data.Main.SplittedInitial\Stenn.EntityFrameworkCore.Data.Main.SplittedInitial.csproj", "{94A58282-915A-4174-9D30-9A46A28E6D5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial", "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.csproj", "{94A58282-915A-4174-9D30-9A46A28E6D5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Stenn.EntityFrameworkCore.SplittedMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations;
 
-namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.Tests.HistoricalMigrations
 {
     public class DbContext2 : Microsoft.EntityFrameworkCore.DbContext
     {
@@ -19,10 +19,10 @@ namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
         }
     }
 
-    [SplittedMigration(typeof(DbContext1), Initial = true)]
+    [HistoricalMigration(typeof(DbContext1), Initial = true)]
     [DbContext(typeof(DbContext2))]
-    [Migration("20_SplittedInitialMigration20")]
-    public class SplittedInitialMigration20 : Migration
+    [Migration("20_HistoricalInitialMigration20")]
+    public class HistoricalInitialMigration20 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

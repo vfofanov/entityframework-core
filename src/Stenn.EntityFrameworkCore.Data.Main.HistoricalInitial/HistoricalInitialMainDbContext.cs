@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.Data.Main.Configurations;
 
-namespace Stenn.EntityFrameworkCore.Data.Main.SplittedInitial
+namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial
 {
-    public class SplittedInitialMainDbContext: Microsoft.EntityFrameworkCore.DbContext
+    public class HistoricalInitialMainDbContext: Microsoft.EntityFrameworkCore.DbContext
     {
         /// <inheritdoc />
-        protected SplittedInitialMainDbContext()
+        protected HistoricalInitialMainDbContext()
         {
         }
 
         /// <inheritdoc />
-        public SplittedInitialMainDbContext(DbContextOptions<SplittedInitialMainDbContext> options)
+        public HistoricalInitialMainDbContext(DbContextOptions<HistoricalInitialMainDbContext> options)
             : base(options)
         {
         }

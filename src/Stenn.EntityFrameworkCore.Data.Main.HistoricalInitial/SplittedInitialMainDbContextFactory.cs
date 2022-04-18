@@ -4,14 +4,14 @@ using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 
-namespace Stenn.EntityFrameworkCore.Data.Main.SplittedInitial
+namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial
 {
     // ReSharper disable once UnusedType.Global
-    public class SplittedInitialMainDbContextFactory : IDesignTimeDbContextFactory<SplittedInitialMainDbContext>
+    public class HistoricalInitialMainDbContextFactory : IDesignTimeDbContextFactory<HistoricalInitialMainDbContext>
     {
-        public SplittedInitialMainDbContext CreateDbContext(string[] args)
+        public HistoricalInitialMainDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<SplittedInitialMainDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<HistoricalInitialMainDbContext>();
             
             optionsBuilder.UseSqlServer();
             optionsBuilder.UseStaticMigrationsSqlServer(options =>
@@ -24,7 +24,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main.SplittedInitial
                 }
             );
             
-            return new SplittedInitialMainDbContext(optionsBuilder.Options);
+            return new HistoricalInitialMainDbContext(optionsBuilder.Options);
         }
     }
 }

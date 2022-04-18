@@ -1,6 +1,6 @@
 using System;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class InitialMigrationAttribute : Attribute

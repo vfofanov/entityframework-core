@@ -11,103 +11,103 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Stenn.EntityFrameworkCore.SplittedMigrations;
-using Stenn.EntityFrameworkCore.Tests.SplittedMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations;
+using Stenn.EntityFrameworkCore.Tests.HistoricalMigrations;
 
 namespace Stenn.EntityFrameworkCore.Tests
 {
-    public class SplittedMigrationsTests
+    public class HistoricalMigrationsTests
     {
         [Test]
-        public void CombineSplitted0_Empty()
+        public void CombineHistorical0_Empty()
         {
-            TestSplitted<DbContext0>(ArraySegment<string>.Empty,
+            TestHistorical<DbContext0>(ArraySegment<string>.Empty,
                 new[] { "00_StartInitialMigration", "01_Migration01" });
         }
 
         [Test]
-        public void CombineSplitted0_00Applied()
+        public void CombineHistorical0_00Applied()
         {
-            TestSplitted<DbContext0>(new[] { "00_StartInitialMigration" },
+            TestHistorical<DbContext0>(new[] { "00_StartInitialMigration" },
                 new[] { "01_Migration01" });
         }
 
         [Test]
-        public void CombineSplitted1_Empty()
+        public void CombineHistorical1_Empty()
         {
-            TestSplitted<DbContext1>(ArraySegment<string>.Empty,
+            TestHistorical<DbContext1>(ArraySegment<string>.Empty,
                 new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
         }
 
         [Test]
-        public void CombineSplitted1_AppliedTo_00_StartInitialMigration()
+        public void CombineHistorical1_AppliedTo_00_StartInitialMigration()
         {
-            TestSplitted<DbContext1>(new[] { "00_StartInitialMigration" },
+            TestHistorical<DbContext1>(new[] { "00_StartInitialMigration" },
                 new[]
                 {
                     "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
         }
 
         [Test]
-        public void CombineSplitted1_AppliedTo_11_Migration11()
+        public void CombineHistorical1_AppliedTo_11_Migration11()
         {
-            TestSplitted<DbContext1>(new[]
+            TestHistorical<DbContext1>(new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11"
+                    "10_HistoricalMigration10", "11_Migration11"
                 },
                 new[] { "12_Migration12" });
         }
 
         [Test]
-        public void CombineSplitted2_Empty()
+        public void CombineHistorical2_Empty()
         {
-            var actual = TestSplitted<DbContext2>(ArraySegment<string>.Empty,
+            var actual = TestHistorical<DbContext2>(ArraySegment<string>.Empty,
                 new[]
                 {
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
 
-            actual[0].Value.Should().Be<SplittedInitialMigration20>();
+            actual[0].Value.Should().Be<HistoricalInitialMigration20>();
         }
 
         [Test]
-        public void CombineSplitted2_AppliedTo_00_StartInitialMigration()
+        public void CombineHistorical2_AppliedTo_00_StartInitialMigration()
         {
-            var actual = TestSplitted<DbContext2>(new[] { "00_StartInitialMigration" },
+            var actual = TestHistorical<DbContext2>(new[] { "00_StartInitialMigration" },
                 new[]
                 {
                     "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12",
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12",
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
 
             TestInitialMigrationReplace(actual, 4,
                 new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
         }
 
         [Test]
-        public void CombineSplitted2_AppliedTo_11_Migration11()
+        public void CombineHistorical2_AppliedTo_11_Migration11()
         {
-            var actual = TestSplitted<DbContext2>(new[]
+            var actual = TestHistorical<DbContext2>(new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11"
+                    "10_HistoricalMigration10", "11_Migration11"
                 },
                 new[]
                 {
                     "12_Migration12",
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
 
 
@@ -115,127 +115,127 @@ namespace Stenn.EntityFrameworkCore.Tests
                 new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
         }
 
         [Test]
-        public void CombineSplitted2_AppliedTo_20_SplittedInitialMigration20()
+        public void CombineHistorical2_AppliedTo_20_HistoricalInitialMigration20()
         {
-            TestSplitted<DbContext2>(new[] { "20_SplittedInitialMigration20" },
+            TestHistorical<DbContext2>(new[] { "20_HistoricalInitialMigration20" },
                 new[] { "21_Migration21", "22_Migration22" });
         }
 
         [Test]
-        public void CombineSplitted2_AppliedTo_21_Migration21()
+        public void CombineHistorical2_AppliedTo_21_Migration21()
         {
-            TestSplitted<DbContext2>(new[] { "20_SplittedInitialMigration20", "21_Migration21" },
+            TestHistorical<DbContext2>(new[] { "20_HistoricalInitialMigration20", "21_Migration21" },
                 new[] { "22_Migration22" });
         }
 
         [Test]
-        public void CombineSplitted3_Empty()
+        public void CombineHistorical3_Empty()
         {
-            var actual = TestSplitted<DbContext3>(ArraySegment<string>.Empty,
+            var actual = TestHistorical<DbContext3>(ArraySegment<string>.Empty,
                 new[]
                 {
-                    "31_SplittedInitialMigration31", "30_Migration30", "32_Migration32"
+                    "31_HistoricalInitialMigration31", "30_Migration30", "32_Migration32"
                 });
 
-            actual[0].Value.Should().Be<SplittedInitialMigration31>();
+            actual[0].Value.Should().Be<HistoricalInitialMigration31>();
         }
 
         [Test]
-        public void CombineSplitted3_AppliedTo_00_StartInitialMigration()
+        public void CombineHistorical3_AppliedTo_00_StartInitialMigration()
         {
-            var actual = TestSplitted<DbContext3>(new[] { "00_StartInitialMigration" },
+            var actual = TestHistorical<DbContext3>(new[] { "00_StartInitialMigration" },
                 new[]
                 {
                     "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12",
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22",
-                    "31_SplittedInitialMigration31", "30_Migration30", "32_Migration32"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12",
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22",
+                    "31_HistoricalInitialMigration31", "30_Migration30", "32_Migration32"
                 });
 
             TestInitialMigrationReplace(actual, 4,
                 new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
 
             TestInitialMigrationReplace(actual, 7,
                 new[]
                 {
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
         }
 
         [Test]
-        public void CombineSplitted3_AppliedTo_11_Migration11()
+        public void CombineHistorical3_AppliedTo_11_Migration11()
         {
-            var actual = TestSplitted<DbContext3>(new[]
+            var actual = TestHistorical<DbContext3>(new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11"
+                    "10_HistoricalMigration10", "11_Migration11"
                 },
                 new[]
                 {
                     "12_Migration12",
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22",
-                    "31_SplittedInitialMigration31", "30_Migration30", "32_Migration32"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22",
+                    "31_HistoricalInitialMigration31", "30_Migration30", "32_Migration32"
                 });
 
             TestInitialMigrationReplace(actual, 1,
                 new[]
                 {
                     "00_StartInitialMigration", "01_Migration01",
-                    "10_SplittedMigration10", "11_Migration11", "12_Migration12"
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
                 });
 
             TestInitialMigrationReplace(actual, 4,
                 new[]
                 {
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
         }
 
         [Test]
-        public void CombineSplitted3_AppliedTo_21_Migration21()
+        public void CombineHistorical3_AppliedTo_21_Migration21()
         {
-            var actual = TestSplitted<DbContext3>(new[]
+            var actual = TestHistorical<DbContext3>(new[]
                 {
-                    "20_SplittedInitialMigration20", "21_Migration21"
+                    "20_HistoricalInitialMigration20", "21_Migration21"
                 },
                 new[]
                 {
                     "22_Migration22",
-                    "31_SplittedInitialMigration31", "30_Migration30", "32_Migration32"
+                    "31_HistoricalInitialMigration31", "30_Migration30", "32_Migration32"
                 });
 
             TestInitialMigrationReplace(actual, 1,
                 new[]
                 {
-                    "20_SplittedInitialMigration20", "21_Migration21", "22_Migration22"
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
                 });
         }
 
 
         [Test]
-        public void CombineSplitted3_AppliedTo_31_SplittedInitialMigration31()
+        public void CombineHistorical3_AppliedTo_31_HistoricalInitialMigration31()
         {
-            TestSplitted<DbContext3>(new[] { "31_SplittedInitialMigration31" },
+            TestHistorical<DbContext3>(new[] { "31_HistoricalInitialMigration31" },
                 new[] { "30_Migration30", "32_Migration32" });
         }
 
         [Test]
-        public void CombineSplitted3_AppliedTo_30_Migration30()
+        public void CombineHistorical3_AppliedTo_30_Migration30()
         {
-            TestSplitted<DbContext3>(new[] { "31_SplittedInitialMigration31", "30_Migration30" },
+            TestHistorical<DbContext3>(new[] { "31_HistoricalInitialMigration31", "30_Migration30" },
                 new[] { "32_Migration32" });
         }
 
-        private List<KeyValuePair<string, TypeInfo>> TestSplitted<TDbContext>(IEnumerable<string> appliedMigrationEntries, string[] expected)
+        private List<KeyValuePair<string, TypeInfo>> TestHistorical<TDbContext>(IEnumerable<string> appliedMigrationEntries, string[] expected)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var sorter = GetMigrationsSorter<TDbContext>();
@@ -265,7 +265,7 @@ namespace Stenn.EntityFrameworkCore.Tests
         {
             var services = new ServiceCollection();
 
-            var connectionString = GetConnectionString("test_splitted");
+            var connectionString = GetConnectionString("test_Historical");
 
             services.AddDbContext<TDbContext>(builder => { builder.UseSqlServer(connectionString); },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
@@ -275,7 +275,7 @@ namespace Stenn.EntityFrameworkCore.Tests
             return provider.GetRequiredService<TDbContext>();
         }
 
-        private SplittedMigrationsAssembly GetMigrationsSorter<TContext>()
+        private HistoricalMigrationsAssembly GetMigrationsSorter<TContext>()
             where TContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var context = GetContext<TContext>(out var options);
@@ -287,7 +287,7 @@ namespace Stenn.EntityFrameworkCore.Tests
             var logger = contextProvider.GetRequiredService<IDiagnosticsLogger<DbLoggerCategory.Migrations>>();
 
             var historyRepository = contextProvider.GetRequiredService<IHistoryRepository>();
-            return new SplittedMigrationsAssembly(currentDbContext, options, idGenerator, logger, historyRepository);
+            return new HistoricalMigrationsAssembly(currentDbContext, options, idGenerator, logger, historyRepository);
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Stenn.EntityFrameworkCore.SplittedMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations;
 
-namespace Stenn.EntityFrameworkCore.Data.Main.SplittedInitial.Migrations
+namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.Migrations
 {
-    [SplittedMigration(typeof(MainDbContext), Initial = true)]
+    [HistoricalMigration(typeof(MainDbContext), Initial = true)]
     public partial class Initial160422 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

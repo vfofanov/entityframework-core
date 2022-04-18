@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Stenn.EntityFrameworkCore.SplittedMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations;
 
-namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.Tests.HistoricalMigrations
 {
     public class DbContext3 : Microsoft.EntityFrameworkCore.DbContext
     {
@@ -20,7 +20,7 @@ namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
     }
 
     
-    //NOTE: Case: Split initial(31_SplittedInitialMigration31) created before get earlier migration(30_Migration30) from long develop feature branch     
+    //NOTE: Case: Split initial(31_HistoricalInitialMigration31) created before get earlier migration(30_Migration30) from long develop feature branch     
     [DbContext(typeof(DbContext3))]
     [Migration("30_Migration30")]
     public class Migration30 : Migration
@@ -31,10 +31,10 @@ namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
         }
     }
 
-    [SplittedMigration(typeof(DbContext2), Initial = true)]
+    [HistoricalMigration(typeof(DbContext2), Initial = true)]
     [DbContext(typeof(DbContext3))]
-    [Migration("31_SplittedInitialMigration31")]
-    public class SplittedInitialMigration31 : Migration
+    [Migration("31_HistoricalInitialMigration31")]
+    public class HistoricalInitialMigration31 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

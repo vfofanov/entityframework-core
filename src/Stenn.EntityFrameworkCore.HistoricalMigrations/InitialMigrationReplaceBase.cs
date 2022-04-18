@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
     public abstract class InitialMigrationReplaceBase : Migration
     {

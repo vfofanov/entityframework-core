@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection
+namespace Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection
 {
     /// <summary>
     ///     Dependency injection extensions for register Entity Framework core static migrations
@@ -9,13 +9,13 @@ namespace Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInje
     public static class EntityFrameworkCoreExtensions
     {
         /// <summary>
-        /// Add splitted migrations
+        /// Add historical migrations
         /// </summary>
         /// <param name="optionsBuilder">Db context options builder</param>
         /// <returns></returns>
-        public static DbContextOptionsBuilder UseSplittedMigrations(this DbContextOptionsBuilder optionsBuilder)
+        public static DbContextOptionsBuilder UseHistoricalMigrations(this DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.ReplaceService<IMigrationsAssembly, SplittedMigrationsAssembly>();
+            optionsBuilder.ReplaceService<IMigrationsAssembly, HistoricalMigrationsAssembly>();
             return optionsBuilder;
         }
     }

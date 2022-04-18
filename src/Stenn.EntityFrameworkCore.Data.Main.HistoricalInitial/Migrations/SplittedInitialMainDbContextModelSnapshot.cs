@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Stenn.EntityFrameworkCore.Data.Main.SplittedInitial;
+using Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial;
 
-namespace Stenn.EntityFrameworkCore.Data.Main.SplittedInitial.Migrations
+namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.Migrations
 {
-    [DbContext(typeof(SplittedInitialMainDbContext))]
-    partial class SplittedInitialMainDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(HistoricalInitialMainDbContext))]
+    partial class HistoricalInitialMainDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

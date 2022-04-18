@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Stenn.EntityFrameworkCore.Tests.SplittedMigrations
+namespace Stenn.EntityFrameworkCore.Tests.HistoricalMigrations
 {
     public class DbContext0 : Microsoft.EntityFrameworkCore.DbContext
     {
