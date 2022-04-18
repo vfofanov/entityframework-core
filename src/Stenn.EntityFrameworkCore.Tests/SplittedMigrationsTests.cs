@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.HistoricalMigrations;
+using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.Tests.HistoricalMigrations;
 
 namespace Stenn.EntityFrameworkCore.Tests
@@ -222,7 +223,7 @@ namespace Stenn.EntityFrameworkCore.Tests
 
 
         [Test]
-        public void CombineHistorical3_AppliedTo_31_HistoricalInitialMigration31()
+        public void CombineHistorical3_AppliedTo_HistoricalInitialMigration31()
         {
             TestHistorical<DbContext3>(new[] { "31_HistoricalInitialMigration31" },
                 new[] { "30_Migration30", "32_Migration32" });
@@ -234,19 +235,60 @@ namespace Stenn.EntityFrameworkCore.Tests
             TestHistorical<DbContext3>(new[] { "31_HistoricalInitialMigration31", "30_Migration30" },
                 new[] { "32_Migration32" });
         }
+        
+        [Test]
+        public void CombineHistorical3_Empty_FullHistory()
+        {
+            TestHistorical<DbContext3>(Array.Empty<string>(),
+                new[]
+                {
+                    "00_StartInitialMigration", "01_Migration01",
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12",
+                    "21_Migration21", "22_Migration22",
+                    "30_Migration30", "32_Migration32"
+                }, true);
+            
+            //NOTE: Test run after run with full history enabled
+            var actual = TestHistorical<DbContext3>(new[]
+                {
+                    "00_StartInitialMigration", "01_Migration01",
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12",
+                    "21_Migration21", "22_Migration22",
+                    "30_Migration30", "32_Migration32"
+                },
+                new[]
+                {
+                    "20_HistoricalInitialMigration20", "31_HistoricalInitialMigration31"
+                });
+            
+            TestInitialMigrationReplace(actual, 0,
+                new[]
+                {
+                    "00_StartInitialMigration", "01_Migration01",
+                    "10_HistoricalMigration10", "11_Migration11", "12_Migration12"
+                });
+            TestInitialMigrationReplace(actual, 1,
+                new[]
+                {
+                    "20_HistoricalInitialMigration20", "21_Migration21", "22_Migration22"
+                });
+        }
 
-        private List<KeyValuePair<string, TypeInfo>> TestHistorical<TDbContext>(IEnumerable<string> appliedMigrationEntries, string[] expected)
+        private List<KeyValuePair<string, TypeInfo>> TestHistorical<TDbContext>(IEnumerable<string> appliedMigrationEntries, string[] expected,
+            bool migrateFromFullHistory = false)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
-            var sorter = GetMigrationsSorter<TDbContext>();
-            var actual = sorter.PopulateMigrations(appliedMigrationEntries).ToList();
+            var historicalMigrations = GetHistoricalMigrations<TDbContext>(
+                new HistoricalMigrationsOptions { MigrateFromFullHistory = migrateFromFullHistory });
+
+            var actual = historicalMigrations.PopulateMigrations(appliedMigrationEntries).ToList();
             var actualIds = actual.Select(m => m.Key).ToList();
 
             actualIds.Should().ContainInOrder(expected);
 
             return actual;
         }
-        
+
         private static void TestInitialMigrationReplace(IReadOnlyList<KeyValuePair<string, TypeInfo>> actual, 
             int index, string[] expectedRemoveIds)
         {
@@ -260,34 +302,29 @@ namespace Stenn.EntityFrameworkCore.Tests
             return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
         }
 
-        private static TDbContext GetContext<TDbContext>(out DbContextOptions options)
+        private static TDbContext GetContext<TDbContext>(HistoricalMigrationsOptions options)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
 
             var connectionString = GetConnectionString("test_Historical");
 
-            services.AddDbContext<TDbContext>(builder => { builder.UseSqlServer(connectionString); },
+            services.AddDbContext<TDbContext>(builder =>
+                {
+                    builder.UseSqlServer(connectionString);
+                    builder.UseHistoricalMigrations(options);
+                },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             var provider = services.BuildServiceProvider();
-            options = provider.GetRequiredService<DbContextOptions<TDbContext>>();
             return provider.GetRequiredService<TDbContext>();
         }
 
-        private HistoricalMigrationsAssembly GetMigrationsSorter<TContext>()
+        private static HistoricalMigrationsAssembly GetHistoricalMigrations<TContext>(HistoricalMigrationsOptions options)
             where TContext : Microsoft.EntityFrameworkCore.DbContext
         {
-            var context = GetContext<TContext>(out var options);
-            var contextProvider = context.GetInfrastructure();
-
-            var currentDbContext = contextProvider.GetRequiredService<ICurrentDbContext>();
-
-            var idGenerator = contextProvider.GetRequiredService<IMigrationsIdGenerator>();
-            var logger = contextProvider.GetRequiredService<IDiagnosticsLogger<DbLoggerCategory.Migrations>>();
-
-            var historyRepository = contextProvider.GetRequiredService<IHistoryRepository>();
-            return new HistoricalMigrationsAssembly(currentDbContext, options, idGenerator, logger, historyRepository);
+            var context = GetContext<TContext>(options);
+            return (HistoricalMigrationsAssembly)context.GetInfrastructure().GetRequiredService<IMigrationsAssembly>();
         }
     }
 }

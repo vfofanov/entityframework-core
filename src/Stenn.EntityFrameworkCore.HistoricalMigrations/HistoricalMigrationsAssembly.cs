@@ -16,24 +16,28 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
     {
         private readonly IHistoryRepository _historyRepository;
         private readonly ICurrentDbContext _currentContext;
-        private readonly IDbContextOptions _options;
+        private readonly IDbContextOptions _dbContextOptions;
         private readonly IMigrationsIdGenerator _idGenerator;
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
+        private readonly HistoricalMigrationsOptions _options;
 
         /// <inheritdoc />
         public HistoricalMigrationsAssembly(
             ICurrentDbContext currentContext, 
-            IDbContextOptions options, 
+            IDbContextOptions dbContextOptions, 
             IMigrationsIdGenerator idGenerator,
             IDiagnosticsLogger<DbLoggerCategory.Migrations> logger, 
             IHistoryRepository historyRepository) 
-            : base(currentContext, options, idGenerator, logger)
+            : base(currentContext, dbContextOptions, idGenerator, logger)
         {
             _historyRepository = historyRepository;
             _currentContext = currentContext;
-            _options = options;
+            _dbContextOptions = dbContextOptions;
             _idGenerator = idGenerator;
             _logger = logger;
+            
+            _options = dbContextOptions.FindExtension<HistoricalMigrationsOptionsExtension>().Options;
+
         }
 
         /// <inheritdoc />
@@ -59,7 +63,8 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                 if (historicalMigrationAttribute.Initial)
                 {
                     var initialMigrationId = historicalMigration.Key;
-                    if (appliedMigrationEntrySet.Count == 0)
+                    if (appliedMigrationEntrySet.Count == 0 && 
+                        !_options.MigrateFromFullHistory)
                     {
                         //NOTE: Retuns initial migration first 
                         yield return historicalMigration;
@@ -73,8 +78,12 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                         {
                             yield return migration;
                         }
-                        var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allHistoricalMigrationIds.ToArray());
-                        yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
+                        
+                        if (!_options.MigrateFromFullHistory)
+                        {
+                            var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allHistoricalMigrationIds.ToArray());
+                            yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
+                        }
                         appliedMigrationEntrySet.Add(initialMigrationId);
                     }
                 }
@@ -114,7 +123,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 
         private IReadOnlyDictionary<string, TypeInfo> GetItems(Type dbContextType)
         {
-            var migrationsAssembly = new ItemMigrationsAssembly(dbContextType, _currentContext, _options, _idGenerator, _logger);
+            var migrationsAssembly = new ItemMigrationsAssembly(dbContextType, _currentContext, _dbContextOptions, _idGenerator, _logger);
             return migrationsAssembly.Migrations;
         }
 
