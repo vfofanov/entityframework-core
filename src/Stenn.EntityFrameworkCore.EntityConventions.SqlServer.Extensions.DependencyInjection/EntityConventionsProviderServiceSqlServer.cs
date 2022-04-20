@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Stenn.EntityFrameworkCore.EntityConventions;
 
-namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection
 {
     public class EntityConventionsProviderServiceSqlServer : IEntityConventionsProviderService
     {

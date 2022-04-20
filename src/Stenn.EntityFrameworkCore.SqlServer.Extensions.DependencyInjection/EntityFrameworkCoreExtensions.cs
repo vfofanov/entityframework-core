@@ -16,27 +16,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection
         ///     Use static migrations with specified db context
         /// </summary>
         /// <param name="optionsBuilder">Db contextoptions builder</param>
-        /// <param name="initMigrations">Init static migrations action</param>
-        /// <returns></returns>
-        public static DbContextOptionsBuilder UseStaticMigrationsSqlServer(this DbContextOptionsBuilder optionsBuilder,
-            Action<StaticMigrationBuilder> initMigrations)
-        {
-            UseStaticMigrationsSqlServer(optionsBuilder, 
-                options => { options.InitMigrations = initMigrations; });
-
-            return optionsBuilder;
-        }
-
-        /// <summary>
-        ///     Use static migrations with specified db context
-        /// </summary>
-        /// <param name="optionsBuilder">Db contextoptions builder</param>
+        /// <param name="initMigrations"></param>
         /// <param name="optionsInit">Static migrations options initialization</param>
         /// <returns></returns>
         public static DbContextOptionsBuilder UseStaticMigrationsSqlServer(this DbContextOptionsBuilder optionsBuilder,
+            Action<StaticMigrationBuilder> initMigrations,
             Action<StaticMigrationsOptions>? optionsInit = null)
         {
-            CommonExtensions.UseStaticMigrations(Configurator, optionsBuilder, optionsInit);
+            CommonExtensions.UseStaticMigrations(Configurator, optionsBuilder,initMigrations, optionsInit);
 
             return optionsBuilder;
         }

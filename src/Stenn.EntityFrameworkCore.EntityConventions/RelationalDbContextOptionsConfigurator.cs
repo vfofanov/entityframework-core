@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Stenn.EntityFrameworkCore.StaticMigrations
+namespace Stenn.EntityFrameworkCore.EntityConventions
 {
     public class RelationalDbContextOptionsConfigurator : IDbContextOptionsConfigurator
     {
         /// <inheritdoc />
         public void Configure(DbContextOptionsBuilder builder)
         {
-            builder.ReplaceService<IMigrator, MigratorWithStaticMigrations>();
+            builder.ReplaceService<IModelCustomizer, RelationalModelCustomizerWithConventions>();
         }
     }
 }

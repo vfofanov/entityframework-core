@@ -12,7 +12,9 @@ using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
+using Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
+using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
@@ -73,19 +75,24 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             services.AddDbContext<TDbContext>(builder =>
                 {
                     builder.UseSqlServer(connectionString);
-                    builder.UseStaticMigrationsSqlServer(options =>
+                    builder.UseStaticMigrationsSqlServer(b =>
                     {
-                        options.InitMigrations = init;
-                        options.ConventionsOptions.IncludeCommonConventions = includeCommonConventions;
-                        options.ConventionsOptions.InitEntityConventions = b =>
+                        init.Invoke(b);
+                        if (includeCommonConventions)
                         {
-                            if (includeCommonConventions)
-                            {
-                                b.AddTriggerBasedCommonConventions();
-                            }
-                        };
+                            b.AddTriggerBasedEntityConventionsMigrationSqlServer();
+                        }
                     });
+                    
                     builder.UseHistoricalMigrations();
+                    
+                    if (includeCommonConventions)
+                    {
+                        builder.UseEntityConventionsSqlServer(b =>
+                        {
+                            b.AddTriggerBasedCommonConventions();
+                        });
+                    }
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 

@@ -7,7 +7,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
         /// <summary>
         /// Use full migrations history and ignore initial migrations
         /// </summary>
-        public bool MigrateFromFullHistory { get; init; } = false;
+        public bool MigrateFromFullHistory { get; init; }
 
         /// <inheritdoc />
         public bool Equals(HistoricalMigrationsOptions? other)

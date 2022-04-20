@@ -4,6 +4,6 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
     public interface IStaticMigrationsProviderConfigurator
     {
-        void RegisterServices(IServiceCollection services);
+        void RegisterServices(IServiceCollection services, StaticMigrationsOptions options);
     }
 }

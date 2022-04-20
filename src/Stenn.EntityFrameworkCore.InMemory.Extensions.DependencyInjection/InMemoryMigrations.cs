@@ -9,23 +9,17 @@ namespace Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection
 {
     public sealed class InMemoryMigrations :IDbContextOptionsConfigurator, IStaticMigrationsProviderConfigurator
     {
-        public void RegisterServices(IServiceCollection services)
+        public void RegisterServices(IServiceCollection services, StaticMigrationsOptions options)
         {
-            services.TryAddTransient<IEnumsStaticMigrationFactory, EnumsStaticMigrationFactoryInMemory>();
+            if (options.EnableEnumTables)
+            {
+                services.TryAddTransient<IEnumsStaticMigrationFactory, EnumsStaticMigrationFactoryInMemory>();
+            }
         }
 
         /// <inheritdoc />
         public void Configure(DbContextOptionsBuilder builder)
         {
-        }
-    }
-
-    public class EnumsStaticMigrationFactoryInMemory : IEnumsStaticMigrationFactory
-    {
-        /// <inheritdoc />
-        public IStaticSqlMigration Create(DbContext context, string schemaName = "enum")
-        {
-            return new EmptyStaticSqlMigration();
         }
     }
 }

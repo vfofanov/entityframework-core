@@ -3,12 +3,10 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
-using Stenn.EntityFrameworkCore.StaticMigrations.Conventions;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
-namespace Stenn.EntityFrameworkCore.SqlServer.Conventions
+namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer
 {
     public class ConventionsStaticMigrationSqlServer : ConventionsStaticMigration
     {
