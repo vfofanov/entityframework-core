@@ -23,11 +23,11 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 
         /// <inheritdoc />
         public HistoricalMigrationsAssembly(
-            ICurrentDbContext currentContext, 
-            IDbContextOptions dbContextOptions, 
+            ICurrentDbContext currentContext,
+            IDbContextOptions dbContextOptions,
             IMigrationsIdGenerator idGenerator,
-            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger, 
-            IHistoryRepository historyRepository) 
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
+            IHistoryRepository historyRepository)
             : base(currentContext, dbContextOptions, idGenerator, logger)
         {
             _historyRepository = historyRepository;
@@ -35,9 +35,9 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             _dbContextOptions = dbContextOptions;
             _idGenerator = idGenerator;
             _logger = logger;
-            
-            _options = dbContextOptions.FindExtension<HistoricalMigrationsOptionsExtension>().Options;
 
+            _options = dbContextOptions.FindExtension<HistoricalMigrationsOptionsExtension>()?.Options ??
+                       throw new Exception("Can't find EF extension: HistoricalMigrationsOptionsExtension");
         }
 
         /// <inheritdoc />

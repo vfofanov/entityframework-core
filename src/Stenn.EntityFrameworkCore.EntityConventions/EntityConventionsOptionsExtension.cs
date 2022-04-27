@@ -27,7 +27,8 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         {
 #pragma warning disable EF1001
             return provider.GetRequiredService<IDbContextServices>().ContextOptions
-                .FindExtension<EntityConventionsOptionsExtension>();
+                .FindExtension<EntityConventionsOptionsExtension>()??
+                   throw new Exception("Can't find EF extension: EntityConventionsOptionsExtension");
 #pragma warning restore EF1001
         }
 
@@ -96,6 +97,13 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                 }
             }
 
+            /// <inheritdoc />
+            public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            {
+                return other is ExtensionInfo otherInfo &&
+                       otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
+            }
+
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
                 if (debugInfo == null)
@@ -106,7 +114,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                 debugInfo["Entity Conventions: IncludeCommonConventions"] = Extension._options.IncludeCommonConventions.ToString();
             }
 
-            public override long GetServiceProviderHashCode()
+            public override int GetServiceProviderHashCode()
             {
                 return 0;
             }

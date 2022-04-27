@@ -21,7 +21,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IRelationalConnection _connection;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
-        private readonly IDiagnosticsLogger<DbLoggerCategory.Database.Command> _commandLogger;
+        private readonly IRelationalCommandDiagnosticsLogger _commandLogger;
         private readonly IHistoryRepository _historyRepository;
         private readonly IRelationalDatabaseCreator _databaseCreator;
         private readonly IMigrationCommandExecutor _migrationCommandExecutor;
@@ -165,18 +165,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         }
 
         /// <inheritdoc />
-        protected override void PopulateMigrations(IEnumerable<string> appliedMigrationEntries,
-            string targetMigration,
-            out IReadOnlyList<Migration> migrationsToApply,
-            out IReadOnlyList<Migration> migrationsToRevert,
-            out Migration actualTargetMigration)
-        {
-            //TODO: Use MigrationsSorter here
-            base.PopulateMigrations(appliedMigrationEntries, targetMigration, out migrationsToApply, out migrationsToRevert, out actualTargetMigration);
-        }
-
-        /// <inheritdoc />
-        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration? previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {
             throw new NotSupportedException("Down migration doesn't supported by migrator with static migrations");
         }
