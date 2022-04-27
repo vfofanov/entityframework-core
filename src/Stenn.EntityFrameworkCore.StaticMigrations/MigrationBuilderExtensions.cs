@@ -1,5 +1,8 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
@@ -67,6 +70,19 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             }
         }
 
+        /// <summary>
+        /// Drop DEFAULT constraint for specific alter column operation if it exists.
+        /// Usually usage for drop temporary DEFAULT after creating NOT NULL column on existed table with data.
+        /// </summary>
+        /// <param name="opBuilder"></param>
+        /// <param name="builder"></param>
+        public static void DropDefaultConstraint<TOperation>(this OperationBuilder<TOperation> opBuilder, MigrationBuilder builder)
+        where TOperation:ColumnOperation
+        {
+            var operation = opBuilder.GetInfrastructure();
+            builder.DropDefaultConstraint(operation.Table,operation.Name,operation.Schema);
+        }
+        
         private static string? GetProviderDefaultSchema(this MigrationBuilder builder)
         {
             return builder.ActiveProvider switch

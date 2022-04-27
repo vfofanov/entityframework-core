@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
+using Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection;
+using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
+using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer;
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
@@ -13,9 +16,15 @@ namespace Stenn.EntityFrameworkCore.Data.Main
             var optionsBuilder = new DbContextOptionsBuilder<MainDbContext>();
             
             optionsBuilder.UseSqlServer();
-            optionsBuilder.UseStaticMigrationsSqlServer(options =>
+            optionsBuilder.UseEntityConventionsSqlServer(b =>
+            {
+                b.AddTriggerBasedCommonConventions();
+            });
+            
+            optionsBuilder.UseStaticMigrationsSqlServer(b =>
                 {
-                    options.InitMigrations = MainStaticMigrations.Init;
+                    MainStaticMigrations.Init(b);
+                    b.AddTriggerBasedEntityConventionsMigrationSqlServer();
                 }
             );
             

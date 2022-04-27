@@ -32,10 +32,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         public bool EnsureCreated()
         {
             var result = _databaseCreator.EnsureCreated();
-            if (result)
-            {
-                _staticMigrationsService.MigrateDictionaryEntities(DateTime.UtcNow, true);
-            }
+            
             return result;
         }
 
@@ -43,10 +40,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         public async Task<bool> EnsureCreatedAsync(CancellationToken cancellationToken = default)
         {
             var result = await _databaseCreator.EnsureCreatedAsync(cancellationToken);
-            if (result)
-            {
-                await _staticMigrationsService.MigrateDictionaryEntitiesAsync(DateTime.UtcNow, cancellationToken, true);
-            }
             return result;
         }
 

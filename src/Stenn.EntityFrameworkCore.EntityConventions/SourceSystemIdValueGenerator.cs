@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Stenn.EntityConventions.Contacts;
 
@@ -11,7 +12,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         /// <inheritdoc />
         protected override object NextValue(EntityEntry entry)
         {
-            return ((IEntityWithSourceSystemId)entry.Entity).GenerateSourceSystemId();
+            return ((IWithSourceSystemIdEntityConvention)entry.Entity).GenerateSourceSystemId();
         }
     }
 }

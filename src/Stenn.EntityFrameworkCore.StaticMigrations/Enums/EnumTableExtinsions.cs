@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -10,13 +11,25 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         {
             foreach (var group in model.GetEntityTypes().SelectMany(e => e.GetProperties())
                          .Distinct() // For abstract entity and inheritors: Proprty will appears count of inheritors
-                         .Where(p => p.ClrType.IsEnum).GroupBy(p => p.ClrType))
+                         .Where(p => GetPropertyType(p).IsEnum).GroupBy(GetPropertyType))
             {
                 var table = EnumTable.FromEnum(group.Key);
                 yield return new ModelEnumTable(table, group.ToArray());
             }
         }
 
-        
+        private static Type GetPropertyType(IProperty p)
+        {
+            var type = p.ClrType;
+            if (type.IsEnum)
+            {
+                return type;
+            }
+            if (type.IsValueType && Nullable.GetUnderlyingType(type) is { } nullableType)
+            {
+                return nullableType;
+            }
+            return type;
+        }
     }
 }

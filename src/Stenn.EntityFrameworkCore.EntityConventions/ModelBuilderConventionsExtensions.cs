@@ -2,7 +2,6 @@
 
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -18,70 +17,36 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         {
             builder
                 .AddCreateAudited()
-                .AddUpdateAudited()
-                .AddSoftDelete()
                 .AddConcurrentAudited()
-                .AddEntityWithDiscriminator()
-                .AddEntityWithSourceSystemId();
+                .AddWithDiscriminator()
+                .AddWithSourceSystemId();
         }
 
         public static IEntityConventionsBuilder AddCreateAudited(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConventionProperty<ICreateAuditedEntity>(x => x.Created,
-                (_, _, p) => p.IsRequired()
-                    .ValueGeneratedOnAdd()
-                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
-                    .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'"));
-            return builder;
-        }
-
-        public static IEntityConventionsBuilder AddUpdateAudited(this IEntityConventionsBuilder builder)
-        {
-            builder.AddInterfaceConventionProperty<IUpdateAuditedEntity>(x => x.ModifiedAt,
-                (_, _, p) => p.IsRequired()
-                    .ValueGeneratedOnAddOrUpdate()
-                    .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
-                    .HasAnnotation(ConventionsAnnotationNames.ColumnTriggerUpdate_SqlDefault, true)
-                    .HasComment("Row last modified datetime. Updated by trigger. Configured by convention 'IUpdateAuditedEntity'"));
-
-            return builder;
-        }
-
-        public static IEntityConventionsBuilder AddSoftDelete(this IEntityConventionsBuilder builder)
-        {
-            builder.AddInterfaceConvention<ISoftDeleteEntity>(
-                e =>
+            builder.AddInterfaceConventionProperty<ICreateAuditedEntityConvention>(x => x.Created,
+                (e, _, p) =>
                 {
-                    e.HasAnnotation(ConventionsAnnotationNames.SoftDelete, true);
+                    var options = e.Metadata.ClrType.GetCustomAttribute<CreateAuditedOptions>() ?? builder.DefaultOptions.CreateAudited;
 
-                    e.Property(typeof(bool), nameof(ISoftDeleteEntity.IsDeleted))
-                        .IsRequired()
-                        .HasDefaultValue(false)
-                        .HasComment(
-                            "Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+                    p.IsRequired()
+                        .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
+                        .ValueGeneratedOnAdd()
+                        .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'");
 
-                    e.Property(typeof(DateTime?), nameof(ISoftDeleteEntity.Deleted))
-                        .IsRequired(false)
-                        .HasComment(
-                            "Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+                    if (options.HasValueGenerator)
+                    {
+                        p.HasValueGenerator(options.Generator ?? typeof(CreateAuditedEntityValueGenerator));
+                    }
 
-                    e.HasIndex(nameof(ISoftDeleteEntity.IsDeleted));
-
-                    var entityParam = Expression.Parameter(e.Metadata.ClrType, "x");
-                    var deletedPropInfo = typeof(ISoftDeleteEntity).GetProperty(nameof(ISoftDeleteEntity.IsDeleted))!;
-                    var propAccess = Expression.MakeMemberAccess(entityParam, deletedPropInfo);
-                    var lambdaExpression = Expression.Lambda(
-                        Expression.MakeBinary(ExpressionType.Equal, propAccess, Expression.Constant(false)),
-                        entityParam);
-                    e.HasQueryFilter(lambdaExpression);
+                    FillPropertyOptions(e, p, options);
                 });
-
             return builder;
         }
 
         public static IEntityConventionsBuilder AddConcurrentAudited(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConventionProperty<IConcurrentAuditedEntity>(x => x.RowVersion,
+            builder.AddInterfaceConventionProperty<IConcurrentAuditedEntityConvention>(x => x.RowVersion,
                 (_, _, p) => p.IsRequired()
                     .IsRowVersion()
                     .HasComment("Concurrent token(row version). Configured by convention 'IConcurrentAuditedEntity'"));
@@ -89,9 +54,9 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
             return builder;
         }
 
-        public static IEntityConventionsBuilder AddEntityWithSourceSystemId(this IEntityConventionsBuilder builder)
+        public static IEntityConventionsBuilder AddWithSourceSystemId(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConventionProperty<IEntityWithSourceSystemId>(x => x.SourceSystemId, (e, i, p) =>
+            builder.AddInterfaceConventionProperty<IWithSourceSystemIdEntityConvention>(x => x.SourceSystemId, (e, _, p) =>
             {
                 var options = e.Metadata.ClrType.GetCustomAttribute<SourceSystemIdOptions>() ?? builder.DefaultOptions.SourceSystemId;
 
@@ -110,40 +75,39 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
             return builder;
         }
 
-        public static IEntityConventionsBuilder AddEntityWithDiscriminator(this IEntityConventionsBuilder builder)
+        public static IEntityConventionsBuilder AddWithDiscriminator(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConvention<IEntityWithDiscriminator>(e =>
+            builder.AddInterfaceConvention<IWithDiscriminatorEntityConvention>(e =>
             {
                 var entityType = e.Metadata.ClrType;
                 var options = entityType.GetCustomAttribute<DiscriminatorOptions>() ?? builder.DefaultOptions.Discriminator;
 
                 Type propertyType;
-                if (entityType.IsAssignableTo(typeof(IEntityWithDiscriminator<string>)))
+                if (entityType.IsAssignableTo(typeof(IWithDiscriminatorEntityConvention<string>)))
                 {
                     propertyType = typeof(string);
                 }
                 else
                 {
                     var interfaceType = entityType.GetInterfaces()
-                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityWithDiscriminator<>));
+                        .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWithDiscriminatorEntityConvention<>));
                     if (interfaceType == null)
                     {
                         throw new EntityConventionsException($"Entity '{entityType.Name}' must inherit from 'IEntityWithDiscriminator<>' interface");
                     }
                     propertyType = interfaceType.GetGenericArguments()[0];
                 }
-                var p = e.Property(propertyType, nameof(IEntityWithDiscriminator<string>.Discriminator));
-                
+                var p = e.Property(propertyType, nameof(IWithDiscriminatorEntityConvention<string>.Discriminator));
+
                 p.IsRequired()
                     .HasComment("Discriminator. Configured by convention 'IEntityWithDiscriminator<>'");
-                
+
                 FillStringPropertyOptions(e, p, options);
             });
             return builder;
         }
-        
-        
-        public static void FillStringPropertyOptions(EntityTypeBuilder e,PropertyBuilder p, StringPropertyOptions options)
+
+        public static void FillStringPropertyOptions(EntityTypeBuilder e, PropertyBuilder p, StringPropertyOptions options)
         {
 #pragma warning disable EF1001
             if (options.ColumnName is { } columnName && p.Metadata.FindAnnotation(RelationalAnnotationNames.ColumnName) is not { })

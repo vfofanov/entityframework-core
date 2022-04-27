@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using Stenn.EntityConventions.Contacts;
+using Stenn.EntityConventions.Contacts.TriggerBased;
 
 namespace Stenn.EntityFrameworkCore.Data.Main
 {
     [DebuggerDisplay("{Name}, Id = {Id}")]
-    [SourceSystemIdOptions(MaxLength = 100, IsUnicode = false, HasIndex = false)]
+    [CreateAuditedOptions(HasValueGenerator = false)] //Disable it. We can't use value generator for dict entity
     public class Role : Entity,
-        ICreateAuditedEntity,
-        IUpdateAuditedEntity,
-        IEntityWithSourceSystemIdGuid,
-        ISoftDeleteEntity
+        ICreateAuditedEntityConvention,
+        IUpdateAuditedEntityConvention,
+        ISoftDeleteEntityConvention
     {
         public string Name { get; private set; }
         public string Description { get; set; }

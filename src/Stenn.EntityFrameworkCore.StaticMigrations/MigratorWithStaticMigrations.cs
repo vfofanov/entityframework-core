@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,11 +19,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     public class MigratorWithStaticMigrations : Migrator
     {
         private readonly IRelationalConnection _connection;
+        private readonly ICurrentDbContext _currentContext;
+        private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
+        private readonly IDiagnosticsLogger<DbLoggerCategory.Database.Command> _commandLogger;
         private readonly IHistoryRepository _historyRepository;
+        private readonly IRelationalDatabaseCreator _databaseCreator;
         private readonly IMigrationCommandExecutor _migrationCommandExecutor;
         private readonly IMigrationsSqlGenerator _migrationsSqlGenerator;
-
-        private MigrateContext? _migrateContext;
+        private readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
 
         /// <inheritdoc />
         public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
@@ -36,11 +41,15 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         {
             StaticMigrationsService = staticMigrationsService;
             _historyRepository = historyRepository;
+            _databaseCreator = (IRelationalDatabaseCreator)databaseCreator;
             _migrationsSqlGenerator = migrationsSqlGenerator;
+            _rawSqlCommandBuilder = rawSqlCommandBuilder;
             _migrationCommandExecutor = migrationCommandExecutor;
             _connection = connection;
+            _currentContext = currentContext;
+            _logger = logger;
+            _commandLogger = commandLogger;
         }
-
 
         private IStaticMigrationsService StaticMigrationsService { get; }
 
@@ -49,30 +58,27 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         {
             MigrateGuard(targetMigration);
             var modified = DateTime.UtcNow;
+            
+            _logger.MigrateUsingConnection(this, _connection);
 
-            try
+            if (!_historyRepository.Exists())
             {
-                var appliedMigrations = _historyRepository.GetAppliedMigrations();
-                _migrateContext = GetMigrateContext(appliedMigrations, modified);
-                if (_migrateContext.HasMigrations)
+                if (!_databaseCreator.Exists())
                 {
-                    // ReSharper disable once RedundantArgumentDefaultValue
-                    base.Migrate(null);
+                    _databaseCreator.Create();
                 }
-                else
-                {
-                    var revertOperations = StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, false);
-                    var applyOperations = StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, false);
-                    var operations = revertOperations.Concat(applyOperations).ToList();
-                    Execute(operations);
-                }
+
+                var command = _rawSqlCommandBuilder.Build(
+                    _historyRepository.GetCreateScript());
+
+                command.ExecuteNonQuery(
+                    new RelationalCommandParameterObject(_connection, null, null, _currentContext.Context, _commandLogger));
             }
-            finally
-            {
-                _migrateContext = null;
-            }
-            var dictEntityOperations = StaticMigrationsService.MigrateDictionaryEntities(modified);
-            Execute(dictEntityOperations);
+            
+            var appliedMigrations = _historyRepository.GetAppliedMigrations();
+            var migrateContext = GetMigrateContext(appliedMigrations, modified);
+            
+            _migrationCommandExecutor.ExecuteNonQuery(GetMigrationCommands(migrateContext), _connection);
         }
 
         /// <inheritdoc />
@@ -81,31 +87,27 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             MigrateGuard(targetMigration);
             var migrationDate = DateTime.UtcNow;
 
-            try
-            {
-                var appliedMigrations = await _historyRepository.GetAppliedMigrationsAsync(cancellationToken).ConfigureAwait(false);
-                _migrateContext = GetMigrateContext(appliedMigrations, migrationDate);
-                if (_migrateContext.HasMigrations)
-                {
-                    await base.MigrateAsync(null, cancellationToken);
-                }
-                else
-                {
-                    var revertOperations = await StaticMigrationsService.GetRevertOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
-                        .ConfigureAwait(false);
-                    var applyOperations = await StaticMigrationsService.GetApplyOperationsAsync(_migrateContext.MigrationDate, false, cancellationToken)
-                        .ConfigureAwait(false);
-                    var operations = revertOperations.Concat(applyOperations).ToList();
+            _logger.MigrateUsingConnection(this, _connection);
 
-                    await ExecuteAsync(operations, cancellationToken).ConfigureAwait(false);
-                }
-            }
-            finally
+            if (!await _historyRepository.ExistsAsync(cancellationToken).ConfigureAwait(false))
             {
-                _migrateContext = null;
+                if (!await _databaseCreator.ExistsAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    await _databaseCreator.CreateAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                var command = _rawSqlCommandBuilder.Build(_historyRepository.GetCreateScript());
+
+                await command.ExecuteNonQueryAsync(
+                        new RelationalCommandParameterObject(_connection, null, null, _currentContext.Context, _commandLogger),
+                        cancellationToken)
+                    .ConfigureAwait(false);
             }
-            var dictEntityOperations = await StaticMigrationsService.MigrateDictionaryEntitiesAsync(migrationDate, cancellationToken).ConfigureAwait(false);
-            await ExecuteAsync(dictEntityOperations, cancellationToken).ConfigureAwait(false);
+
+            var appliedMigrations = await _historyRepository.GetAppliedMigrationsAsync(cancellationToken).ConfigureAwait(false);
+            var migrateContext = GetMigrateContext(appliedMigrations, migrationDate);
+                
+            await _migrationCommandExecutor.ExecuteNonQueryAsync(GetMigrationCommands(migrateContext), _connection, cancellationToken).ConfigureAwait(false);
         }
 
         private void MigrateGuard(string? targetMigration)
@@ -114,12 +116,43 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             {
                 throw new ArgumentException("Migrate to targetMigration not supported", nameof(targetMigration));
             }
-            if (_migrateContext != null)
-            {
-                throw new ArgumentException("Migration is already running", nameof(targetMigration));
-            }
         }
 
+        private IEnumerable<MigrationCommand> GetMigrationCommands(MigrateContext context, MigrationsSqlGenerationOptions options= MigrationsSqlGenerationOptions.Default)
+        {
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetInitialOperations(context.MigrationDate, false).ToList()))
+            {
+                yield return command;
+            }
+
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetRevertOperations(context.MigrationDate, false).ToList()))
+            {
+                yield return command;
+            }
+
+            if (context.HasMigrations)
+            {
+                foreach (var migration in context.MigrationsToApply)
+                {
+                    var operations = migration.UpOperations;
+                    foreach (var operation in operations)
+                    {
+                        StaticMigrationsService.CheckForSuppressTransaction(migration.GetId(), operation);
+                    }
+
+                    foreach (var command in GenerateUpSql(migration, options))
+                    {
+                        yield return command;
+                    }
+                }
+            }
+            
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetApplyOperations(context.MigrationDate, false).ToList()))
+            {
+                yield return command;
+            }
+        }
+        
         protected virtual MigrateContext GetMigrateContext(IEnumerable<HistoryRow> appliedMigrationEntries, DateTime migrationDate)
         {
             PopulateMigrations(appliedMigrationEntries.Select(t => t.MigrationId),
@@ -127,44 +160,25 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 out var migrationsToApply,
                 out _,
                 out _);
-
-            return migrationsToApply.Count == 0
-                ? new MigrateContext(migrationDate)
-                : new MigrateContext(migrationsToApply.First().GetId(), migrationsToApply.Last().GetId(), migrationDate);
+            
+            return new MigrateContext(migrationsToApply, migrationDate);
         }
 
         /// <inheritdoc />
-        protected override IReadOnlyList<MigrationCommand> GenerateUpSql(Migration migration,
-            MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        protected override void PopulateMigrations(IEnumerable<string> appliedMigrationEntries,
+            string targetMigration,
+            out IReadOnlyList<Migration> migrationsToApply,
+            out IReadOnlyList<Migration> migrationsToRevert,
+            out Migration actualTargetMigration)
         {
-            var migrationCommands = base.GenerateUpSql(migration, options);
-            if (_migrateContext == null)
-            {
-                return migrationCommands;
-            }
-            var migrationId = migration.GetId();
-            if (migrationId == _migrateContext.FirstMigrationId &&
-                migrationId == _migrateContext.LastMigrationId)
-            {
-                //NOTE: Add revert static migrations at the beggining of first migration 
-                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
-                //NOTE: Add apply static migrations at the end of last migration
-                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
-                return revertCommands.Concat(migrationCommands).Concat(applyCommands).ToList();
-            }
-            if (migrationId == _migrateContext.FirstMigrationId)
-            {
-                //NOTE: Add revert static migrations at the beggining of first migration 
-                var revertCommands = GenerateCommands(StaticMigrationsService.GetRevertOperations(_migrateContext.MigrationDate, true).ToList());
-                return revertCommands.Concat(migrationCommands).ToList();
-            }
-            if (migrationId == _migrateContext.LastMigrationId)
-            {
-                //NOTE: Add apply static migrations at the end of last migration
-                var applyCommands = GenerateCommands(StaticMigrationsService.GetApplyOperations(_migrateContext.MigrationDate, true).ToList());
-                return migrationCommands.Concat(applyCommands).ToList();
-            }
-            return migrationCommands;
+            //TODO: Use MigrationsSorter here
+            base.PopulateMigrations(appliedMigrationEntries, targetMigration, out migrationsToApply, out migrationsToRevert, out actualTargetMigration);
+        }
+
+        /// <inheritdoc />
+        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        {
+            throw new NotSupportedException("Down migration doesn't supported by migrator with static migrations");
         }
 
         private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operations)
@@ -172,45 +186,17 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             return _migrationsSqlGenerator.Generate(operations);
         }
 
-        private void Execute(IReadOnlyList<MigrationOperation> operations)
-        {
-            var commands = GenerateCommands(operations);
-            _migrationCommandExecutor.ExecuteNonQuery(commands, _connection);
-        }
-
-        private async Task ExecuteAsync(IReadOnlyList<MigrationOperation> operations, CancellationToken cancellationToken = default)
-        {
-            if (operations.Count == 0)
-            {
-                return;
-            }
-            var commands = GenerateCommands(operations);
-            await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken).ConfigureAwait(false);
-        }
-
         protected class MigrateContext
         {
-            public MigrateContext(DateTime migrationDate)
+            public MigrateContext(IReadOnlyList<Migration> migrationsToApply, DateTime migrationDate)
             {
-                FirstMigrationId = string.Empty;
-                LastMigrationId = string.Empty;
-                HasMigrations = false;
+                MigrationsToApply = migrationsToApply;
                 MigrationDate = migrationDate;
             }
 
-            public MigrateContext(string firstMigrationId, string lastMigrationId, DateTime migrationDate)
-            {
-                FirstMigrationId = firstMigrationId;
-                LastMigrationId = lastMigrationId;
-                HasMigrations = true;
-                MigrationDate = migrationDate;
-            }
-
+            public IReadOnlyList<Migration> MigrationsToApply { get; }
             public DateTime MigrationDate { get; }
-
-            public string FirstMigrationId { get; }
-            public string LastMigrationId { get; }
-            public bool HasMigrations { get; }
+            public bool HasMigrations => MigrationsToApply.Count > 0;
         }
     }
 }

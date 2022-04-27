@@ -10,16 +10,19 @@ namespace Stenn.EntityConventions.Contacts
         public SourceSystemIdOptions()
         {
             IndexIsUnique = true;
+            HasValueGenerator = true;
+            Generator = null;
+
         }
 
         /// <summary>
         /// Has value generator
         /// </summary>
-        public bool HasValueGenerator { get; set; } = true;
+        public bool HasValueGenerator { get; set; }
 
         /// <summary>
         /// Value generator type if null standard value generator will be used
         /// </summary>
-        public Type? Generator { get; set; } = null;
+        public Type? Generator { get; set; }
     }
 }

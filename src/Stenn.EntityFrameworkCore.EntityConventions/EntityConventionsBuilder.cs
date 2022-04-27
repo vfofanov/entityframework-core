@@ -19,8 +19,6 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
             DefaultOptions = defaultOptions;
         }
 
-        
-
         public EntityConventionsCommonDefaultsOptions DefaultOptions { get; }
 
         
@@ -35,12 +33,14 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
         /// <inheritdoc />
         public void AddInterfaceConvention<TConvention>(Action<EntityTypeBuilder> configure)
+        where TConvention:IEntityConventionContract
         {
             Add(new InterfaceConvention(typeof(TConvention), configure));
         }
 
         public void AddInterfaceConventionProperty<TConvention>(Expression<Func<TConvention, object?>> propertyExpression,
             Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure)
+            where TConvention : IEntityConventionContract
         {
             var propInfo = (PropertyInfo)propertyExpression.GetMemberAccess();
             Add(new InterfaceConvention(typeof(TConvention),
@@ -50,7 +50,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     configure(builder, propInfo, prop);
                 }));
         }
-        
+
         /// <inheritdoc />
         public bool HasConventions => _conventions.Count > 0;
 

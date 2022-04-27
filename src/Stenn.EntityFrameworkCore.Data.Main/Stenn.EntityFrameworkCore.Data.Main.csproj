@@ -5,8 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
@@ -22,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="StaticMigrations\Sql\InitDB.Create.sql" />
+    <EmbeddedResource Include="StaticMigrations\Sql\InitDB.Apply.sql" />
     <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Apply.sql" />
     <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Revert.sql" />
   </ItemGroup>

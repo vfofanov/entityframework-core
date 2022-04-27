@@ -83,9 +83,60 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<byte?>("TypeNameNullable")
+                        .HasColumnType("tinyint");
+
                     b.HasKey("Id");
 
                     b.ToTable("Contact");
+                });
+
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Contact2", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()")
+                        .HasComment("Row creation datetime. Configured by convention 'ICreateAuditedEntity'");
+
+                    b.Property<string>("EMail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceSystemId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)")
+                        .IsFixedLength(false)
+                        .HasComment("Source system id. Row id for cross services' communication. Configured by convention 'IEntityWithSourceSystemId'");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TypeName2")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte?>("TypeNameNullable")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contact2");
                 });
 
             modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Currency", b =>
@@ -113,6 +164,16 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.HasKey("Iso3LetterCode");
 
                     b.ToTable("Currency");
+
+                    b.HasData(
+                        new
+                        {
+                            Iso3LetterCode = "TST",
+                            DecimalDigits = (byte)1,
+                            Description = "Test currency Changed",
+                            IsoNumericCode = 1,
+                            Type = 2
+                        });
                 });
 
             modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Role", b =>
@@ -150,14 +211,6 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SourceSystemId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)")
-                        .IsFixedLength(false)
-                        .HasComment("Source system id. Row id for cross services' communication. Configured by convention 'IEntityWithSourceSystemId'");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted");
@@ -166,6 +219,26 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b
                         .HasAnnotation("ColumnTriggerSoftDelete", true);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("e017806b-2682-439d-9486-8c13b9f8246a"),
+                            Description = "Admin desc",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("acadf8c5-dcc8-4f11-aa77-62e2a792f62c"),
+                            Description = "Customer desc",
+                            Name = "Customer"
+                        },
+                        new
+                        {
+                            Id = new Guid("2edf50ca-771c-4002-8704-f75e2255d393"),
+                            Description = "Support desc",
+                            Name = "Support"
+                        });
                 });
 
             modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Main.Cat", b =>

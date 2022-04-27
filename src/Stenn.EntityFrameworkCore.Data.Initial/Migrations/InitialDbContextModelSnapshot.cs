@@ -43,6 +43,24 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                     b.HasKey("Iso3LetterCode");
 
                     b.ToTable("Currency");
+
+                    b.HasData(
+                        new
+                        {
+                            Iso3LetterCode = "TST",
+                            DecimalDigits = (byte)2,
+                            Description = "Test currency",
+                            IsoNumericCode = 1,
+                            Type = 1
+                        },
+                        new
+                        {
+                            Iso3LetterCode = "TS2",
+                            DecimalDigits = (byte)2,
+                            Description = "Test currency 2",
+                            IsoNumericCode = 2,
+                            Type = 1
+                        });
                 });
 #pragma warning restore 612, 618
         }

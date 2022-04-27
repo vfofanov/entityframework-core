@@ -20,7 +20,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IServiceProvider _provider;
         
         private IStaticMigrationsService? _migrationsService;
-        private IStaticMigrationsService MigrationsService => _migrationsService ??= _provider.GetRequiredService<IStaticMigrationsService>();
+        private IStaticMigrationsService StaticMigrationsService => _migrationsService ??= _provider.GetRequiredService<IStaticMigrationsService>();
 
         /// <inheritdoc />
         public RelationalDatabaseCreatorWithStaticMigrations(IRelationalDatabaseCreator databaseCreator,
@@ -62,22 +62,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             _databaseCreator.Delete();
         }
 
-        public override Task<bool> ExistsAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override Task<bool> ExistsAsync(CancellationToken cancellationToken = default)
         {
             return _databaseCreator.ExistsAsync(cancellationToken);
         }
 
-        public override Task<bool> HasTablesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
         {
             return _databaseCreator.HasTablesAsync(cancellationToken);
         }
 
-        public override Task CreateAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override Task CreateAsync(CancellationToken cancellationToken = default)
         {
             return _databaseCreator.CreateAsync(cancellationToken);
         }
 
-        public override Task DeleteAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override Task DeleteAsync(CancellationToken cancellationToken = default)
         {
             return _databaseCreator.DeleteAsync(cancellationToken);
         }
@@ -86,20 +86,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         public override void CreateTables()
         {
             _databaseCreator.CreateTables();
-            
-            var migrationDate = DateTime.UtcNow;
-            Execute(MigrationsService.GetApplyOperations(migrationDate, true).ToList());
-            Execute(MigrationsService.MigrateDictionaryEntities(migrationDate, true));
+            Execute(GetMigrateOperationLists());
         }
 
         /// <inheritdoc />
         public override async Task CreateTablesAsync(CancellationToken cancellationToken = default)
         {
             await _databaseCreator.CreateTablesAsync(cancellationToken);
-
-            var migrationDate = DateTime.UtcNow;
-            await ExecuteAsync((await MigrationsService.GetApplyOperationsAsync(migrationDate, true, cancellationToken)).ToList(), cancellationToken);
-            await ExecuteAsync(await MigrationsService.MigrateDictionaryEntitiesAsync(migrationDate, cancellationToken, true), cancellationToken);
+            await ExecuteAsync(GetMigrateOperationLists(), cancellationToken);
         }
 
         /// <inheritdoc />
@@ -108,8 +102,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             var sbuilder = new StringBuilder(_databaseCreator.GenerateCreateScript());
             sbuilder.AppendLine(Dependencies.SqlGenerationHelper.BatchTerminator);
 
-            var migrationDate = DateTime.UtcNow;
-            foreach (var command in GenerateCommands(MigrationsService.GetApplyOperations(migrationDate, true).ToList()))
+            foreach (var command in GenerateCommands(GetMigrateOperationLists()))
             {
                 sbuilder.AppendLine(command.CommandText);
                 sbuilder.AppendLine(Dependencies.SqlGenerationHelper.BatchTerminator);
@@ -117,23 +110,33 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             return sbuilder.ToString();
         }
 
-        private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operations)
+        private IEnumerable<IReadOnlyList<MigrationOperation>> GetMigrateOperationLists()
         {
-            return _migrationsSqlGenerator.Generate(operations);
+            var migrationDate = DateTime.UtcNow;
+            
+            yield return StaticMigrationsService.GetInitialOperations(migrationDate, true).ToList();
+            yield return StaticMigrationsService.GetApplyOperations(migrationDate, true).ToList();
+        }
+        
+        private IEnumerable<MigrationCommand> GenerateCommands(IEnumerable<IReadOnlyList<MigrationOperation>> operationLists)
+        {
+            foreach (var operationList in operationLists)
+            {
+                foreach (var migrationCommand in _migrationsSqlGenerator.Generate(operationList))
+                {
+                    yield return migrationCommand;
+                }
+            }
         }
 
-        private void Execute(IReadOnlyList<MigrationOperation> operations)
+        private void Execute(IEnumerable<IReadOnlyList<MigrationOperation>> operations)
         {
             var commands = GenerateCommands(operations);
             _migrationCommandExecutor.ExecuteNonQuery(commands, _connection);
         }
 
-        private async Task ExecuteAsync(IReadOnlyList<MigrationOperation> operations, CancellationToken cancellationToken = default)
+        private async Task ExecuteAsync(IEnumerable<IReadOnlyList<MigrationOperation>> operations, CancellationToken cancellationToken = default)
         {
-            if (operations.Count == 0)
-            {
-                return;
-            }
             var commands = GenerateCommands(operations);
             await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken).ConfigureAwait(false);
         }

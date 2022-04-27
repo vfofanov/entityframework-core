@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />     
   </ItemGroup>

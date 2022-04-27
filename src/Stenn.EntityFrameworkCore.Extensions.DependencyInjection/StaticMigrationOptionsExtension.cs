@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Stenn.DictionaryEntities;
-using Stenn.EntityFrameworkCore.EntityConventions;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
@@ -22,15 +20,17 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         private ExtensionInfo? _info;
         private readonly IStaticMigrationsProviderConfigurator _configurator;
         private readonly StaticMigrationsOptions _options;
+        private readonly Action<StaticMigrationBuilder>? _initMigrations;
 
         private StaticMigrationBuilder? _staticMigrationBuilder;
-        private IEntityConventionsService? _entityConventionsService;
+        
 
         public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator,
-            StaticMigrationsOptions options)
+            StaticMigrationsOptions options, Action<StaticMigrationBuilder>? initMigrations)
         {
             _configurator = configurator ?? throw new ArgumentNullException(nameof(configurator));
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _initMigrations = initMigrations;
         }
 
         private static StaticMigrationOptionsExtension GetExtension(IServiceProvider provider)
@@ -46,7 +46,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             return extension;
         }
 
-        private StaticMigrationBuilder GetStaticMigrationsBuilder(IServiceProvider provider)
+        private StaticMigrationBuilder GetStaticMigrationsBuilder()
         {
             if (_staticMigrationBuilder is { } b)
             {
@@ -54,57 +54,27 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             }
 
             var builder = new StaticMigrationBuilder();
-
-            var entityConventionsService = provider.GetService<IEntityConventionsService>();
-
-            if (entityConventionsService?.HasConventions == true)
-            {
-                builder.InitConventions();
-            }
+            
             if (_options.EnableEnumTables)
             {
                 builder.AddEnumTables();
             }
-            _options.InitMigrations?.Invoke(builder);
+            _initMigrations?.Invoke(builder);
 
             return _staticMigrationBuilder = builder;
-        }
-
-        private IEntityConventionsService GetEntityConventionsService()
-        {
-            if (_entityConventionsService is { } service)
-            {
-                return service;
-            }
-
-            var builder = new EntityConventionsBuilder(_options.ConventionsOptions.Defaults);
-            if (_options.ConventionsOptions.IncludeCommonConventions)
-            {
-                builder.AddCommonConventions();
-            }
-            _options.ConventionsOptions.InitEntityConventions?.Invoke(builder);
-
-            return _entityConventionsService = builder;
         }
 
         /// <inheritdoc />
         public void ApplyServices(IServiceCollection services)
         {
-            _configurator.RegisterServices(services);
+            _configurator.RegisterServices(services, _options);
 
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
-
-            services.AddScoped(
-                provider => GetExtension(provider).GetEntityConventionsService());
 
             services.AddScoped<IStaticMigrationCollection<IStaticSqlMigration, DbContext>>(
-                provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).SQLMigrations);
-
-            services.AddScoped<IStaticMigrationCollection<IDictionaryEntityMigration, DbContext>>(
-                provider => GetExtension(provider).GetStaticMigrationsBuilder(provider).DictEntityMigrations);
+                provider => GetExtension(provider).GetStaticMigrationsBuilder().SQLMigrations);
 
             services.TryAddScoped<IStaticMigrationsService, StaticMigrationsService>();
-            services.TryAddScoped<IDictionaryEntityMigrator, DbContextDictionaryEntityMigrator>();
 
             var relationalOverrided = OverrideService<IRelationalDatabaseCreator>(services, (provider, creator) =>
                 new RelationalDatabaseCreatorWithStaticMigrations(creator,

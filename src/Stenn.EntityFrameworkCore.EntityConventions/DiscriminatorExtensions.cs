@@ -16,9 +16,9 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         /// <returns> A builder that allows the discriminator property to be configured. </returns>
         public static DiscriminatorBuilder<TDiscriminator> HasConventionDiscriminator<TEntity, TDiscriminator>(this EntityTypeBuilder<TEntity> builder,
             Action<PropertyBuilder<TDiscriminator>>? init = null)
-            where TEntity : class, IEntityWithDiscriminator<TDiscriminator>
+            where TEntity : class, IWithDiscriminatorEntityConvention<TDiscriminator>
         {
-            const string propertyName = nameof(IEntityWithDiscriminator<TDiscriminator>.Discriminator);
+            const string propertyName = nameof(IWithDiscriminatorEntityConvention<TDiscriminator>.Discriminator);
             var property = builder.Property<TDiscriminator>(propertyName);
             init?.Invoke(property);
             return builder.HasDiscriminator<TDiscriminator>(propertyName);

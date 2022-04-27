@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations.DictEntities;
 
 namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
 {
@@ -14,6 +15,8 @@ namespace Stenn.EntityFrameworkCore.Data.Main.Configurations
             builder.Property(x => x.IsoNumericCode).IsRequired();
             builder.Property(x => x.DecimalDigits).IsRequired();
             builder.Property(x => x.Description).IsUnicode().HasMaxLength(150);
+            
+            builder.HasData(CurrencyDeclaration.GetActual());
         }
     }
 }

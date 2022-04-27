@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <Description>Dictionary entities</Description>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-</Project>

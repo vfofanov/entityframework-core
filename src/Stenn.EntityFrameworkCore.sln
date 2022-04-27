@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 		..\.github\workflows\build_and_publish_nuget.yml = ..\.github\workflows\build_and_publish_nuget.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.DictionaryEntities", "Stenn.DictionaryEntities\Stenn.DictionaryEntities.csproj", "{D3693447-48B5-4651-8087-FCC6A799457E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{4D0A2092-01C6-4396-A117-31263DD64D57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Tests", "Stenn.EntityFrameworkCore.SqlServer.Tests\Stenn.EntityFrameworkCore.SqlServer.Tests.csproj", "{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}"
@@ -54,9 +52,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2", "Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj", "{400665A8-CA03-4E79-B154-75CF44DDDAE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations", "Stenn.EntityFrameworkCore.SplittedMigrations\Stenn.EntityFrameworkCore.SplittedMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations", "Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SplittedMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.TriggerBased.Contacts", "Stenn.EntityConventions.TriggerBased.Contacts\Stenn.EntityConventions.TriggerBased.Contacts.csproj", "{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj", "{9834F941-47B0-44CC-9DAE-839BD6F71F65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial", "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.csproj", "{94A58282-915A-4174-9D30-9A46A28E6D5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection.csproj", "{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj", "{43720D28-FD68-4953-A360-5D02CF9C67A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj", "{B5A6B581-554B-4584-AD6D-C0E514E13E0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,10 +82,6 @@ Global
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3416A707-49CC-45BA-A488-9C6A823BAA18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3693447-48B5-4651-8087-FCC6A799457E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -140,6 +146,30 @@ Global
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CD745FF-C7ED-467E-A273-3815D4A40FAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94A58282-915A-4174-9D30-9A46A28E6D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94A58282-915A-4174-9D30-9A46A28E6D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94A58282-915A-4174-9D30-9A46A28E6D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94A58282-915A-4174-9D30-9A46A28E6D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43720D28-FD68-4953-A360-5D02CF9C67A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43720D28-FD68-4953-A360-5D02CF9C67A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43720D28-FD68-4953-A360-5D02CF9C67A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43720D28-FD68-4953-A360-5D02CF9C67A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,5 +187,11 @@ Global
 		{9D173795-BE10-4366-BD34-83BA59B3F486} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 		{F19D4945-4921-40EF-90C5-19AB688EB617} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{400665A8-CA03-4E79-B154-75CF44DDDAE3} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{9834F941-47B0-44CC-9DAE-839BD6F71F65} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{94A58282-915A-4174-9D30-9A46A28E6D5B} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{43720D28-FD68-4953-A360-5D02CF9C67A2} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{B5A6B581-554B-4584-AD6D-C0E514E13E0E} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 	EndGlobalSection
 EndGlobal

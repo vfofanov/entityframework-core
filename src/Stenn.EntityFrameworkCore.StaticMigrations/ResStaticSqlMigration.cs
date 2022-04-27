@@ -10,9 +10,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
     {
         private readonly ResFile? _applyResFile;
         private readonly ResFile? _revertResFile;
-        private readonly bool _suppressTransaction;
 
-        public ResStaticSqlMigration(ResFile? applyResFile, ResFile? revertResFile, bool suppressTransaction)
+        public ResStaticSqlMigration(ResFile? applyResFile, ResFile? revertResFile)
         {
             if (applyResFile is null && revertResFile is null)
             {
@@ -20,7 +19,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             }
             _applyResFile = applyResFile;
             _revertResFile = revertResFile;
-            _suppressTransaction = suppressTransaction;
         }
 
         protected override byte[] GetHashInternal()
@@ -28,7 +26,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             using var stream = (_applyResFile ?? _revertResFile)?.ReadStream() ?? new MemoryStream(new byte[] { 0 });
             return HashAlgorithm.ComputeHash(stream);
         }
-
 
         /// <inheritdoc />
         public IEnumerable<MigrationOperation> GetRevertOperations()
@@ -38,7 +35,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 yield break;
             }
             var sql = _revertResFile.Read();
-            yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
+            yield return new SqlOperation { Sql = sql, SuppressTransaction = false };
         }
 
         /// <inheritdoc />
@@ -49,7 +46,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 yield break;
             }
             var sql = _applyResFile.Read();
-            yield return new SqlOperation { Sql = sql, SuppressTransaction = _suppressTransaction };
+            yield return new SqlOperation { Sql = sql, SuppressTransaction = false };
         }
     }
 }
