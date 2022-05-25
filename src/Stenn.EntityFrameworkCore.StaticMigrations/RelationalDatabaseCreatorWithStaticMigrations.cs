@@ -85,24 +85,38 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         /// <inheritdoc />
         public override void CreateTables()
         {
+            var migrationDate = DateTime.UtcNow;
+
+            Execute(GetInitialOperationsList(migrationDate));
             _databaseCreator.CreateTables();
-            Execute(GetMigrateOperationLists());
+            Execute(GetApplyOperationsList(migrationDate));
         }
 
         /// <inheritdoc />
         public override async Task CreateTablesAsync(CancellationToken cancellationToken = default)
         {
+            var migrationDate = DateTime.UtcNow;
+            await ExecuteAsync(GetInitialOperationsList(migrationDate), cancellationToken);
             await _databaseCreator.CreateTablesAsync(cancellationToken);
-            await ExecuteAsync(GetMigrateOperationLists(), cancellationToken);
+            await ExecuteAsync(GetApplyOperationsList(migrationDate), cancellationToken);
         }
 
         /// <inheritdoc />
         public override string GenerateCreateScript()
         {
-            var sbuilder = new StringBuilder(_databaseCreator.GenerateCreateScript());
+            var migrationDate = DateTime.UtcNow;
+            var sbuilder = new StringBuilder();
+            
+            foreach (var command in GenerateCommands(GetInitialOperationsList(migrationDate)))
+            {
+                sbuilder.AppendLine(command.CommandText);
+                sbuilder.AppendLine(Dependencies.SqlGenerationHelper.BatchTerminator);
+            }
+            
+            sbuilder.AppendLine(_databaseCreator.GenerateCreateScript());
             sbuilder.AppendLine(Dependencies.SqlGenerationHelper.BatchTerminator);
 
-            foreach (var command in GenerateCommands(GetMigrateOperationLists()))
+            foreach (var command in GenerateCommands(GetApplyOperationsList(migrationDate)))
             {
                 sbuilder.AppendLine(command.CommandText);
                 sbuilder.AppendLine(Dependencies.SqlGenerationHelper.BatchTerminator);
@@ -110,32 +124,28 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             return sbuilder.ToString();
         }
 
-        private IEnumerable<IReadOnlyList<MigrationOperation>> GetMigrateOperationLists()
+        private IReadOnlyList<MigrationOperation> GetInitialOperationsList(DateTime migrationDate)
         {
-            var migrationDate = DateTime.UtcNow;
-            
-            yield return StaticMigrationsService.GetInitialOperations(migrationDate, true).ToList();
-            yield return StaticMigrationsService.GetApplyOperations(migrationDate, true).ToList();
+            return StaticMigrationsService.GetInitialOperations(migrationDate, true).ToList();
         }
         
-        private IEnumerable<MigrationCommand> GenerateCommands(IEnumerable<IReadOnlyList<MigrationOperation>> operationLists)
+        private IReadOnlyList<MigrationOperation> GetApplyOperationsList(DateTime migrationDate)
         {
-            foreach (var operationList in operationLists)
-            {
-                foreach (var migrationCommand in _migrationsSqlGenerator.Generate(operationList))
-                {
-                    yield return migrationCommand;
-                }
-            }
+            return StaticMigrationsService.GetApplyOperations(migrationDate, true).ToList();
+        }
+        
+        private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operationList)
+        {
+            return _migrationsSqlGenerator.Generate(operationList);
         }
 
-        private void Execute(IEnumerable<IReadOnlyList<MigrationOperation>> operations)
+        private void Execute(IReadOnlyList<MigrationOperation> operations)
         {
             var commands = GenerateCommands(operations);
             _migrationCommandExecutor.ExecuteNonQuery(commands, _connection);
         }
 
-        private async Task ExecuteAsync(IEnumerable<IReadOnlyList<MigrationOperation>> operations, CancellationToken cancellationToken = default)
+        private async Task ExecuteAsync(IReadOnlyList<MigrationOperation> operations, CancellationToken cancellationToken = default)
         {
             var commands = GenerateCommands(operations);
             await _migrationCommandExecutor.ExecuteNonQueryAsync(commands, _connection, cancellationToken).ConfigureAwait(false);
