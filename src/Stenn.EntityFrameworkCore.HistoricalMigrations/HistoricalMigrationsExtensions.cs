@@ -5,12 +5,12 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
     public static class HistoricalMigrationsExtensions
     {
-        public static bool HasHistoricalMigrations(this TypeInfo migration)
+        public static bool HasHistoricalMigrationAttribute(this TypeInfo migration)
         {
             return migration.GetCustomAttribute<HistoricalMigrationAttribute>() is not null;
         }
 
-        public static HistoricalMigrationAttribute GetHistoricalMigrations(this TypeInfo migration)
+        public static HistoricalMigrationAttribute GetHistoricalMigrationAttribute(this TypeInfo migration)
         {
             return migration.GetCustomAttribute<HistoricalMigrationAttribute>() ?? throw new InvalidOperationException();
         }

@@ -14,8 +14,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.15" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Conventions" />
-  </ItemGroup>
-
 </Project>

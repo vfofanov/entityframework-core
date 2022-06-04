@@ -292,7 +292,7 @@ namespace Stenn.EntityFrameworkCore.Tests
         private static void TestInitialMigrationReplace(IReadOnlyList<KeyValuePair<string, TypeInfo>> actual, 
             int index, string[] expectedRemoveIds)
         {
-            actual[index].Value.Should().BeAssignableTo<InitialMigrationReplaceBase>();
+            actual[index].Value.Should().BeAssignableTo<InitialReplaceMigration>();
             actual[index].Value.GetInitialMigration()
                 .RemoveMigrationRowIds.Should().ContainInOrder(expectedRemoveIds);
         }
