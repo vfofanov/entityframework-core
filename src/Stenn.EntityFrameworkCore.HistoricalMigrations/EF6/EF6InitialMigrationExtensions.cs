@@ -2,9 +2,7 @@ using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
 {
@@ -41,7 +39,16 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
             var ef6DbContextOptions = (IDbContextOptions)generic.Invoke(dependencies.Options, new object?[] { ef6RelationalOptions })!;
             //var ef6DbContextOptions = ((DbContextOptions)dependencies.Options).WithExtension(ef6RelationalOptions);
 
-            var ef6Dependincies = dependencies.With(ef6DbContextOptions);
+            var ef6Dependincies = new HistoryRepositoryDependencies(dependencies.DatabaseCreator, dependencies.RawSqlCommandBuilder, dependencies.Connection,
+                ef6DbContextOptions, dependencies.ModelDiffer, dependencies.MigrationsSqlGenerator, dependencies.SqlGenerationHelper,
+                dependencies.ConventionSetBuilder, dependencies.ModelDependencies, dependencies.TypeMappingSource, dependencies.CurrentContext,
+                dependencies.ModelRuntimeInitializer, 
+#pragma warning disable CS0618
+                dependencies.ModelLogger, 
+#pragma warning restore CS0618
+                dependencies.CommandLogger);
+            
+            
 
             var ef6HistoryRepository = (IHistoryRepository?)Activator.CreateInstance(repository.GetType(), ef6Dependincies);
 
