@@ -9,10 +9,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
+using Stenn.EntityFrameworkCore.HistoricalMigrations.EF6;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
-    public class HistoricalMigrationsAssembly: MigrationsAssembly
+    public class HistoricalMigrationsAssembly : MigrationsAssembly
     {
         private readonly IHistoryRepository _historyRepository;
         private readonly ICurrentDbContext _currentContext;
@@ -54,17 +55,47 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             HashSet<string> appliedMigrationEntrySet, List<string>? allMigrationIds)
         {
             allMigrationIds ??= new List<string>(migrations.Count);
-            var historicalMigration = migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrations());
-            if (historicalMigration is { Value: { } })
+            if (migrations.SingleOrDefault(m => m.Value.HasEF6InitialMigrationAttribute()) is { Value: { } } ef6HistoricalMigration)
             {
-                var historicalMigrationAttribute = historicalMigration.Value.GetHistoricalMigrations();
+                var initialMigrationId = ef6HistoricalMigration.Key;
+                
+                var ef6Attr = ef6HistoricalMigration.Value.GetEF6InitialMigrationAttribute();
+                var manager = ef6Attr.GetManager();
+                var ef6HistoryRepository = manager.GetRepository(_currentContext);
+
+                if (appliedMigrationEntrySet.Count == 0 &&
+                    !ef6HistoryRepository.Exists())
+                {
+                    //NOTE: Retuns initial migration first
+                    yield return ef6HistoricalMigration;
+                }
+                else
+                {
+                    var ef6AppliedMigrations = ef6HistoryRepository.GetAppliedMigrationIds().ToList();
+
+                    var missed = manager.MigrationIds.Except(ef6AppliedMigrations).ToArray();
+                    var extra = ef6AppliedMigrations.Except(manager.MigrationIds).ToArray();
+
+                    if (missed.Length != 0 || extra.Length != 0)
+                    {
+                        throw new EF6MigrateSyncException(missed, extra);
+                    }
+
+                    //NOTE: Replace original initial migration with EF6InitialReplaceMigration
+                    var initialReplaceMigration = CreateInitialMigrationReplaceType<EF6InitialReplaceMigration>(initialMigrationId, manager.MigrationIds);
+                    yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);    
+                }
+                appliedMigrationEntrySet.Add(initialMigrationId);
+            }
+            else if (migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrationAttribute()) is { Value: { } } historicalMigration)
+            {
+                var historicalMigrationAttribute = historicalMigration.Value.GetHistoricalMigrationAttribute();
                 var historicalMigrations = GetItems(historicalMigrationAttribute.DBContextAssemblyAnchorType);
 
                 if (historicalMigrationAttribute.Initial)
                 {
                     var initialMigrationId = historicalMigration.Key;
-                    if (appliedMigrationEntrySet.Count == 0 && 
-                        !_options.MigrateFromFullHistory)
+                    if (appliedMigrationEntrySet.Count == 0 && !_options.MigrateFromFullHistory)
                     {
                         //NOTE: Retuns initial migration first 
                         yield return historicalMigration;
@@ -78,10 +109,12 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                         {
                             yield return migration;
                         }
-                        
+
+                        //NOTE: Replace original initial migration with InitialReplaceMigration if full history turned off
                         if (!_options.MigrateFromFullHistory)
                         {
-                            var initialReplaceMigration = CreateInitialMigrationReplaceType(initialMigrationId, allHistoricalMigrationIds.ToArray());
+                            var initialReplaceMigration =
+                                CreateInitialMigrationReplaceType<InitialReplaceMigration>(initialMigrationId, allHistoricalMigrationIds.ToArray());
                             yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
                         }
                         appliedMigrationEntrySet.Add(initialMigrationId);
@@ -109,13 +142,15 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
         /// <inheritdoc />
         public override Migration CreateMigration(TypeInfo migrationClass, string activeProvider)
         {
-            if (!migrationClass.IsAssignableTo(typeof(InitialMigrationReplaceBase)))
+            if (!migrationClass.IsAssignableTo(typeof(ReplaceMigrationBase)))
             {
                 return base.CreateMigration(migrationClass, activeProvider);
             }
-            
+
             var removeMigrationRowIds = migrationClass.GetInitialMigration().RemoveMigrationRowIds;
-            var migration = (Migration)Activator.CreateInstance(migrationClass.AsType(), _historyRepository, removeMigrationRowIds)!;
+            
+            var migration = (Migration)Activator.CreateInstance(migrationClass.AsType(), 
+                _historyRepository, removeMigrationRowIds)!;
             migration.ActiveProvider = activeProvider;
 
             return migration;
@@ -127,7 +162,8 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             return migrationsAssembly.Migrations;
         }
 
-        private static TypeInfo CreateInitialMigrationReplaceType(string migrationId, string[] migrationIds)
+        private static TypeInfo CreateInitialMigrationReplaceType<TReplaceMigration>(string migrationId, string[] migrationIds)
+            where TReplaceMigration : ReplaceMigrationBase
         {
             var assemblyName = $"Assembly{migrationId}";
             var aName = new AssemblyName(assemblyName);
@@ -136,7 +172,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             // The module name is usually the same as the assembly name.
             var mb = ab.DefineDynamicModule(assemblyName);
 
-            var parent = typeof(InitialMigrationReplaceBase);
+            var parent = typeof(TReplaceMigration);
             var tb = mb.DefineType("InitialMigration", TypeAttributes.Public, parent);
 
             #region MigrationAttribute
@@ -145,6 +181,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                 tb.SetCustomAttribute(new CustomAttributeBuilder(con, new object?[] { migrationId }));
             }
             #endregion
+
             #region InitialMigrationAttribute
             {
                 var con = typeof(InitialMigrationAttribute).GetConstructor(new[] { typeof(string[]) })!;
@@ -152,7 +189,12 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             }
             #endregion
 
-            Type[] parameterTypes = { typeof(IHistoryRepository), typeof(IReadOnlyCollection<string>) };
+            Type[] parameterTypes =
+            {
+                typeof(IHistoryRepository),
+                typeof(IReadOnlyCollection<string>)
+            };
+
             var ctor1 = tb.DefineConstructor(
                 MethodAttributes.Public,
                 CallingConventions.Standard,
@@ -162,7 +204,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             ctor1IL.Emit(OpCodes.Ldarg_0);
             ctor1IL.Emit(OpCodes.Ldarg_1);
             ctor1IL.Emit(OpCodes.Ldarg_2);
-            ctor1IL.Emit(OpCodes.Call, parent.GetConstructors(BindingFlags.NonPublic|BindingFlags.Instance).First());
+            ctor1IL.Emit(OpCodes.Call, parent.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First());
             ctor1IL.Emit(OpCodes.Ret);
 
             // Finish the type.

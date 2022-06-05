@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
+using Stenn.EntityFrameworkCore.Data.Main.EF6Initial;
 using Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection;
@@ -29,10 +30,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         private InitialDbContext _dbContextInitial = null!;
         private MainDbContext _dbContextMain = null!;
         private HistoricalInitialMainDbContext _dbContextMainHistoricalInitial = null!;
+        private EF6InitialMainDbContext _dbContextMainEF6Initial = null!;
 
         private IServiceProvider _serviceProviderInitial = null!;
         private IServiceProvider _serviceProviderMain = null!;
         private IServiceProvider _serviceProviderMainHistoricalInitial = null!;
+        private IServiceProvider _serviceProviderMainEF6Initial = null!;
 
         private static string GetConnectionString(string dbName)
         {
@@ -42,22 +45,26 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [SetUp]
         public void Setup()
         {
-            InitDbContext(InitialStaticMigrations.Init, false, 
-                out _serviceProviderInitial, 
+            InitDbContext(InitialStaticMigrations.Init, false,
+                out _serviceProviderInitial,
                 out _dbContextInitial);
 
             InitDbContext(MainStaticMigrations.Init, true,
                 out _serviceProviderMain,
                 out _dbContextMain);
-            
+
             InitDbContext(MainStaticMigrations.Init, true,
                 out _serviceProviderMainHistoricalInitial,
                 out _dbContextMainHistoricalInitial);
+
+            InitDbContext(MainStaticMigrations.Init, true,
+                out _serviceProviderMainEF6Initial,
+                out _dbContextMainEF6Initial);
         }
 
-        private static void InitDbContext<TContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions, 
+        private static void InitDbContext<TContext>(Action<StaticMigrationBuilder> init, bool includeCommonConventions,
             out IServiceProvider serviceProvider,
-            out TContext dbContext) 
+            out TContext dbContext)
             where TContext : Microsoft.EntityFrameworkCore.DbContext
         {
             serviceProvider = GetServices<TContext>(init, includeCommonConventions);
@@ -83,15 +90,12 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                             b.AddTriggerBasedEntityConventionsMigrationSqlServer();
                         }
                     });
-                    
+
                     builder.UseHistoricalMigrations();
-                    
+
                     if (includeCommonConventions)
                     {
-                        builder.UseEntityConventionsSqlServer(b =>
-                        {
-                            b.AddTriggerBasedCommonConventions();
-                        });
+                        builder.UseEntityConventionsSqlServer(b => { b.AddTriggerBasedCommonConventions(); });
                     }
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
@@ -137,7 +141,21 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
 
-        
+        [Test]
+        public async Task EnsureCreated_MainEF6Initial()
+        {
+            await EnsureCreated(_dbContextMainEF6Initial);
+
+            var actual = await _dbContextMainEF6Initial.Set<Currency>().ToListAsync();
+            var expected = Data.Main.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
+            actual.Should().BeEquivalentTo(expected);
+
+            var actualRoles = await _dbContextMainEF6Initial.Set<Role>().ToListAsync();
+            var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
+            actualRoles.Should().BeEquivalentTo(expectedRoles);
+        }
+
+
         [Test]
         public async Task Migrate_Initial()
         {
@@ -166,11 +184,17 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await Migrate_Main(true);
         }
-        
+
         [Test]
         public async Task Migrate_MainHistoricalInitial()
         {
             await Migrate_MainHistoricalInitial(true);
+        }
+
+        [Test]
+        public async Task Migrate_MainEF6Initial()
+        {
+            await Migrate_MainEF6Initial(true);
         }
 
         [Test, Explicit]
@@ -193,7 +217,40 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await Migrate_Main(false);
             await Migrate_MainHistoricalInitial(false);
         }
-        
+
+        [Test]
+        public async Task Migrate_InitialThenMain_EmulateEF6_ThenMainEF6Initial()
+        {
+            await Migrate_Initial();
+            await Migrate_Main(false);
+            await EmulateEF6();
+            await Migrate_MainEF6Initial(false);
+        }
+
+        private async Task EmulateEF6()
+        {
+            //NOTE: Convert __EFMigrationsHistory(Core) to __MigrationHistory(EF6) 
+            //EF6Migration uses only MigrationId column, so we can just rename original __EFMigrationsHistory to __MigrationHistory
+            await _dbContextMain.Database.ExecuteSqlRawAsync(
+                @"
+DROP TABLE IF EXISTS [dbo].[__MigrationHistory]
+
+CREATE TABLE [dbo].[__MigrationHistory] (
+[MigrationId] nvarchar(150) NOT NULL,
+[ContextKey] nvarchar(300) NOT NULL DEFAULT('efcore-tests'),
+[Model] varbinary(MAX) NOT NULL DEFAULT (0xFF),
+[ProductVersion] nvarchar(32) NOT NULL,
+CONSTRAINT [PK_dbo.__MigrationHistory]
+PRIMARY KEY CLUSTERED ([MigrationId] ASC, [ContextKey] ASC))
+
+INSERT INTO [dbo].[__MigrationHistory](MigrationId, ProductVersion)
+SELECT MigrationId, '6.4.4'
+FROM [dbo].[__EFMigrationsHistory]
+    
+DROP TABLE IF EXISTS [dbo].[__EFMigrationsHistory]
+");
+        }
+
         private async Task Migrate_Main(bool deleteDb)
         {
             await RunMigrations(_dbContextMain, deleteDb);
@@ -207,7 +264,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
             await CheckMain(_dbContextMainHistoricalInitial);
         }
-        
+
+        private async Task Migrate_MainEF6Initial(bool deleteDb)
+        {
+            await RunMigrations(_dbContextMainEF6Initial, deleteDb);
+
+            await CheckMain(_dbContextMainEF6Initial);
+        }
+
         private async Task CheckMain(Microsoft.EntityFrameworkCore.DbContext context)
         {
             await CheckSelect(context, "SELECT * FROM dbo.ContactView",
@@ -230,7 +294,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
-        
+
         [Test]
         public void ExtractEnums_Main()
         {

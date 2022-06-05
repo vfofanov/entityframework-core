@@ -3,29 +3,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
-    public abstract class InitialMigrationReplaceBase : Migration
+    public abstract class InitialReplaceMigration : ReplaceMigrationBase
     {
-        private readonly IHistoryRepository _historyRepository;
-
         /// <inheritdoc />
-        protected InitialMigrationReplaceBase(IHistoryRepository historyRepository,
+        protected InitialReplaceMigration(
+            IHistoryRepository historyRepository,
             IReadOnlyCollection<string> removeMigrationRowIds)
+            : base(historyRepository, removeMigrationRowIds)
         {
-            _historyRepository = historyRepository;
-            RemoveMigrationRowIds = removeMigrationRowIds;
         }
-
-        public IReadOnlyCollection<string> RemoveMigrationRowIds { get; }
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             foreach (var migrationId in RemoveMigrationRowIds)
             {
-                var sql = _historyRepository.GetDeleteScript(migrationId);
+                var sql = HistoryRepository.GetDeleteScript(migrationId);
                 migrationBuilder.Sql(sql);
             }
-
         }
     }
 }

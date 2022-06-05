@@ -68,6 +68,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj", "{B5A6B581-554B-4584-AD6D-C0E514E13E0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.EF6Initial", "Stenn.EntityFrameworkCore.Data.Main.EF6Initial\Stenn.EntityFrameworkCore.Data.Main.EF6Initial.csproj", "{EC1B995A-8CC5-4526-A131-C23D64DE5099}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -170,6 +172,10 @@ Global
 		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5A6B581-554B-4584-AD6D-C0E514E13E0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC1B995A-8CC5-4526-A131-C23D64DE5099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1B995A-8CC5-4526-A131-C23D64DE5099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1B995A-8CC5-4526-A131-C23D64DE5099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1B995A-8CC5-4526-A131-C23D64DE5099}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -193,5 +199,6 @@ Global
 		{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 		{43720D28-FD68-4953-A360-5D02CF9C67A2} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
 		{B5A6B581-554B-4584-AD6D-C0E514E13E0E} = {883F8EE3-E05C-4066-BD02-7F23BE62080D}
+		{EC1B995A-8CC5-4526-A131-C23D64DE5099} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 	EndGlobalSection
 EndGlobal
