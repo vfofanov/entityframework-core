@@ -16,7 +16,6 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
     public class HistoricalMigrationsAssembly : MigrationsAssembly
     {
         private readonly IHistoryRepository _historyRepository;
-        private readonly HistoryRepositoryDependencies _historyRepositoryDependencies;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDbContextOptions _dbContextOptions;
         private readonly IMigrationsIdGenerator _idGenerator;
@@ -29,12 +28,10 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             IDbContextOptions dbContextOptions,
             IMigrationsIdGenerator idGenerator,
             IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
-            IHistoryRepository historyRepository,
-            HistoryRepositoryDependencies historyRepositoryDependencies)
+            IHistoryRepository historyRepository)
             : base(currentContext, dbContextOptions, idGenerator, logger)
         {
             _historyRepository = historyRepository;
-            _historyRepositoryDependencies = historyRepositoryDependencies;
             _currentContext = currentContext;
             _dbContextOptions = dbContextOptions;
             _idGenerator = idGenerator;
@@ -61,16 +58,28 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             if (migrations.SingleOrDefault(m => m.Value.HasEF6InitialMigrationAttribute()) is { Value: { } } ef6HistoricalMigration)
             {
                 var initialMigrationId = ef6HistoricalMigration.Key;
+                
+                var ef6Attr = ef6HistoricalMigration.Value.GetEF6InitialMigrationAttribute();
+                var manager = ef6Attr.GetManager();
+                var ef6HistoryRepository = manager.GetRepository(_currentContext);
+
                 if (appliedMigrationEntrySet.Count == 0 &&
-                    !_historyRepository.EF6HistoryRepositoryExists(_historyRepositoryDependencies))
+                    !ef6HistoryRepository.Exists())
                 {
                     //NOTE: Retuns initial migration first
                     yield return ef6HistoricalMigration;
                 }
                 else
                 {
-                    var ef6Attr = ef6HistoricalMigration.Value.GetEF6InitialMigrationAttribute();
-                    var manager = ef6Attr.GetManager();
+                    var ef6AppliedMigrations = ef6HistoryRepository.GetAppliedMigrationIds().ToList();
+
+                    var missed = manager.MigrationIds.Except(ef6AppliedMigrations).ToArray();
+                    var extra = ef6AppliedMigrations.Except(manager.MigrationIds).ToArray();
+
+                    if (missed.Length != 0 || extra.Length != 0)
+                    {
+                        throw new EF6MigrateSyncException(missed, extra);
+                    }
 
                     //NOTE: Replace original initial migration with EF6InitialReplaceMigration
                     var initialReplaceMigration = CreateInitialMigrationReplaceType<EF6InitialReplaceMigration>(initialMigrationId, manager.MigrationIds);

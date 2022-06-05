@@ -2,10 +2,10 @@ using Stenn.EntityFrameworkCore.HistoricalMigrations.EF6;
 
 namespace Stenn.EntityFrameworkCore.Data.Main.EF6Initial
 {
-    internal sealed class EF6MigrationManager : IEF6MigrationManager
+    internal sealed class EF6MigrationManager : EF6MigrationManagerBase
     {
         /// <inheritdoc />
-        public string[] MigrationIds => new[]
+        public override string[] MigrationIds => new[]
         {
             "20220122095651_Initial",
             "20220327210310_AddRole_Contact",

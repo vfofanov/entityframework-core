@@ -1,8 +1,10 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
 {
-    public sealed class EF6MigrateException : Exception
+    [Serializable]
+    public class EF6MigrateException : Exception
     {
         /// <inheritdoc />
         public EF6MigrateException()
@@ -10,7 +12,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
         }
 
         /// <inheritdoc />
-        public EF6MigrateException(string? message) 
+        public EF6MigrateException(string? message)
             : base(message)
         {
         }
@@ -18,6 +20,12 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
         /// <inheritdoc />
         public EF6MigrateException(string? message, Exception? innerException)
             : base(message, innerException)
+        {
+        }
+
+        /// <inheritdoc />
+        protected EF6MigrateException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
