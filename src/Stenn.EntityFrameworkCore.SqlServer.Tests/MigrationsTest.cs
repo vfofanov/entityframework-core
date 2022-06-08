@@ -226,6 +226,17 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await EmulateEF6();
             await Migrate_MainEF6Initial(false);
         }
+        
+        [Test]
+        public async Task Migrate_InitialThenMain_EmulateEF6_ThenMainEF6Initial_ThenMainEF6Initial()
+        {
+            await Migrate_Initial();
+            await Migrate_Main(false);
+            await EmulateEF6();
+            await Migrate_MainEF6Initial(false);
+            //Emulate run migration after migrate from EF6
+            await Migrate_MainEF6Initial(false);
+        }
 
         private async Task EmulateEF6()
         {
