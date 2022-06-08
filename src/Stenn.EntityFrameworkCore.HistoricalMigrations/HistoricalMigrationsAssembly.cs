@@ -58,34 +58,37 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             if (migrations.SingleOrDefault(m => m.Value.HasEF6InitialMigrationAttribute()) is { Value: { } } ef6HistoricalMigration)
             {
                 var initialMigrationId = ef6HistoricalMigration.Key;
-                
-                var ef6Attr = ef6HistoricalMigration.Value.GetEF6InitialMigrationAttribute();
-                var manager = ef6Attr.GetManager();
-                var ef6HistoryRepository = manager.GetRepository(_currentContext);
 
-                if (appliedMigrationEntrySet.Count == 0 &&
-                    !ef6HistoryRepository.Exists())
+                if (!appliedMigrationEntrySet.Contains(initialMigrationId))
                 {
-                    //NOTE: Retuns initial migration first
-                    yield return ef6HistoricalMigration;
-                }
-                else
-                {
-                    var ef6AppliedMigrations = ef6HistoryRepository.GetAppliedMigrationIds().ToList();
+                    var ef6Attr = ef6HistoricalMigration.Value.GetEF6InitialMigrationAttribute();
+                    var manager = ef6Attr.GetManager();
+                    var ef6HistoryRepository = manager.GetRepository(_currentContext);
 
-                    var missed = manager.MigrationIds.Except(ef6AppliedMigrations).ToArray();
-                    var extra = ef6AppliedMigrations.Except(manager.MigrationIds).ToArray();
-
-                    if (missed.Length != 0 || extra.Length != 0)
+                    if (appliedMigrationEntrySet.Count == 0 &&
+                        !ef6HistoryRepository.Exists())
                     {
-                        throw new EF6MigrateSyncException(missed, extra);
+                        //NOTE: Retuns initial migration first
+                        yield return ef6HistoricalMigration;
                     }
+                    else
+                    {
+                        var ef6AppliedMigrations = ef6HistoryRepository.GetAppliedMigrationIds().ToList();
 
-                    //NOTE: Replace original initial migration with EF6InitialReplaceMigration
-                    var initialReplaceMigration = CreateInitialMigrationReplaceType<EF6InitialReplaceMigration>(initialMigrationId, manager.MigrationIds);
-                    yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);    
+                        var missed = manager.MigrationIds.Except(ef6AppliedMigrations).ToArray();
+                        var extra = ef6AppliedMigrations.Except(manager.MigrationIds).ToArray();
+
+                        if (missed.Length != 0 || extra.Length != 0)
+                        {
+                            throw new EF6MigrateSyncException(missed, extra);
+                        }
+
+                        //NOTE: Replace original initial migration with EF6InitialReplaceMigration
+                        var initialReplaceMigration = CreateInitialMigrationReplaceType<EF6InitialReplaceMigration>(initialMigrationId, manager.MigrationIds);
+                        yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
+                    }
+                    appliedMigrationEntrySet.Add(initialMigrationId);
                 }
-                appliedMigrationEntrySet.Add(initialMigrationId);
             }
             else if (migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrationAttribute()) is { Value: { } } historicalMigration)
             {
