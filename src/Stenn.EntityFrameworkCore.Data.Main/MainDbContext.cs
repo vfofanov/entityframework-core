@@ -21,6 +21,7 @@ namespace Stenn.EntityFrameworkCore.Data.Main
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new CurrencyMap());
+            modelBuilder.ApplyConfiguration(new VCurrencyMap());
             modelBuilder.ApplyConfiguration(new RoleMap());
             modelBuilder.ApplyConfiguration(new ContactMap());
             modelBuilder.ApplyConfiguration(new Contact2Map());

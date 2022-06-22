@@ -50,7 +50,7 @@ namespace Stenn.StaticMigrations
             relativePath = "." + relativePath;
             assembly ??= Assembly.GetCallingAssembly();
             relativePath = PrepareResPath(assembly, relativePath);
-            return new ResFile(assembly, relativePath);
+            return new ResFile(assembly, relativePath, encoding);
         }
 
         public bool Exists()

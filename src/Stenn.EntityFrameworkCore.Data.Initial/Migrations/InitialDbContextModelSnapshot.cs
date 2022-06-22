@@ -62,6 +62,19 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
                             Type = 1
                         });
                 });
+
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Initial.VCurrency", b =>
+                {
+                    b.Property<string>("Iso3LetterCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Iso3LetterCode");
+
+                    b.ToView("vCurrency");
+                });
 #pragma warning restore 612, 618
         }
     }
