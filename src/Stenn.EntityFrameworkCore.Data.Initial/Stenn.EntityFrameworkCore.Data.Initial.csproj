@@ -19,11 +19,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="StaticMigrations\Sql\InitDB.Apply.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\InitDB.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Apply.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Revert.sql" />
     <None Remove="StaticMigrations\Sql\TestViews.Create.sql" />
-    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Apply.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Apply.sql" />
     <None Remove="StaticMigrations\Sql\TestViews.Drop.sql" />
-    <EmbeddedResource Include="StaticMigrations\Sql\TestViews.Revert.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Revert.sql" />
   </ItemGroup>
 
 </Project>

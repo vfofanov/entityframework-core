@@ -20,7 +20,8 @@ namespace Stenn.EntityFrameworkCore.Data.Initial
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new CurrencyV1Map());
-            
+            modelBuilder.ApplyConfiguration(new VCurrencyMap());
+
             base.OnModelCreating(modelBuilder);
         }
     }

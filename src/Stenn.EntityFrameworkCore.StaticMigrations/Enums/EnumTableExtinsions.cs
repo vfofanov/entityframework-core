@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Stenn.EntityFrameworkCore.Relational;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 {
@@ -9,7 +10,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
     {
         public static IEnumerable<ModelEnumTable> ExtractEnumTables(this IModel model)
         {
-            foreach (var group in model.GetEntityTypes().SelectMany(e => e.GetProperties())
+            foreach (var group in model.GetEntityTypes().Where(e => !e.IsView()).SelectMany(e => e.GetProperties())
                          .Distinct() // For abstract entity and inheritors: Proprty will appears count of inheritors
                          .Where(p => GetPropertyType(p).IsEnum).GroupBy(GetPropertyType))
             {

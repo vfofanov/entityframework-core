@@ -254,6 +254,19 @@ namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 
                     b.HasDiscriminator().HasValue("Elefant");
                 });
+            
+            modelBuilder.Entity("Stenn.EntityFrameworkCore.Data.Initial.VCurrency", b =>
+            {
+                b.Property<string>("Iso3LetterCode")
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<int>("Type")
+                    .HasColumnType("int");
+
+                b.HasKey("Iso3LetterCode");
+
+                b.ToView("vCurrency");
+            });
 #pragma warning restore 612, 618
         }
     }

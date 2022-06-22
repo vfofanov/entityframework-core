@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Stenn.EntityFrameworkCore.Data.Main.Migrations.Static;
 using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.EntityConventions.TriggerBased;
