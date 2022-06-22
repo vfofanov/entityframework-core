@@ -11,7 +11,7 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// <returns></returns>
         public static bool IsView(this IEntityType entity)
         {
-            return entity.FindAnnotation(RelationalAnnotationNames.ViewName) != null;
+            return entity.FindAnnotation(RelationalAnnotationNames.ViewName)?.Value != null;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// <returns></returns>
         public static bool IsTable(this IEntityType entity)
         {
-            return entity.FindAnnotation(RelationalAnnotationNames.TableName) != null;
+            return entity.FindAnnotation(RelationalAnnotationNames.TableName)?.Value != null;
         }
     }
 }
