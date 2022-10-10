@@ -44,10 +44,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="migrations">Static migrations' builder</param>
         /// <param name="mainFileName">File name or path with name without extension</param>
         /// <param name="suppressTransaction">Suppress transaction during run migration or not</param>
+        /// <param name="assembly">Assembly with embedded resources</param>
         public static void AddInitialSqlResFile(this StaticMigrationBuilder migrations, string mainFileName,
-            bool suppressTransaction = false)
+            bool suppressTransaction = false, Assembly? assembly = null)
         {
-            migrations.AddInitResSql(mainFileName, GetFilePath(mainFileName), Assembly.GetCallingAssembly(), suppressTransaction: suppressTransaction);
+            assembly ??= Assembly.GetCallingAssembly();
+
+            migrations.AddInitResSql(mainFileName, GetFilePath(mainFileName), assembly, suppressTransaction: suppressTransaction);
         }
 
         /// <summary>
@@ -56,12 +59,16 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="migrations">Static migrations' builder</param>
         /// <param name="mainFileName">File name or path with name without extension</param>
         /// <param name="type">Type of added resources</param>
-        public static void AddSqlResFile(this StaticMigrationBuilder migrations, string mainFileName, ResSqlFile type = ResSqlFile.All)
+        /// <param name="assembly">Assembly with embedded resources</param>
+        public static void AddSqlResFile(this StaticMigrationBuilder migrations, string mainFileName, ResSqlFile type = ResSqlFile.All,
+            Assembly? assembly = null)
         {
+            assembly ??= Assembly.GetCallingAssembly();
+
             migrations.AddResSql(mainFileName,
                 type.HasFlag(ResSqlFile.Apply) ? GetApplyFilePath(mainFileName) : null,
                 type.HasFlag(ResSqlFile.Revert) ? GetRevertFilePath(mainFileName) : null,
-                Assembly.GetCallingAssembly());
+                assembly);
         }
     }
 }
