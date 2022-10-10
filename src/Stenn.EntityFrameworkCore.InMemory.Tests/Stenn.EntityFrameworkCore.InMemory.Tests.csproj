@@ -22,7 +22,8 @@
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection.csproj" />    
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Testing\Stenn.EntityFrameworkCore.Testing.csproj" />    
   </ItemGroup>
 
 </Project>
