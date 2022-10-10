@@ -6,13 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.Data.Initial;
 using Stenn.EntityFrameworkCore.Data.Initial.Migrations.Static;
-using Stenn.EntityFrameworkCore.Data.Initial.StaticMigrations;
 using Stenn.EntityFrameworkCore.Data.Main;
 using Stenn.EntityFrameworkCore.Data.Main.Migrations.Static;
-using Stenn.EntityFrameworkCore.Data.Main.StaticMigrations;
 using Stenn.EntityFrameworkCore.Extensions.DependencyInjection;
 using Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection;
-using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.EntityFrameworkCore.Testing;
 
 namespace Stenn.EntityFrameworkCore.InMemory.Tests
 {
@@ -72,15 +70,22 @@ namespace Stenn.EntityFrameworkCore.InMemory.Tests
             var expectedRoles = Data.Main.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
-        
-        private static async Task<bool> EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
+
+        [Test]
+        public void CheckMapping()
+        {
+            _dbContextInitial.CheckEntities();
+            _dbContextMain.CheckEntities();
+        }
+
+        private static async Task EnsureCreated(Microsoft.EntityFrameworkCore.DbContext dbContext, bool deleteDb = true)
         {
             var database = dbContext.Database;
             if (deleteDb)
             {
                 await database.EnsureDeletedAsync();
             }
-            return await database.EnsureCreatedAsync();
+            await database.EnsureCreatedAsync();
         }
     }
 }
