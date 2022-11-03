@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.Definitions;
 
@@ -17,6 +18,17 @@ namespace Stenn.EntityDefinition
         /// <summary>
         /// Remark based on <see cref="DefinitionRemarkAttribute"/>
         /// </summary>
-        public static AttributeDefinitionInfo<string, DefinitionRemarkAttribute> Remark = new("Remark");
+        public static MemberInfoDefinitionInfo<string> Remark = new AttributeDefinitionInfo<string, DefinitionRemarkAttribute>("Remark");
+
+        /// <summary>
+        /// IsObsolete or not based on <see cref="ObsoleteAttribute"/>
+        /// </summary>
+        public static MemberInfoDefinitionInfo<bool> IsObsolete = new CustomAttributeDefinitionInfo<bool, ObsoleteAttribute>("IsObsolete", _ => true);
+
+        /// <summary>
+        /// IsObsolete or not based on <see cref="ObsoleteAttribute"/>
+        /// </summary>
+        public static MemberInfoDefinitionInfo<string> ObsoleteMessage =
+            new CustomAttributeDefinitionInfo<string, ObsoleteAttribute>("IsObsolete", attr => attr.Message);
     }
 }

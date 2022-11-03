@@ -44,12 +44,14 @@ namespace Stenn.EntityDefinition.Tests
                 {
                     EFCommonDefinitions.Entities.Name,
                     EFCommonDefinitions.Entities.Remark,
+                    EFCommonDefinitions.Entities.IsObsolete,
                     CustomDefinitions.Domain.ToEntity()
                 },
                 new[]
                 {
                     EFCommonDefinitions.Properties.Name,
                     EFCommonDefinitions.Properties.Remark,
+                    EFCommonDefinitions.Properties.IsObsolete,
                     CustomDefinitions.Domain.ToProperty()
                 });
 

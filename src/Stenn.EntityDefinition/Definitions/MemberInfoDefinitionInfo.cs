@@ -4,7 +4,7 @@ using Stenn.EntityDefinition.Contracts;
 
 namespace Stenn.EntityDefinition.Definitions
 {
-    public abstract class MemberInfoDefinitionInfo<T> : DefinitionInfo<T>,IMemberInfoDefinitionInfo
+    public abstract class MemberInfoDefinitionInfo<T> : DefinitionInfo<T>
     {
         /// <inheritdoc />
         public MemberInfoDefinitionInfo(string name, Func<T, string>? convertToString = null)
@@ -12,16 +12,7 @@ namespace Stenn.EntityDefinition.Definitions
         {
 
         }
-
         public abstract T? Extract(MemberInfo? member, IDefinitionExtractContext context);
 
-        /// <inheritdoc />
-        DefinitionInfo IMemberInfoDefinitionInfo.Info => this;
-
-        /// <inheritdoc />
-        object? IMemberInfoDefinitionInfo.Extract(MemberInfo? member, IDefinitionExtractContext context)
-        {
-            return Extract(member, context);
-        }
     }
 }
