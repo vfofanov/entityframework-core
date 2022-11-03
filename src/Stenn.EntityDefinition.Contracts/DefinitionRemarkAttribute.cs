@@ -1,6 +1,9 @@
 ﻿namespace Stenn.EntityDefinition.Contracts
 {
-    public sealed class DefinitionRemarkAttribute : DefinitionAttribute<string>
+    /// <summary>
+    /// Definition remark attribute
+    /// </summary>
+    public sealed class DefinitionRemarkAttribute : DefinitionAttribute
     {
         /// <inheritdoc />
         public DefinitionRemarkAttribute(string value) 

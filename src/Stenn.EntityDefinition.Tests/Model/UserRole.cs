@@ -2,12 +2,14 @@
 
 namespace Stenn.EntityDefinition.Tests.Model
 {
-    [DefinitionDomain(Domain.Security)]
     public class UserRole
     {
+        [DefinitionDomain(Domain.Security)]
         public int UserId { get; set; }
-        public string RoleId { get; set; }
-
+        
+        [DefinitionDomain(Domain.Security)]
+        public int RoleId { get; set; }
+        
         public virtual User User { get; set; }
         public virtual Role Role { get; set; }
     }

@@ -5,30 +5,25 @@ namespace Stenn.EntityDefinition.Contracts
     public sealed class DefinitionMap : IDefinitionMap
     {
         /// <inheritdoc />
-        IReadOnlyCollection<string> IDefinitionMap.ActiveEntityDefinitions => ActiveEntityDefinitions;
-
-        /// <inheritdoc />
-        IReadOnlyCollection<string> IDefinitionMap.ActivePropertyDefinitions => ActivePropertyDefinitions;
-
-        /// <inheritdoc />
         IReadOnlyCollection<EntityDefinition> IDefinitionMap.Entities => Entities;
 
-        internal List<string> ActiveEntityDefinitions { get; }
+        public IReadOnlyCollection<DefinitionInfo> EntityDefinitions { get; }
 
-        internal List<string> ActivePropertyDefinitions { get; }
+        public IReadOnlyCollection<DefinitionInfo> PropertyDefinitions { get; }
 
         internal List<EntityDefinition> Entities { get; }
 
-        public DefinitionMap()
+        public DefinitionMap(IReadOnlyCollection<DefinitionInfo> entityDefinitions,
+            IReadOnlyCollection<DefinitionInfo> propertyDefinitions)
         {
-            ActiveEntityDefinitions = new List<string>();
-            ActivePropertyDefinitions = new List<string>();
+            EntityDefinitions = entityDefinitions;
+            PropertyDefinitions = propertyDefinitions;
             Entities = new List<EntityDefinition>();
         }
 
         public EntityDefinitionBuilder Add(string name)
         {
-            var entityDefinition = new EntityDefinition(name, ActiveEntityDefinitions.Count);
+            var entityDefinition = new EntityDefinition(name, EntityDefinitions.Count);
             Entities.Add(entityDefinition);
 
             return new EntityDefinitionBuilder(this, entityDefinition);

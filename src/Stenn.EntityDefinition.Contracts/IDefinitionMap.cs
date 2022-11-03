@@ -4,8 +4,8 @@ namespace Stenn.EntityDefinition.Contracts
 {
     public interface IDefinitionMap
     {
-        IReadOnlyCollection<string> ActiveEntityDefinitions { get; }
-        IReadOnlyCollection<string> ActivePropertyDefinitions { get; }
+        IReadOnlyCollection<DefinitionInfo> EntityDefinitions { get; }
+        IReadOnlyCollection<DefinitionInfo> PropertyDefinitions { get; }
         IReadOnlyCollection<EntityDefinition> Entities { get; }
     }
 }

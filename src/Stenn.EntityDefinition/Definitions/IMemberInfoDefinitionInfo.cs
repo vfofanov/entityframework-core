@@ -6,6 +6,6 @@ namespace Stenn.EntityDefinition.Definitions
     public interface IMemberInfoDefinitionInfo
     {
         DefinitionInfo Info { get; }
-        object? Extract(MemberInfo member, IDefinitionExtractContext context);
+        object? Extract(MemberInfo? member, IDefinitionExtractContext context);
     }
 }

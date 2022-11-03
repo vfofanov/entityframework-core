@@ -1,9 +1,3 @@
-namespace Stenn.EntityDefinition.Tests.Model.Definitions
-{
-    public enum Domain
-    {
-        Unknown = 0,
-        Security = 1,
-        Order = 2
-    }
-}
+using Stenn.EntityDefinition.Tests.Model.Definitions;
+
+[assembly: DefinitionDomain(Domain.Unknown)]

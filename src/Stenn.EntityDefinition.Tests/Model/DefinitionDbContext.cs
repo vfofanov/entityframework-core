@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stenn.EntityDefinition.Tests.Model.Configurations;
 
-namespace Stenn.EntityFrameworkCore.Data.Initial
+namespace Stenn.EntityDefinition.Tests.Model
 {
     public class DefinitionDbContext: DbContext
     {
@@ -20,6 +20,8 @@ namespace Stenn.EntityFrameworkCore.Data.Initial
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserMap());
+            modelBuilder.ApplyConfiguration(new RoleMap());
+            modelBuilder.ApplyConfiguration(new UserRoleMap());
 
             base.OnModelCreating(modelBuilder);
         }

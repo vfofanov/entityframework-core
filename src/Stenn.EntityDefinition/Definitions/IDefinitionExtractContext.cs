@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Stenn.EntityDefinition
+namespace Stenn.EntityDefinition.Definitions
 {
     public interface IDefinitionExtractContext
     {
-        T? GetAssemblyAttribute<T>(MemberInfo member)
+        T? GetParentAttribute<T>(MemberInfo member)
             where T : Attribute
         {
-            //TODO: Cache attributes
-            return member.Module.Assembly.GetCustomAttribute<T>();
+            if (member.MemberType == MemberTypes.TypeInfo)
+            {
+                //TODO: Cache attributes
+
+                return member.Module.Assembly.GetCustomAttribute<T>();
+            }
+            return null;
         }
     }
 }

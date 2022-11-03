@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace Stenn.EntityDefinition
+namespace Stenn.EntityDefinition.Definitions
 {
-    internal sealed class NameMemberInfoDefinitionInfo : MemberInfoDefinitionInfo<string, IDefinitionExtractContext> 
+    internal sealed class NameMemberInfoDefinitionInfo : MemberInfoDefinitionInfo<string> 
     {
         /// <inheritdoc />
         public NameMemberInfoDefinitionInfo() 
@@ -11,9 +11,9 @@ namespace Stenn.EntityDefinition
         }
 
         /// <inheritdoc />
-        public override string Extract(MemberInfo member, IDefinitionExtractContext context)
+        public override string? Extract(MemberInfo? member, IDefinitionExtractContext context)
         {
-            return member.Name;
+            return member?.Name;
         }
     }
 }

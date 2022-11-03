@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
 
-namespace Stenn.EntityDefinition.EntityFrameworkCore
+namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
     public interface IEFEntityDefinitionInfo
     {

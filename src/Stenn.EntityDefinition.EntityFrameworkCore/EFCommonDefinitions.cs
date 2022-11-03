@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using Stenn.EntityDefinition.Contracts;
-using Stenn.EntityDefinition.Definitions;
+﻿using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 
-namespace Stenn.EntityDefinition
+namespace Stenn.EntityDefinition.EntityFrameworkCore
 {
     /// <summary>
     /// Common Entity Framework model definitions
@@ -11,22 +9,14 @@ namespace Stenn.EntityDefinition
     {
         public static class Entities
         {
-            
+            public static IEFEntityDefinitionInfo Name = CommonDefinitions.Name.ToEntity();
+            public static IEFEntityDefinitionInfo Remark = CommonDefinitions.Remark.ToEntity();
         }
-        
+
         public static class Properties
         {
-            
+            public static IEFPropertyDefinitionInfo Name = CommonDefinitions.Name.ToProperty();
+            public static IEFPropertyDefinitionInfo Remark = CommonDefinitions.Remark.ToProperty();
         }
-
-        /// <summary>
-        /// Name definition based on <see cref="MemberInfo.Name"/>
-        /// </summary>
-        public static MemberInfoDefinitionInfo<string, IDefinitionExtractContext> Name = new NameMemberInfoDefinitionInfo();
-
-        /// <summary>
-        /// Remark based on <see cref="DefinitionRemarkAttribute"/>
-        /// </summary>
-        public static AttributeDefinitionInfo<string, DefinitionRemarkAttribute> Remark = new("Remark");
     }
 }

@@ -1,4 +1,4 @@
-namespace Stenn.EntityDefinition.Contracts
+namespace Stenn.EntityDefinition.Tests.Model.Definitions
 {
     public enum Domain
     {

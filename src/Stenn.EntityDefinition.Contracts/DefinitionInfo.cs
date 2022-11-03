@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Stenn.EntityDefinition.Contracts
 {
+    [DebuggerDisplay("{Name}")]
     public abstract class DefinitionInfo
     {
         internal DefinitionInfo(string name)
@@ -17,5 +19,30 @@ namespace Stenn.EntityDefinition.Contracts
         }
 
         public string Name { get; }
+    }
+
+    public abstract class DefinitionInfo<T> : DefinitionInfo
+    {
+        private readonly Func<T, string>? _convertToString;
+
+        /// <inheritdoc />
+        protected DefinitionInfo(string name, Func<T, string>? convertToString = null)
+            : base(name)
+        {
+            _convertToString = convertToString;
+        }
+
+        /// <inheritdoc />
+        public override Type ValueType => typeof(T);
+
+        /// <inheritdoc />
+        public override string? ConvertToString(object? val)
+        {
+            if (_convertToString is { } && val is { })
+            {
+                return _convertToString((T)val);
+            }
+            return base.ConvertToString(val);
+        }
     }
 }
