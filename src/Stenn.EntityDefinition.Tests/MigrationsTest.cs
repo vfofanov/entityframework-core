@@ -39,7 +39,6 @@ namespace Stenn.EntityDefinition.Tests
         [Test]
         public void Test()
         {
-
             var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
                 new[]
                 {

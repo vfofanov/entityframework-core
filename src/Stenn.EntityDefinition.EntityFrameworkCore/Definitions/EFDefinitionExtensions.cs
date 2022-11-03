@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.Definitions;
@@ -14,7 +15,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 
         public static IEFPropertyDefinitionInfo ToProperty<T>(this MemberInfoDefinitionInfo<T> info)
         {
-            return new EFPropertyDefinition(info, (property, context) => info.Extract(property.PropertyInfo, context));
+            return new EFPropertyDefinition(info, (_, propertyInfo, context) => info.Extract(propertyInfo, context));
         }
 
         private sealed class EFEntityDefinition : IEFEntityDefinitionInfo
@@ -36,12 +37,12 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
                 return _extract(type, context);
             }
         }
-        
+
         private sealed class EFPropertyDefinition : IEFPropertyDefinitionInfo
         {
-            private readonly Func<IProperty, IEFDefinitionExtractContext, object?> _extract;
+            private readonly Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, object?> _extract;
 
-            internal EFPropertyDefinition(DefinitionInfo info, Func<IProperty, IEFDefinitionExtractContext, object?> extract)
+            internal EFPropertyDefinition(DefinitionInfo info, Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, object?> extract)
             {
                 _extract = extract;
                 Info = info;
@@ -51,9 +52,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
             public DefinitionInfo Info { get; }
 
             /// <inheritdoc />
-            public object? Extract(IProperty type, IEFDefinitionExtractContext context)
+            public object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, IEFDefinitionExtractContext context)
             {
-                return _extract(type, context);
+                return _extract(property, propertyInfo, context);
             }
         }
     }

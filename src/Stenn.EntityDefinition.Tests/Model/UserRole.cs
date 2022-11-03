@@ -1,4 +1,5 @@
-﻿using Stenn.EntityDefinition.Tests.Model.Definitions;
+﻿using System;
+using Stenn.EntityDefinition.Tests.Model.Definitions;
 
 namespace Stenn.EntityDefinition.Tests.Model
 {
@@ -12,5 +13,8 @@ namespace Stenn.EntityDefinition.Tests.Model
         
         public virtual User User { get; set; }
         public virtual Role Role { get; set; }
+        
+        [Obsolete]
+        public int Obsolete { get; set; }
     }
 }

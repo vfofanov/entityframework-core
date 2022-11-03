@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
@@ -6,6 +7,6 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
     public interface IEFPropertyDefinitionInfo
     {
         DefinitionInfo Info { get; }
-        object? Extract(IProperty property, IEFDefinitionExtractContext context);
+        object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, IEFDefinitionExtractContext context);
     }
 }
