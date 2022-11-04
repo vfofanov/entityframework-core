@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Stenn.EntityDefinition.Definitions
+namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public interface IDefinitionExtractContext
     {

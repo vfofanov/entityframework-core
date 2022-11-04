@@ -1,4 +1,5 @@
-﻿using Stenn.EntityDefinition.Definitions;
+﻿using Stenn.EntityDefinition.Contracts.Definitions;
+using Stenn.EntityDefinition.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {

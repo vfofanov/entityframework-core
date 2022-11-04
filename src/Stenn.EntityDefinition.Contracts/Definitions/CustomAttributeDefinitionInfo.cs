@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Stenn.EntityDefinition.Definitions
+namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public sealed class CustomAttributeDefinitionInfo<T, TAttr> : AttributeDefinitionInfoBase<T, TAttr> where TAttr : Attribute
     {

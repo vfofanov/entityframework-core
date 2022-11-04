@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityDefinition.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
+using Stenn.EntityDefinition.Model.Definitions;
 using Stenn.EntityDefinition.Tests.Model;
-using Stenn.EntityDefinition.Tests.Model.Definitions;
 
-namespace Stenn.EntityDefinition.Tests
+namespace Stenn.EntityDefinition.InMemory.Tests
 {
     public class EntityDefinitionsTests
     {
@@ -28,10 +28,7 @@ namespace Stenn.EntityDefinition.Tests
         {
             var services = new ServiceCollection();
 
-            services.AddDbContext<TDbContext>(builder =>
-            {
-                builder.UseInMemoryDatabase(DBName);
-            });
+            services.AddDbContext<TDbContext>(builder => { builder.UseInMemoryDatabase(DBName); });
 
             return services.BuildServiceProvider();
         }
@@ -40,23 +37,23 @@ namespace Stenn.EntityDefinition.Tests
         public void Test()
         {
             var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
-                new[]
+                new IEFEntityDefinitionInfo[]
                 {
+                    CustomDefinitions.Domain.ToEntity(),
                     EFCommonDefinitions.Entities.Name,
                     EFCommonDefinitions.Entities.Remark,
-                    EFCommonDefinitions.Entities.IsObsolete,
-                    CustomDefinitions.Domain.ToEntity()
+                    EFCommonDefinitions.Entities.IsObsolete
                 },
-                new[]
+                new IEFPropertyDefinitionInfo[]
                 {
+                    CustomDefinitions.Domain.ToProperty(),
                     EFCommonDefinitions.Properties.Name,
                     EFCommonDefinitions.Properties.Remark,
                     EFCommonDefinitions.Properties.IsObsolete,
-                    CustomDefinitions.Domain.ToProperty()
+                    EFCommonDefinitions.Properties.IsShadow
                 });
 
             var map = reader.Read();
         }
-
     }
 }

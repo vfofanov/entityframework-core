@@ -2,57 +2,58 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 using Stenn.EntityDefinition.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
     public static class EFDefinitionExtensions
     {
-        public static IEFEntityDefinitionInfo ToEntity<T>(this MemberInfoDefinitionInfo<T> info)
+        public static IEFEntityDefinitionInfo<T> ToEntity<T>(this MemberInfoDefinitionInfo<T> info)
         {
-            return new EFEntityDefinition(info, (type, context) => info.Extract(type.ClrType, context));
+            return new EFEntityDefinition<T>(info, (type, context) => info.Extract(type.ClrType, context));
         }
 
-        public static IEFPropertyDefinitionInfo ToProperty<T>(this MemberInfoDefinitionInfo<T> info)
+        public static IEFPropertyDefinitionInfo<T> ToProperty<T>(this MemberInfoDefinitionInfo<T> info)
         {
-            return new EFPropertyDefinition(info, (_, propertyInfo, context) => info.Extract(propertyInfo, context));
+            return new EFPropertyDefinition<T>(info, (_, propertyInfo, context) => info.Extract(propertyInfo, context));
         }
 
-        private sealed class EFEntityDefinition : IEFEntityDefinitionInfo
+        private sealed class EFEntityDefinition<T> : IEFEntityDefinitionInfo<T>
         {
-            private readonly Func<IEntityType, IEFDefinitionExtractContext, object?> _extract;
+            private readonly Func<IEntityType, IEFDefinitionExtractContext, T?> _extract;
 
-            internal EFEntityDefinition(DefinitionInfo info, Func<IEntityType, IEFDefinitionExtractContext, object?> extract)
+            internal EFEntityDefinition(DefinitionInfo<T> info, Func<IEntityType, IEFDefinitionExtractContext, T?> extract)
             {
                 _extract = extract;
                 Info = info;
             }
 
             /// <inheritdoc />
-            public DefinitionInfo Info { get; }
+            public DefinitionInfo<T> Info { get; }
 
             /// <inheritdoc />
-            public object? Extract(IEntityType type, IEFDefinitionExtractContext context)
+            public T? Extract(IEntityType type, IEFDefinitionExtractContext context)
             {
                 return _extract(type, context);
             }
         }
 
-        private sealed class EFPropertyDefinition : IEFPropertyDefinitionInfo
+        private sealed class EFPropertyDefinition<T> : IEFPropertyDefinitionInfo<T>
         {
-            private readonly Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, object?> _extract;
+            private readonly Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, T?> _extract;
 
-            internal EFPropertyDefinition(DefinitionInfo info, Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, object?> extract)
+            internal EFPropertyDefinition(DefinitionInfo<T> info, Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, T?> extract)
             {
                 _extract = extract;
                 Info = info;
             }
 
             /// <inheritdoc />
-            public DefinitionInfo Info { get; }
+            public DefinitionInfo<T> Info { get; }
 
             /// <inheritdoc />
-            public object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, IEFDefinitionExtractContext context)
+            public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, IEFDefinitionExtractContext context)
             {
                 return _extract(property, propertyInfo, context);
             }

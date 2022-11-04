@@ -1,17 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Entity Framework Core common extensions</Description>
-    <Nullable>enable</Nullable>
-  </PropertyGroup> 
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
-  </ItemGroup> 
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
-    <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
   </ItemGroup>
 
 </Project>

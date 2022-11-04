@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using Stenn.EntityDefinition.Contracts;
 
-namespace Stenn.EntityDefinition.Definitions
+namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public sealed class AttributeDefinitionInfo<T, TAttr> : AttributeDefinitionInfoBase<T, TAttr>
         where TAttr : DefinitionAttribute

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.15" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.Model\Stenn.EntityDefinition.Model.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.Definitions
 {

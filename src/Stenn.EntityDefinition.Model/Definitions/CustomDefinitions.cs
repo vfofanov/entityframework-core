@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
-using Stenn.EntityDefinition.Definitions;
+using Stenn.EntityDefinition.Contracts.Definitions;
+using Stenn.EntityDefinition.Tests.Model.Definitions;
 
-namespace Stenn.EntityDefinition.Tests.Model.Definitions
+namespace Stenn.EntityDefinition.Model.Definitions
 {
     public static class CustomDefinitions
     {

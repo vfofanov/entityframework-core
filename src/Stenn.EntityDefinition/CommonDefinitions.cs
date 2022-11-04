@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 using Stenn.EntityDefinition.Definitions;
 
 namespace Stenn.EntityDefinition
