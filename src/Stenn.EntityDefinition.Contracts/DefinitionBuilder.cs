@@ -6,16 +6,16 @@ namespace Stenn.EntityDefinition.Contracts
     public class DefinitionBuilder<T>
         where T : DefinitionRowBase
     {
-        public DefinitionBuilder(T obj)
+        public DefinitionBuilder(T row)
         {
-            Obj = obj;
+            Row = row;
         }
 
-        protected T Obj { get; }
+        public T Row { get; }
 
         public void AddDefinition(DefinitionInfo info, object? value)
         {
-            Obj.Values.Add(info, value);
+            Row.Values.Add(info, value);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.InteropServices.ComTypes;
+using Microsoft.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityFrameworkCore.Relational;
 
@@ -12,22 +13,22 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
         public static class Entities
         {
             public static readonly IEFEntityDefinition<string> DbName =
-                new EFEntityDefinition<string>("DbName", (type, _) => type.GetTableName() ?? type.GetViewName());
+                new EFEntityDefinition<string>("DbName", (type, _, _) => type.GetTableName() ?? type.GetViewName());
 
             public static readonly IEFEntityDefinition<bool> IsTable =
-                new EFEntityDefinition<bool>("IsTable", (type, _) => type.IsTable());
+                new EFEntityDefinition<bool>("IsTable", (type, _, _) => type.IsTable());
 
             public static readonly IEFEntityDefinition<bool> IsView =
-                new EFEntityDefinition<bool>("IsView", (type, _) => type.IsView());
+                new EFEntityDefinition<bool>("IsView", (type, _, _) => type.IsView());
         }
 
         public static class Properties
         {
             public static readonly IEFPropertyDefinition<string> ColumnName =
-                new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _) => property.GetFinalColumnName());
+                new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _, _) => property.GetFinalColumnName());
 
             public static readonly IEFPropertyDefinition<string> ColumnType =
-                new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _) => property.GetColumnType());
+                new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _, _) => property.GetColumnType());
 
             /// <summary>
             ///     <para>
@@ -40,7 +41,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             ///     </para>
             /// </summary>
             public static readonly IEFPropertyDefinition<bool> IsColumnNullable =
-                new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _) => property.IsColumnNullable());
+                new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _, _) => property.IsColumnNullable());
         }
     }
 }

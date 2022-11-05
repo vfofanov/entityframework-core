@@ -9,6 +9,6 @@ namespace Stenn.EntityDefinition.Model.Definitions
         /// Name definition based on <see cref="MemberInfo.Name"/>
         /// </summary>
         public static MemberInfoDefinition<Domain> Domain =
-            new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain");
+            new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain", true);
     }
 }

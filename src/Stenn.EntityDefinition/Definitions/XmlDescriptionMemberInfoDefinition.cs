@@ -30,7 +30,7 @@ namespace Stenn.EntityDefinition.Definitions
         }
 
         /// <inheritdoc />
-        public override string? Extract(MemberInfo? member, DefinitionContext context)
+        public override string? Extract(MemberInfo? member, string? parentValue, DefinitionContext context)
         {
             var extractContext = context.GetOrAdd(Info, () => new ExtractContext(_getCommentDoc));
 

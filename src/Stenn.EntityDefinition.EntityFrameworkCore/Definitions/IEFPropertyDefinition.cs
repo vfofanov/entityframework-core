@@ -8,7 +8,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
     public interface IEFPropertyDefinitionInfo
     {
         DefinitionInfo Info { get; }
-        object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, DefinitionContext context);
+        object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, object? parentValue, DefinitionContext context);
     }
 
     public interface IEFPropertyDefinition<T> : IEFPropertyDefinitionInfo
@@ -17,12 +17,15 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
         DefinitionInfo IEFPropertyDefinitionInfo.Info => Info;
 
         /// <inheritdoc />
-        object? IEFPropertyDefinitionInfo.Extract(IPropertyBase? property, PropertyInfo? propertyInfo, DefinitionContext context)
+        object? IEFPropertyDefinitionInfo.Extract(IPropertyBase? property, PropertyInfo? propertyInfo, object? parentValue, DefinitionContext context)
         {
-            return Extract(property, propertyInfo, context);
+            return parentValue is null
+                // ReSharper disable once ArrangeDefaultValueWhenTypeNotEvident
+                ? Extract(property, propertyInfo, default(T?), context)
+                : Extract(property, propertyInfo, (T?)parentValue, context);
         }
 
         new DefinitionInfo<T> Info { get; }
-        new T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, DefinitionContext context);
+        T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, T? parentValue, DefinitionContext context);
     }
 }

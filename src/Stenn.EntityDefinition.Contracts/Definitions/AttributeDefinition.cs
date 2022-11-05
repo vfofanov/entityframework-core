@@ -6,8 +6,8 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         where TAttr : DefinitionAttribute
     {
         /// <inheritdoc />
-        public AttributeDefinition(string name, Func<T, string>? convertToString = null)
-            : base(name, convertToString)
+        public AttributeDefinition(string name, bool copyParentValueIfUndefined = false, Func<T, string>? convertToString = null)
+            : base(name, copyParentValueIfUndefined, convertToString)
         {
         }
 

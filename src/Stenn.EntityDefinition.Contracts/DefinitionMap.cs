@@ -21,12 +21,12 @@ namespace Stenn.EntityDefinition.Contracts
             Entities = new List<EntityDefinitionRow>();
         }
 
-        public EntityDefinitionBuilder Add(string name)
+        public EntityDefinitionRowBuilder Add(string name)
         {
             var entityDefinition = new EntityDefinitionRow(name, EntityDefinitions.Count);
             Entities.Add(entityDefinition);
 
-            return new EntityDefinitionBuilder(this, entityDefinition);
+            return new EntityDefinitionRowBuilder(this, entityDefinition);
         }
     }
 }

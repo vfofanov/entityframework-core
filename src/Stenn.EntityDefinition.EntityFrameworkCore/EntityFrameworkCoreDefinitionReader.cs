@@ -77,17 +77,20 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                 var entityBuilder = map.Add(entityType.Name);
                 foreach (var definition in _entityDefinitions)
                 {
-                    var val = definition.Extract(entityType, context);
+                    var val = definition.Extract(entityType, null, context);
                     entityBuilder.AddDefinition(definition.Info, val);
                 }
 
+                var entityRow = entityBuilder.Row;
                 var handledProperties = new List<PropertyInfo>();
                 foreach (var property in entityType.GetPropertiesAndNavigations().Where(p => _filterProperties(entityType, p)))
                 {
                     var propertyBuilder = entityBuilder.AddProperty(property.Name);
                     foreach (var definition in _propertyDefinitions)
                     {
-                        var val = definition.Extract(property, property.PropertyInfo, context);
+                        var val = definition.Extract(property, property.PropertyInfo, 
+                            entityRow.Values.GetValueOrDefault(definition.Info), context);
+                        
                         propertyBuilder.AddDefinition(definition.Info, val);
                         handledProperties.Add(property.PropertyInfo);
                     }
@@ -101,7 +104,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                         var propertyBuilder = entityBuilder.AddProperty(property.Name);
                         foreach (var definition in _propertyDefinitions)
                         {
-                            var val = definition.Extract(null, property, context);
+                            var val = definition.Extract(null, property, 
+                                entityRow.Values.GetValueOrDefault(definition.Info), context);
+                            
                             propertyBuilder.AddDefinition(definition.Info, val);
                         }
                     }

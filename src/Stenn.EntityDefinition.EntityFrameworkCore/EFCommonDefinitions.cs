@@ -35,13 +35,13 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             public static readonly EFPropertyDefinition<bool> IsObsolete = CommonDefinitions.IsObsolete.ToProperty();
             public static readonly EFPropertyDefinition<string> ObsoleteMessage = CommonDefinitions.ObsoleteMessage.ToProperty();
 
-            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _) => property?.IsShadowProperty() ?? false);
+            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _) => property?.IsShadowProperty() ?? false);
 
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsNullable =
-                new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _) => property.IsNullable);
+                new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _, _) => property.IsNullable);
 
             /// <summary>
             /// Gets definition for <see cref="CommonDefinitions.XmlDescription"/>

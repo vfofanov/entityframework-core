@@ -9,13 +9,13 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
     {
         /// <inheritdoc />
         public EFNavigationPropertyDefinition(string name,
-            Func<INavigation?, PropertyInfo?, DefinitionContext, T?> extract, Func<T, string>? convertToString = null)
+            Func<INavigation?, PropertyInfo?, T?, DefinitionContext, T?> extract, Func<T, string>? convertToString = null)
             : base(name,
-                (property, propertyInfo, context) =>
+                (property, propertyInfo, parentValue, context) =>
                 {
                     if (property is INavigation p)
                     {
-                        return extract(p, propertyInfo, context);
+                        return extract(p, propertyInfo, parentValue, context);
                     }
                     return default;
                 }, convertToString)

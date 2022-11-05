@@ -16,7 +16,7 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         {
 
         }
-        public abstract T? Extract(MemberInfo? member, DefinitionContext context);
+        public abstract T? Extract(MemberInfo? member, T? parentValue, DefinitionContext context);
 
     }
 

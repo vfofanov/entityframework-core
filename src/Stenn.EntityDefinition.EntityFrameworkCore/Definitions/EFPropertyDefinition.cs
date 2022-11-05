@@ -8,10 +8,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
     public class EFPropertyDefinition<T> : Definition<T>, IEFPropertyDefinition<T>
     {
-        private readonly Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> _extract;
+        private readonly Func<IPropertyBase?, PropertyInfo?,T?, DefinitionContext, T?> _extract;
 
         /// <inheritdoc />
-        public EFPropertyDefinition(DefinitionInfo<T> info, Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> extract)
+        public EFPropertyDefinition(DefinitionInfo<T> info, Func<IPropertyBase?, PropertyInfo?, T?, DefinitionContext, T?> extract)
             : base(info)
         {
             _extract = extract ?? throw new ArgumentNullException(nameof(extract));
@@ -19,7 +19,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 
 
         /// <inheritdoc />
-        public EFPropertyDefinition(string name, Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> extract,
+        public EFPropertyDefinition(string name, Func<IPropertyBase?, PropertyInfo?,T?, DefinitionContext, T?> extract,
             Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
@@ -27,9 +27,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
         }
 
         /// <inheritdoc />
-        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, DefinitionContext context)
+        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, T? parentValue, DefinitionContext context)
         {
-            return _extract(property, propertyInfo, context);
+            return _extract(property, propertyInfo, parentValue, context);
         }
     }
 }

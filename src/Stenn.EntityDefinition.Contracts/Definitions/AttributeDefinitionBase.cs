@@ -6,14 +6,17 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
     public abstract class AttributeDefinitionBase<T, TAttr> : MemberInfoDefinition<T> 
         where TAttr : Attribute
     {
+        private readonly bool _copyParentValueIfUndefined;
+
         /// <inheritdoc />
-        protected AttributeDefinitionBase(string name, Func<T, string>? convertToString = null)
+        protected AttributeDefinitionBase(string name, bool copyParentValueIfUndefined=false, Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
+            _copyParentValueIfUndefined = copyParentValueIfUndefined;
         }
 
         /// <inheritdoc />
-        public override T? Extract(MemberInfo? member, DefinitionContext context)
+        public override T? Extract(MemberInfo? member, T? parentValue, DefinitionContext context)
         {
             TAttr? attr = null;
             if (member is { })
@@ -24,7 +27,7 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
             {
                 return GetValue(a, context);
             }
-            return default;
+            return _copyParentValueIfUndefined ? parentValue : default;
         }
 
         private static TAttr? GetParentAttribute(MemberInfo member)
