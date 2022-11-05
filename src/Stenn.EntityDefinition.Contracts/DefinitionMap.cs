@@ -5,25 +5,25 @@ namespace Stenn.EntityDefinition.Contracts
     public sealed class DefinitionMap : IDefinitionMap
     {
         /// <inheritdoc />
-        IReadOnlyCollection<EntityDefinition> IDefinitionMap.Entities => Entities;
+        IReadOnlyCollection<EntityDefinitionRow> IDefinitionMap.Entities => Entities;
 
         public IReadOnlyCollection<DefinitionInfo> EntityDefinitions { get; }
 
         public IReadOnlyCollection<DefinitionInfo> PropertyDefinitions { get; }
 
-        internal List<EntityDefinition> Entities { get; }
+        internal List<EntityDefinitionRow> Entities { get; }
 
         public DefinitionMap(IReadOnlyCollection<DefinitionInfo> entityDefinitions,
             IReadOnlyCollection<DefinitionInfo> propertyDefinitions)
         {
             EntityDefinitions = entityDefinitions;
             PropertyDefinitions = propertyDefinitions;
-            Entities = new List<EntityDefinition>();
+            Entities = new List<EntityDefinitionRow>();
         }
 
         public EntityDefinitionBuilder Add(string name)
         {
-            var entityDefinition = new EntityDefinition(name, EntityDefinitions.Count);
+            var entityDefinition = new EntityDefinitionRow(name, EntityDefinitions.Count);
             Entities.Add(entityDefinition);
 
             return new EntityDefinitionBuilder(this, entityDefinition);

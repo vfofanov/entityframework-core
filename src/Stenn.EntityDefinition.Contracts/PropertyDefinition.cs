@@ -1,9 +1,9 @@
 ﻿namespace Stenn.EntityDefinition.Contracts
 {
-    public sealed class PropertyDefinition : DefinitionBase
+    public sealed class PropertyDefinitionRow : DefinitionRowBase
     {
         /// <inheritdoc />
-        public PropertyDefinition(string name, int valuesCount)
+        public PropertyDefinitionRow(string name, int valuesCount)
             : base(name, valuesCount)
         {
         }

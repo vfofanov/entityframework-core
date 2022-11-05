@@ -4,7 +4,7 @@ using System.Linq;
 namespace Stenn.EntityDefinition.Contracts
 {
     public class DefinitionBuilder<T>
-        where T : DefinitionBase
+        where T : DefinitionRowBase
     {
         public DefinitionBuilder(T obj)
         {

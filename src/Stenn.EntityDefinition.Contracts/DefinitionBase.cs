@@ -4,9 +4,9 @@ using System.Diagnostics;
 namespace Stenn.EntityDefinition.Contracts
 {
     [DebuggerDisplay("{Name}")]
-    public abstract class DefinitionBase
+    public abstract class DefinitionRowBase
     {
-        protected DefinitionBase(string name, int valuesCount)
+        protected DefinitionRowBase(string name, int valuesCount)
         {
             Name = name;
             Values = new Dictionary<DefinitionInfo, object?>(valuesCount);

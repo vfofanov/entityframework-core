@@ -6,6 +6,6 @@ namespace Stenn.EntityDefinition.Contracts
     {
         IReadOnlyCollection<DefinitionInfo> EntityDefinitions { get; }
         IReadOnlyCollection<DefinitionInfo> PropertyDefinitions { get; }
-        IReadOnlyCollection<EntityDefinition> Entities { get; }
+        IReadOnlyCollection<EntityDefinitionRow> Entities { get; }
     }
 }

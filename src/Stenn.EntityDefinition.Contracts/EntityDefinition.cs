@@ -2,20 +2,20 @@
 
 namespace Stenn.EntityDefinition.Contracts
 {
-    public sealed class EntityDefinition : DefinitionBase
+    public sealed class EntityDefinitionRow : DefinitionRowBase
     {
-        private readonly List<PropertyDefinition> _properties;
+        private readonly List<PropertyDefinitionRow> _properties;
 
         /// <inheritdoc />
-        public EntityDefinition(string name, int valuesCount)
+        public EntityDefinitionRow(string name, int valuesCount)
             : base(name, valuesCount)
         {
-            _properties = new List<PropertyDefinition>();
+            _properties = new List<PropertyDefinitionRow>();
         }
 
-        public IReadOnlyCollection<PropertyDefinition> Properties => _properties;
+        public IReadOnlyCollection<PropertyDefinitionRow> Properties => _properties;
 
-        internal void AddProperty(PropertyDefinition property)
+        internal void AddProperty(PropertyDefinitionRow property)
         {
             _properties.Add(property);
         }
