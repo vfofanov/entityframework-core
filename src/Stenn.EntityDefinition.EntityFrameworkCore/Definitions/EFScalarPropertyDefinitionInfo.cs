@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
-    public sealed class EFScalarPropertyDefinitionInfo<T> : EFPropertyDefinitionInfo<T>
+    public sealed class EFScalarPropertyDefinition<T> : EFPropertyDefinition<T>
     {
         /// <inheritdoc />
-        public EFScalarPropertyDefinitionInfo(string name,
-            Func<IProperty, PropertyInfo?, IEFDefinitionExtractContext, T?> extract, Func<T, string>? convertToString = null)
+        public EFScalarPropertyDefinition(string name,
+            Func<IProperty, PropertyInfo?,DefinitionContext, T?> extract, Func<T, string>? convertToString = null)
             : base(name,
                 (property, propertyInfo, context) =>
                 {

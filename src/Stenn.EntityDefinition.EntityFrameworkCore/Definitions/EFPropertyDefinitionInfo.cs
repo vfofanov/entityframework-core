@@ -2,15 +2,24 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
-    public class EFPropertyDefinitionInfo<T> : DefinitionInfo<T>, IEFPropertyDefinitionInfo<T>
+    public class EFPropertyDefinition<T> : Definition<T>, IEFPropertyDefinition<T>
     {
-        private readonly Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, T?> _extract;
+        private readonly Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> _extract;
 
         /// <inheritdoc />
-        public EFPropertyDefinitionInfo(string name, Func<IPropertyBase?, PropertyInfo?, IEFDefinitionExtractContext, T?> extract,
+        public EFPropertyDefinition(DefinitionInfo<T> info, Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> extract)
+            : base(info)
+        {
+            _extract = extract ?? throw new ArgumentNullException(nameof(extract));
+        }
+
+
+        /// <inheritdoc />
+        public EFPropertyDefinition(string name, Func<IPropertyBase?, PropertyInfo?, DefinitionContext, T?> extract,
             Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
@@ -18,10 +27,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
         }
 
         /// <inheritdoc />
-        public DefinitionInfo<T> Info => this;
-
-        /// <inheritdoc />
-        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, IEFDefinitionExtractContext context)
+        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, DefinitionContext context)
         {
             return _extract(property, propertyInfo, context);
         }

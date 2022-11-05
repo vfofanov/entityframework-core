@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Stenn.EntityDefinition.Contracts.Definitions;
-using Stenn.EntityDefinition.Tests.Model.Definitions;
 
 namespace Stenn.EntityDefinition.Model.Definitions
 {
@@ -9,7 +8,7 @@ namespace Stenn.EntityDefinition.Model.Definitions
         /// <summary>
         /// Name definition based on <see cref="MemberInfo.Name"/>
         /// </summary>
-        public static MemberInfoDefinitionInfo<Domain> Domain =
-            new AttributeDefinitionInfo<Domain, DefinitionDomainAttribute>("Domain");
+        public static MemberInfoDefinition<Domain> Domain =
+            new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain");
     }
 }

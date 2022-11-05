@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Stenn.EntityDefinition.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
+using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
-using Stenn.EntityDefinition.Tests.Model;
 
 namespace Stenn.EntityDefinition.InMemory.Tests
 {
@@ -37,12 +37,13 @@ namespace Stenn.EntityDefinition.InMemory.Tests
         public void Test()
         {
             var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
-                new IEFEntityDefinitionInfo[]
+                new IEFEntityDefinition[]
                 {
                     CustomDefinitions.Domain.ToEntity(),
                     EFCommonDefinitions.Entities.Name,
                     EFCommonDefinitions.Entities.Remark,
-                    EFCommonDefinitions.Entities.IsObsolete
+                    EFCommonDefinitions.Entities.IsObsolete,
+                    EFCommonDefinitions.Entities.GetXmlDescription()
                 },
                 new IEFPropertyDefinitionInfo[]
                 {
@@ -50,7 +51,8 @@ namespace Stenn.EntityDefinition.InMemory.Tests
                     EFCommonDefinitions.Properties.Name,
                     EFCommonDefinitions.Properties.Remark,
                     EFCommonDefinitions.Properties.IsObsolete,
-                    EFCommonDefinitions.Properties.IsShadow
+                    EFCommonDefinitions.Properties.IsShadow,
+                    EFCommonDefinitions.Properties.GetXmlDescription()
                 });
 
             var map = reader.Read();

@@ -1,15 +1,23 @@
 using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
-    public sealed class EFEntityDefinitionInfo<T> : DefinitionInfo<T>, IEFEntityDefinitionInfo<T>
+    public sealed class EFEntityDefinition<T> : Definition<T>, IEFEntityDefinition<T>
     {
-        private readonly Func<IEntityType, IEFDefinitionExtractContext, T?> _extract;
+        private readonly Func<IEntityType, DefinitionContext, T?> _extract;
 
         /// <inheritdoc />
-        public EFEntityDefinitionInfo(string name, Func<IEntityType, IEFDefinitionExtractContext, T?> extract,
+        public EFEntityDefinition(DefinitionInfo<T> info, Func<IEntityType, DefinitionContext, T?> extract) 
+            : base(info)
+        {
+            _extract = extract ?? throw new ArgumentNullException(nameof(extract));
+        }
+
+        /// <inheritdoc />
+        public EFEntityDefinition(string name, Func<IEntityType, DefinitionContext, T?> extract,
             Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
@@ -17,10 +25,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
         }
 
         /// <inheritdoc />
-        DefinitionInfo<T> IEFEntityDefinitionInfo<T>.Info => this;
-
-        /// <inheritdoc />
-        T? IEFEntityDefinitionInfo<T>.Extract(IEntityType type, IEFDefinitionExtractContext context)
+        T? IEFEntityDefinition<T>.Extract(IEntityType type, DefinitionContext context)
         {
             return _extract(type, context);
         }

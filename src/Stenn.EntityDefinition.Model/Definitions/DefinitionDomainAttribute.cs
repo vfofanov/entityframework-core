@@ -1,6 +1,6 @@
 ﻿using Stenn.EntityDefinition.Contracts;
 
-namespace Stenn.EntityDefinition.Tests.Model.Definitions
+namespace Stenn.EntityDefinition.Model.Definitions
 {
     /// <summary>
     /// Definition remark attribute

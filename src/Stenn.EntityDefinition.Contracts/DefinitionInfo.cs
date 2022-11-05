@@ -21,12 +21,12 @@ namespace Stenn.EntityDefinition.Contracts
         public string Name { get; }
     }
 
-    public abstract class DefinitionInfo<T> : DefinitionInfo
+    public sealed class DefinitionInfo<T> : DefinitionInfo
     {
         private readonly Func<T, string>? _convertToString;
 
         /// <inheritdoc />
-        protected DefinitionInfo(string name, Func<T, string>? convertToString = null)
+        public DefinitionInfo(string name, Func<T, string>? convertToString = null)
             : base(name)
         {
             _convertToString = convertToString;

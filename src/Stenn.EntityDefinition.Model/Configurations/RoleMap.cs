@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Stenn.EntityDefinition.Tests.Model.Configurations
+namespace Stenn.EntityDefinition.Model.Configurations
 {
     public class RoleMap: IEntityTypeConfiguration<Role>
     {

@@ -1,7 +1,7 @@
 ﻿using System;
-using Stenn.EntityDefinition.Tests.Model.Definitions;
+using Stenn.EntityDefinition.Model.Definitions;
 
-namespace Stenn.EntityDefinition.Tests.Model
+namespace Stenn.EntityDefinition.Model
 {
     public class UserRole
     {

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore
@@ -13,14 +14,14 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
     public sealed class EntityFrameworkCoreDefinitionReader : IDefinitionReader
     {
         private readonly IModel _model;
-        private readonly IEFEntityDefinitionInfo[] _entityDefinitions;
+        private readonly IEFEntityDefinition[] _entityDefinitions;
         private readonly IEFPropertyDefinitionInfo[] _propertyDefinitions;
         private readonly EntityFrameworkCoreDefinitionReaderOptions _options;
         private readonly Func<IEntityType, bool> _filterEntities;
         private readonly Func<IEntityType, IPropertyBase, bool> _filterProperties;
 
         public EntityFrameworkCoreDefinitionReader(IModel model,
-            IEFEntityDefinitionInfo[] entityDefinitions,
+            IEFEntityDefinition[] entityDefinitions,
             IEFPropertyDefinitionInfo[] propertyDefinitions,
             Func<IEntityType, bool>? filterEntities = null,
             Func<IEntityType, IPropertyBase, bool>? filterProperties = null,
@@ -67,7 +68,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
         /// <inheritdoc />
         public DefinitionMap Read()
         {
-            var context = new EFDefinitionExtractContext();
+            using var context = new DefinitionContext();
             var map = new DefinitionMap(_entityDefinitions.Select(d => d.Info).ToList(),
                 _propertyDefinitions.Select(d => d.Info).ToList());
 

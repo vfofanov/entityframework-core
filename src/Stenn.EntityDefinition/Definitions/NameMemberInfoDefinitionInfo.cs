@@ -3,16 +3,16 @@ using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.Definitions
 {
-    internal sealed class NameMemberInfoDefinitionInfo : MemberInfoDefinitionInfo<string> 
+    internal sealed class NameMemberInfoDefinition : MemberInfoDefinition<string> 
     {
         /// <inheritdoc />
-        public NameMemberInfoDefinitionInfo() 
+        public NameMemberInfoDefinition() 
             : base("Name")
         {
         }
 
         /// <inheritdoc />
-        public override string? Extract(MemberInfo? member, IDefinitionExtractContext context)
+        public override string? Extract(MemberInfo? member, DefinitionContext context)
         {
             return member?.Name;
         }

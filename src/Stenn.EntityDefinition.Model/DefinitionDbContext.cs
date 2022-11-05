@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Stenn.EntityDefinition.Tests.Model.Configurations;
+using Stenn.EntityDefinition.Model.Configurations;
 
-namespace Stenn.EntityDefinition.Tests.Model
+namespace Stenn.EntityDefinition.Model
 {
     public class DefinitionDbContext: DbContext
     {

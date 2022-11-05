@@ -5,8 +5,8 @@ using NUnit.Framework;
 using Stenn.EntityDefinition.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityDefinition.EntityFrameworkCore.Relational;
+using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
-using Stenn.EntityDefinition.Tests.Model;
 
 namespace Stenn.EntityDefinition.SqlServer.Tests
 {
@@ -49,14 +49,15 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
         public void Test()
         {
             var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
-                new IEFEntityDefinitionInfo[]
+                new IEFEntityDefinition[]
                 {
                     CustomDefinitions.Domain.ToEntity(),
                     EFCommonDefinitions.Entities.Name,
                     EFRelationalDefinitions.Entities.DbName,
                     EFRelationalDefinitions.Entities.IsTable,
                     EFCommonDefinitions.Entities.Remark,
-                    EFCommonDefinitions.Entities.IsObsolete
+                    EFCommonDefinitions.Entities.IsObsolete,
+                    EFCommonDefinitions.Entities.GetXmlDescription()
                 },
                 new IEFPropertyDefinitionInfo[]
                 {
@@ -67,7 +68,8 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                     EFRelationalDefinitions.Properties.IsColumnNullable,
                     EFCommonDefinitions.Properties.Remark,
                     EFCommonDefinitions.Properties.IsObsolete,
-                    EFCommonDefinitions.Properties.IsShadow
+                    EFCommonDefinitions.Properties.IsShadow,
+                    EFCommonDefinitions.Properties.GetXmlDescription()
                 });
 
             var map = reader.Read();

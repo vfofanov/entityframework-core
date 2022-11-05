@@ -11,23 +11,23 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
     {
         public static class Entities
         {
-            public static readonly IEFEntityDefinitionInfo<string> DbName =
-                new EFEntityDefinitionInfo<string>("DbName", (type, _) => type.GetTableName() ?? type.GetViewName());
+            public static readonly IEFEntityDefinition<string> DbName =
+                new EFEntityDefinition<string>("DbName", (type, _) => type.GetTableName() ?? type.GetViewName());
 
-            public static readonly IEFEntityDefinitionInfo<bool> IsTable =
-                new EFEntityDefinitionInfo<bool>("IsTable", (type, _) => type.IsTable());
+            public static readonly IEFEntityDefinition<bool> IsTable =
+                new EFEntityDefinition<bool>("IsTable", (type, _) => type.IsTable());
 
-            public static readonly IEFEntityDefinitionInfo<bool> IsView =
-                new EFEntityDefinitionInfo<bool>("IsView", (type, _) => type.IsView());
+            public static readonly IEFEntityDefinition<bool> IsView =
+                new EFEntityDefinition<bool>("IsView", (type, _) => type.IsView());
         }
 
         public static class Properties
         {
-            public static readonly IEFPropertyDefinitionInfo<string> ColumnName =
-                new EFScalarPropertyDefinitionInfo<string>("ColumnName", (property, _, _) => property.GetFinalColumnName());
+            public static readonly IEFPropertyDefinition<string> ColumnName =
+                new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _) => property.GetFinalColumnName());
 
-            public static readonly IEFPropertyDefinitionInfo<string> ColumnType =
-                new EFScalarPropertyDefinitionInfo<string>("ColumnType", (property, _, _) => property.GetColumnType());
+            public static readonly IEFPropertyDefinition<string> ColumnType =
+                new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _) => property.GetColumnType());
 
             /// <summary>
             ///     <para>
@@ -39,8 +39,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             ///         As well as properties on optional types sharing the same table.
             ///     </para>
             /// </summary>
-            public static readonly IEFPropertyDefinitionInfo<bool> IsColumnNullable =
-                new EFScalarPropertyDefinitionInfo<bool>("IsColumnNullable", (property, _, _) => property.IsColumnNullable());
+            public static readonly IEFPropertyDefinition<bool> IsColumnNullable =
+                new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _) => property.IsColumnNullable());
         }
     }
 }

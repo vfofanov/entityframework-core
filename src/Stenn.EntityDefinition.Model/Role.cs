@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Stenn.EntityDefinition.Tests.Model.Definitions;
+using Stenn.EntityDefinition.Model.Definitions;
 
-namespace Stenn.EntityDefinition.Tests.Model
+namespace Stenn.EntityDefinition.Model
 {
     [DefinitionDomain(Domain.Security)]
     public class Role
