@@ -29,7 +29,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
         public static class Properties
         {
-            public static readonly IEFPropertyDefinition<string> Name = CommonDefinitions.Name.ToProperty();
+            public static readonly EFPropertyDefinition<string> Name = CommonDefinitions.Name.ToProperty();
             public static readonly EFPropertyDefinition<string> Remark = CommonDefinitions.Remark.ToProperty();
 
             public static readonly EFPropertyDefinition<bool> IsObsolete = CommonDefinitions.IsObsolete.ToProperty();

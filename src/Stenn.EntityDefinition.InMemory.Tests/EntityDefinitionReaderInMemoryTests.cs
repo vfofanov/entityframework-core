@@ -36,26 +36,23 @@ namespace Stenn.EntityDefinition.InMemory.Tests
         [Test]
         public void Test()
         {
-            var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
-                new IEFEntityDefinition[]
-                {
-                    CustomDefinitions.Domain.ToEntity(),
-                    EFCommonDefinitions.Entities.Name,
-                    EFCommonDefinitions.Entities.Remark,
-                    EFCommonDefinitions.Entities.IsObsolete,
-                    EFCommonDefinitions.Entities.GetXmlDescription()
-                },
-                new IEFPropertyDefinitionInfo[]
-                {
-                    CustomDefinitions.Domain.ToProperty(),
-                    EFCommonDefinitions.Properties.Name,
-                    EFCommonDefinitions.Properties.Remark,
-                    EFCommonDefinitions.Properties.IsObsolete,
-                    EFCommonDefinitions.Properties.IsShadow,
-                    EFCommonDefinitions.Properties.GetXmlDescription()
-                });
+            var csv = _dbContext.Model.GenerateCsv(options =>
+            {
+                options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
+                
+                options.AddEntityColumn(CustomDefinitions.Domain.ToEntity());
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Name);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.IsObsolete);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.GetXmlDescription());
 
-            var map = reader.Read();
+                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty(), "Property Domain");
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name, "Property Name");
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
+            });
         }
     }
 }

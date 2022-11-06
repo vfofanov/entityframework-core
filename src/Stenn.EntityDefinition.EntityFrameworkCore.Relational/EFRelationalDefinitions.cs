@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityFrameworkCore.Relational;
 
@@ -12,22 +11,19 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
     {
         public static class Entities
         {
-            public static readonly IEFEntityDefinition<string> DbName =
-                new EFEntityDefinition<string>("DbName", (type, _, _) => type.GetTableName() ?? type.GetViewName());
+            public static readonly EFEntityDefinition<string> DbName = new("DbName", (type, _, _) => type.GetTableName() ?? type.GetViewName());
 
-            public static readonly IEFEntityDefinition<bool> IsTable =
-                new EFEntityDefinition<bool>("IsTable", (type, _, _) => type.IsTable());
+            public static readonly EFEntityDefinition<bool> IsTable = new("IsTable", (type, _, _) => type.IsTable());
 
-            public static readonly IEFEntityDefinition<bool> IsView =
-                new EFEntityDefinition<bool>("IsView", (type, _, _) => type.IsView());
+            public static readonly EFEntityDefinition<bool> IsView = new("IsView", (type, _, _) => type.IsView());
         }
 
         public static class Properties
         {
-            public static readonly IEFPropertyDefinition<string> ColumnName =
+            public static readonly EFPropertyDefinition<string> ColumnName =
                 new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _, _) => property.GetFinalColumnName());
 
-            public static readonly IEFPropertyDefinition<string> ColumnType =
+            public static readonly EFPropertyDefinition<string> ColumnType =
                 new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _, _) => property.GetColumnType());
 
             /// <summary>
@@ -40,7 +36,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             ///         As well as properties on optional types sharing the same table.
             ///     </para>
             /// </summary>
-            public static readonly IEFPropertyDefinition<bool> IsColumnNullable =
+            public static readonly EFPropertyDefinition<bool> IsColumnNullable =
                 new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _, _) => property.IsColumnNullable());
         }
     }

@@ -90,6 +90,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.InMe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.SqlServer.Tests", "Stenn.EntityDefinition.SqlServer.Tests\Stenn.EntityDefinition.SqlServer.Tests.csproj", "{25AE795A-BC2E-44D7-9247-732E160CDE1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.AspNetCore", "Stenn.EntityDefinition.AspNetCore\Stenn.EntityDefinition.AspNetCore.csproj", "{358EFCFB-25C9-44C0-B859-A59E37871C0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -232,6 +234,10 @@ Global
 		{25AE795A-BC2E-44D7-9247-732E160CDE1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25AE795A-BC2E-44D7-9247-732E160CDE1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25AE795A-BC2E-44D7-9247-732E160CDE1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -263,5 +269,6 @@ Global
 		{5D3AB714-5232-433A-8C4C-20D59A9C623C} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{2B9CD3CD-EA5F-4A38-AC08-07A27D2F7C37} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{25AE795A-BC2E-44D7-9247-732E160CDE1E} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{358EFCFB-25C9-44C0-B859-A59E37871C0E} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
 	EndGlobalSection
 EndGlobal

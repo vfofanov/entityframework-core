@@ -48,31 +48,28 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
         [Test]
         public void Test()
         {
-            var reader = new EntityFrameworkCoreDefinitionReader(_dbContext.Model,
-                new IEFEntityDefinition[]
-                {
-                    CustomDefinitions.Domain.ToEntity(),
-                    EFCommonDefinitions.Entities.Name,
-                    EFRelationalDefinitions.Entities.DbName,
-                    EFRelationalDefinitions.Entities.IsTable,
-                    EFCommonDefinitions.Entities.Remark,
-                    EFCommonDefinitions.Entities.IsObsolete,
-                    EFCommonDefinitions.Entities.GetXmlDescription()
-                },
-                new IEFPropertyDefinitionInfo[]
-                {
-                    CustomDefinitions.Domain.ToProperty(),
-                    EFCommonDefinitions.Properties.Name,
-                    EFRelationalDefinitions.Properties.ColumnName,
-                    EFRelationalDefinitions.Properties.ColumnType,
-                    EFRelationalDefinitions.Properties.IsColumnNullable,
-                    EFCommonDefinitions.Properties.Remark,
-                    EFCommonDefinitions.Properties.IsObsolete,
-                    EFCommonDefinitions.Properties.IsShadow,
-                    EFCommonDefinitions.Properties.GetXmlDescription()
-                });
+            var csv = _dbContext.Model.GenerateCsv(options =>
+            {
+                options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
+                
+                options.AddEntityColumn(CustomDefinitions.Domain.ToEntity());
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Name);
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName);
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.IsObsolete);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.GetXmlDescription());
 
-            var map = reader.Read();
+                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name, "Property Name");
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnName);
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnType);
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.IsColumnNullable);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete, convertToString: x => x ? "X" : null);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
+            });
         }
     }
 }

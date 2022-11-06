@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.XPath;
 using Stenn.EntityDefinition.Contracts;
@@ -45,5 +46,20 @@ namespace Stenn.EntityDefinition
         /// <returns></returns>
         public static MemberInfoDefinition<string> GetXmlDescription(Func<Assembly, XPathDocument?>? getCommentDoc = null)
             => new XmlDescriptionMemberInfoDefinition(XmlDescription, getCommentDoc);
+
+        public static class Converts
+        {
+            /// <summary>
+            /// Converts true to X and false to null
+            /// </summary>
+            /// <returns></returns>
+            public static string? BoolToX(bool v) => v ? "X" : null;
+
+            /// <summary>
+            /// Converts true to X and false to null
+            /// </summary>
+            /// <returns></returns>
+            public static string? TrueFalse(bool v) => v ? "True" : "False";
+        }
     }
 }
