@@ -46,7 +46,7 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
         }
 
         [Test]
-        public void Test()
+        public void TestEntities()
         {
             var csv = _dbContext.Model.GenerateCsv(options =>
             {
@@ -59,9 +59,23 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.IsObsolete);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.GetXmlDescription());
+            });
+        }
+        
+        [Test]
+        public void TestProperties()
+        {
+            var csv = _dbContext.Model.GenerateCsv(options =>
+            {
+                options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
+
+                options.AddEntityColumn(CustomDefinitions.Domain.ToEntity(), "Entity:Domain");
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName, "Entity:DbName");
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
 
                 options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
-                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name, "Property Name");
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnName);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnType);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.IsColumnNullable);

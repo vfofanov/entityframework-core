@@ -34,7 +34,7 @@ namespace Stenn.EntityDefinition.InMemory.Tests
         }
 
         [Test]
-        public void Test()
+        public void TestEntities()
         {
             var csv = _dbContext.Model.GenerateCsv(options =>
             {
@@ -45,9 +45,21 @@ namespace Stenn.EntityDefinition.InMemory.Tests
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.IsObsolete);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.GetXmlDescription());
+            });
+        }
+        
+        [Test]
+        public void TestProperties()
+        {
+            var csv = _dbContext.Model.GenerateCsv(options =>
+            {
+                options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
+                
+                options.AddEntityColumn(CustomDefinitions.Domain.ToEntity(), "Entity:Domain");
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
 
-                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty(), "Property Domain");
-                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name, "Property Name");
+                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);

@@ -34,7 +34,7 @@ namespace Stenn.EntityDefinition.Writer
                         }
                         if (column.ColumnName is null && map.EntityDefinitions.Contains(column.Info))
                         {
-                            columnName = $"P:{columnName}";
+                            columnName = $"Property:{columnName}";
                         }
                         break;
                     default:
