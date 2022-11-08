@@ -29,13 +29,13 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
         public static class Properties
         {
-            public static readonly EFPropertyDefinition<string> Name = CommonDefinitions.Name.ToProperty();
+            public static readonly EFPropertyDefinition<string> Name = new("Name", (_, _, name, _, _) => name);
             public static readonly EFPropertyDefinition<string> Remark = CommonDefinitions.Remark.ToProperty();
 
             public static readonly EFPropertyDefinition<bool> IsObsolete = CommonDefinitions.IsObsolete.ToProperty();
             public static readonly EFPropertyDefinition<string> ObsoleteMessage = CommonDefinitions.ObsoleteMessage.ToProperty();
 
-            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _) => property?.IsShadowProperty() ?? false);
+            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _, _) => property?.IsShadowProperty() ?? false);
 
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.

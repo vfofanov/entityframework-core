@@ -11,7 +11,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
         public EFScalarPropertyDefinition(string name,
             Func<IProperty, PropertyInfo?, T?, DefinitionContext, T?> extract, Func<T, string>? convertToString = null)
             : base(name,
-                (property, propertyInfo, parentValue, context) =>
+                (property, propertyInfo, _, parentValue, context) =>
                 {
                     if (property is IProperty p)
                     {

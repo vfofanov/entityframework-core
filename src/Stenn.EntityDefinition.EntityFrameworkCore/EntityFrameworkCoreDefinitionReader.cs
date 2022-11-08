@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.Contracts.Definitions;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
+using static Stenn.EntityDefinition.EntityFrameworkCore.EntityFrameworkDefinitionReaderOptions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore
 {
@@ -18,6 +20,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
         private readonly EntityFrameworkDefinitionReaderOptions _options;
         private readonly Func<IEntityType, bool> _filterEntities;
         private readonly Func<IEntityType, IPropertyBase, bool> _filterProperties;
+        private readonly Func<IEntityType, IPropertyBase, bool> _filterOwnedTypeProperties;
 
         public EntityFrameworkCoreDefinitionReader(IModel model,
             EntityFrameworkCoreDefinitionReaderOptions options)
@@ -34,7 +37,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             _propertyDefinitions = propertyDefinitions;
             _options = options.ReaderOptions;
             _filterEntities = options.GetEntitiesFilter();
+            
             _filterProperties = options.GetPropertiesFilter();
+            _filterOwnedTypeProperties= options.GetOwnedTypePropertiesFilter();
         }
 
         /// <inheritdoc />
@@ -44,7 +49,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             var map = new DefinitionMap(_entityDefinitions.Select(d => d.Info).ToList(),
                 _propertyDefinitions.Select(d => d.Info).ToList());
 
-            foreach (var entityType in _model.GetEntityTypes().Where(_filterEntities))
+            foreach (var entityType in _model.GetEntityTypes().Where(t => !t.IsOwned()).Where(_filterEntities))
             {
                 var entityBuilder = map.Add(entityType.Name);
                 foreach (var definition in _entityDefinitions)
@@ -53,38 +58,64 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                     entityBuilder.AddDefinition(definition.Info, val);
                 }
 
-                var entityRow = entityBuilder.Row;
-                var handledProperties = new List<PropertyInfo>();
-                foreach (var property in entityType.GetPropertiesAndNavigations().Where(p => _filterProperties(entityType, p)))
-                {
-                    var propertyBuilder = entityBuilder.AddProperty(property.Name);
-                    foreach (var definition in _propertyDefinitions)
-                    {
-                        var val = definition.Extract(property, property.PropertyInfo,
-                            entityRow.Values.GetValueOrDefault(definition.Info), context);
-
-                        propertyBuilder.AddDefinition(definition.Info, val);
-                        handledProperties.Add(property.PropertyInfo);
-                    }
-                }
-
-                if (!_options.HasFlag(EntityFrameworkDefinitionReaderOptions.ExcludeIgnoredProperties))
-                {
-                    foreach (var property in entityType.ClrType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                                 .Where(p => !handledProperties.Contains(p)))
-                    {
-                        var propertyBuilder = entityBuilder.AddProperty(property.Name);
-                        foreach (var definition in _propertyDefinitions)
-                        {
-                            var val = definition.Extract(null, property,
-                                entityRow.Values.GetValueOrDefault(definition.Info), context);
-
-                            propertyBuilder.AddDefinition(definition.Info, val);
-                        }
-                    }
-                }
+                ExtractProperties(entityType, entityBuilder, context, _filterProperties);
             }
             return map;
+        }
+
+        private void ExtractProperties(IEntityType entityType, EntityDefinitionRowBuilder entityBuilder, 
+            DefinitionContext context, 
+            Func<IEntityType, IPropertyBase, bool> filterProperties,
+            string? namePrefix = null, 
+            EntityFrameworkDefinitionReaderOptions excludeIgnored=ExcludeIgnoredProperties)
+        {
+            
+            var handledProperties = new List<PropertyInfo>();
+            foreach (var property in entityType.GetPropertiesAndNavigations().Where(p => filterProperties(entityType, p)))
+            {
+                handledProperties.Add(property.PropertyInfo);
+
+                if (property is Navigation navigation && navigation.TargetEntityType.IsOwned())
+                {
+                    ExtractProperties(navigation.TargetEntityType, entityBuilder, context,
+                        _filterOwnedTypeProperties,
+                        EntityDefinitionRowBuilder.ConcatenateName(namePrefix, property.Name),
+                        excludeIgnored | ExcludeOwnedTypeIgnoredProperties);
+                }
+                else
+                {
+                    ExtractProperty(entityBuilder, context, namePrefix, property, property.PropertyInfo);
+                }
+            }
+
+            if ((_options & excludeIgnored) == 0)
+            {
+                foreach (var property in entityType.ClrType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                             .Where(p => !handledProperties.Contains(p)))
+                {
+                    ExtractProperty(entityBuilder, context, namePrefix, null, property);
+                }
+            }
+        }
+
+        private void ExtractProperty(EntityDefinitionRowBuilder entityBuilder, DefinitionContext context, string? namePrefix,
+            IPropertyBase? property, PropertyInfo? propertyInfo)
+        {
+            var name = property?.Name ?? propertyInfo?.Name;
+            if (name is null)
+            {
+                throw new ArgumentException("property");
+            }
+
+            var propertyBuilder = entityBuilder.AddProperty(name, namePrefix);
+            foreach (var definition in _propertyDefinitions)
+            {
+                var val = definition.Extract(property, propertyInfo,
+                    propertyBuilder.Row.Name,
+                    entityBuilder.Row.Values.GetValueOrDefault(definition.Info), context);
+
+                propertyBuilder.AddDefinition(definition.Info, val);
+            }
         }
     }
 }

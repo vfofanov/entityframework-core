@@ -12,7 +12,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 
         public static EFPropertyDefinition<T> ToProperty<T>(this MemberInfoDefinition<T> info)
         {
-            return new EFPropertyDefinition<T>(info.Info, (_, propertyInfo, parentValue, context) => info.Extract(propertyInfo, parentValue, context));
+            return new EFPropertyDefinition<T>(info.Info, (_, propertyInfo, _, parentValue, context) => info.Extract(propertyInfo, parentValue, context));
         }
     }
 }

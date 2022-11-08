@@ -11,12 +11,25 @@
             _map = map;
         }
 
-        public DefinitionBuilder<PropertyDefinitionRow> AddProperty(string name)
+        public DefinitionBuilder<PropertyDefinitionRow> AddProperty(string name, string? prefix = null)
         {
-            var property = new PropertyDefinitionRow(name, _map.PropertyDefinitions.Count);
-            base.Row.AddProperty(property);
+            var property = new PropertyDefinitionRow(ConcatenateName(prefix, name), _map.PropertyDefinitions.Count);
+            Row.AddProperty(property);
 
             return new DefinitionBuilder<PropertyDefinitionRow>(property);
+        }
+
+        public static string ConcatenateName(string? chunk1, string chunk2)
+        {
+            if (string.IsNullOrEmpty(chunk1))
+            {
+                return chunk2;
+            }
+            if (string.IsNullOrEmpty(chunk2))
+            {
+                return chunk1;
+            }
+            return chunk1 + "." + chunk2;
         }
     }
 }
