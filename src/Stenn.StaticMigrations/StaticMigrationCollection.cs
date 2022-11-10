@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stenn.StaticMigrations.MigrationConditions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ namespace Stenn.StaticMigrations
             return GetEnumerator();
         }
 
-        public void Add(string name, Func<TContext, T> factory)
+        public void Add(string name, Func<TContext, T> factory, Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             if (name == null)
             {
@@ -39,7 +40,7 @@ namespace Stenn.StaticMigrations
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Add(new StaticMigrationItemFactory<T,TContext>(name, factory));
+            Add(new StaticMigrationItemFactory<T,TContext>(name, factory, condition));
         }
 
         public void Add(StaticMigrationItemFactory<T,TContext> item)

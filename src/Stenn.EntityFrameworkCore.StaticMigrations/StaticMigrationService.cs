@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
+using Stenn.StaticMigrations.MigrationConditions;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
@@ -22,9 +23,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             _historyRepository = historyRepository;
             var dbContext = currentDbContext.Context;
 
+            var migrations = sqlMigrations.Select(item => new StaticMigrationItem<IStaticSqlMigration>(item.Name, item.Factory(dbContext), item.Condition)).ToList();
 
-            var migrations = sqlMigrations.Select(item => new StaticMigrationItem<IStaticSqlMigration>(item.Name, item.Factory(dbContext))).ToList();
-            
             _sqlMigrations = migrations.Where(m => !m.Migration.IsInitialMigration).ToArray();
             _initialSqlMigrations = migrations.Where(m => m.Migration.IsInitialMigration).ToArray();
         }
@@ -110,7 +110,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             {
                 for (var i = migrationItems.Length - 1; i >= 0; i--)
                 {
-                    var (name, migration) = migrationItems[i];
+                    var (name, migration, _) = migrationItems[i];
                     foreach (var operation in migration.GetRevertOperations())
                     {
                         CheckForSuppressTransaction($"{name}(Static Revert)", operation);
@@ -128,7 +128,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             }
             for (var i = migrationItems.Length - 1; i >= 0; i--)
             {
-                var (name, migration) = migrationItems[i];
+                var (name, migration, _) = migrationItems[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == name);
 
                 if (row != null)
@@ -159,6 +159,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             for (var i = 0; i < migrationItems.Length; i++)
             {
                 var item = migrationItems[i];
+
+                if (!CheckCondition(item.Condition))
+                {
+                    continue;
+                }
+
                 var row = historyRows.FirstOrDefault(r => r.Name == item.Name);
                 if (row != null)
                 {
@@ -187,6 +193,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private SqlOperation DeleteHistoryRow(StaticMigrationHistoryRow row)
         {
             return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
+        }
+
+        private bool CheckCondition(Func<StaticMigrationConditionOptions, bool>? condition)
+        {
+            if (condition == null) return true;
+            var ConditionOptions = new StaticMigrationConditionOptions(new List<IStaticMigrationConditionItem>()); // todo: pass changed migrations here
+            return condition.Invoke(ConditionOptions);
         }
     }
 }

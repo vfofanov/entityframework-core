@@ -5,6 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="EmbeddedMigrations\migration1.sql" />
+    <None Remove="EmbeddedMigrations\migration2.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedMigrations\migration2.sql" />
+    <EmbeddedResource Include="EmbeddedMigrations\migration1.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.15" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />

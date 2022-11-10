@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.StaticMigrations;
+using Stenn.StaticMigrations.MigrationConditions;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -13,13 +14,13 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
     {
         internal StaticMigrationCollection<IStaticSqlMigration, DbContext> SQLMigrations { get; } = new();
 
-        public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null)
+        public void AddResSql(string name, string? applyRelativeResFilePath, string? revertRelativeResFilePath, Assembly? assembly = null, Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
             var applyResFile = string.IsNullOrEmpty(applyRelativeResFilePath) ? null : ResFile.Relative(applyRelativeResFilePath, assembly);
             var revertResFile = string.IsNullOrEmpty(revertRelativeResFilePath) ? null : ResFile.Relative(revertRelativeResFilePath, assembly);
-            AddResSql(name, applyResFile, revertResFile);
+            AddResSql(name, applyResFile, revertResFile, condition);
         }
 
         /// <summary>
@@ -32,7 +33,10 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="revertFile">
         ///     Migration's revert script resource file path.
         /// </param>
-        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile)
+        /// <param name="condition">
+        ///     Migration will be executed only if condition returns true.
+        /// </param>
+        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile, Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             if (name == null)
             {
@@ -43,7 +47,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(applyFile));
             }
             var migration = new ResStaticSqlMigration(applyFile, revertFile);
-            AddStaticSqlFactory(name, _ => migration);
+            AddStaticSqlFactory(name, _ => migration, condition);
         }
 
         /// <summary>
@@ -86,9 +90,9 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             AddStaticSqlFactory(name, _ => migration);
         }
 
-        public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory)
+        public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory, Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
-            SQLMigrations.Add(name, migrationFactory);
+            SQLMigrations.Add(name, migrationFactory, condition);
         }
     }
 }
