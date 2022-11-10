@@ -73,7 +73,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             var handledProperties = new List<string>();
             foreach (var property in entityType.GetPropertiesAndNavigations().Where(p => filterProperties(entityType, p)))
             {
-                handledProperties.Add(property.PropertyInfo.Name);
+                if (property.PropertyInfo?.Name is {})
+                {
+                    handledProperties.Add(property.PropertyInfo.Name);
+                }
 
                 if (property is Navigation navigation && navigation.TargetEntityType.IsOwned())
                 {
