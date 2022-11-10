@@ -70,10 +70,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             EntityFrameworkDefinitionReaderOptions excludeIgnored=ExcludeIgnoredProperties)
         {
             
-            var handledProperties = new List<PropertyInfo>();
+            var handledProperties = new List<string>();
             foreach (var property in entityType.GetPropertiesAndNavigations().Where(p => filterProperties(entityType, p)))
             {
-                handledProperties.Add(property.PropertyInfo);
+                handledProperties.Add(property.PropertyInfo.Name);
 
                 if (property is Navigation navigation && navigation.TargetEntityType.IsOwned())
                 {
@@ -91,7 +91,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             if ((_options & excludeIgnored) == 0)
             {
                 foreach (var property in entityType.ClrType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                             .Where(p => !handledProperties.Contains(p)))
+                             .Where(p => !handledProperties.Contains(p.Name)))
                 {
                     ExtractProperty(entityBuilder, context, namePrefix, null, property);
                 }
