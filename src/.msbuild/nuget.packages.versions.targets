@@ -5,12 +5,12 @@
 
     <PropertyGroup Condition="'$(IsNETSTANDARD21)'=='True' OR '$(IsNET5)'=='True'">
         <EntityFrameworkCoreVersion Condition="'$(EntityFrameworkCoreVersion)'==''">5.0.17</EntityFrameworkCoreVersion>
-        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">5.0.1-beta</StennSharedVersion>
+        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">5.0.1</StennSharedVersion>
         <MicrosoftExtensionsVersion Condition="'$(MicrosoftExtensionsVersion)'==''">5.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(IsNET6)'=='True'">
         <EntityFrameworkCoreVersion Condition="'$(EntityFrameworkCoreVersion)'==''">6.0.7</EntityFrameworkCoreVersion>
-        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">6.0.1-beta</StennSharedVersion>
+        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">6.0.1</StennSharedVersion>
         <MicrosoftExtensionsVersion Condition="'$(MicrosoftExtensionsVersion)'==''">6.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
 
