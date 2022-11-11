@@ -141,34 +141,37 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 #endregion
 
                 #region Insert data
-                var insertOp = new InsertDataOperation
+                if (enumTable.Table.Rows.Count != 0)
                 {
-                    Schema = table.Schema,
-                    Table = table.Name,
-                    Columns = tableOp.Columns.Select(c => c.Name).ToArray(),
-                    ColumnTypes = tableOp.Columns.Select(c => c.ColumnType!).ToArray()
-                };
+                    var insertOp = new InsertDataOperation
+                    {
+                        Schema = table.Schema,
+                        Table = table.Name,
+                        Columns = tableOp.Columns.Select(c => c.Name).ToArray(),
+                        ColumnTypes = tableOp.Columns.Select(c => c.ColumnType!).ToArray()
+                    };
 
-                var convert = prop.GetValueConverter()?.ConvertToProvider;
-                var providerClrType = prop.GetProviderClrType();
+                    var convert = prop.GetValueConverter()?.ConvertToProvider;
+                    var providerClrType = prop.GetProviderClrType();
 
 
-                var values = new object?[enumTable.Table.Rows.Count, 4];
-                for (var i = 0; i < enumTable.Table.Rows.Count; i++)
-                {
-                    var row = enumTable.Table.Rows[i];
-                    values[i, 0] = convert != null
-                        ? convert(row.RawValue)
-                        : providerClrType != null
-                            ? Convert.ChangeType(row.RawValue, providerClrType)
-                            : row.Value;
-                    values[i, 1] = row.Name;
-                    values[i, 2] = row.DisplayName;
-                    values[i, 3] = row.Description;
+                    var values = new object?[enumTable.Table.Rows.Count, 4];
+                    for (var i = 0; i < enumTable.Table.Rows.Count; i++)
+                    {
+                        var row = enumTable.Table.Rows[i];
+                        values[i, 0] = convert != null
+                            ? convert(row.RawValue)
+                            : providerClrType != null
+                                ? Convert.ChangeType(row.RawValue, providerClrType)
+                                : row.Value;
+                        values[i, 1] = row.Name;
+                        values[i, 2] = row.DisplayName;
+                        values[i, 3] = row.Description;
+                    }
+
+                    insertOp.Values = values;
+                    yield return insertOp;
                 }
-
-                insertOp.Values = values;
-                yield return insertOp;
                 #endregion
 
                 #region Foreign keys
