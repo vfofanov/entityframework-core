@@ -8,12 +8,13 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <NoWarn>EF1001;$(NoWarn)</NoWarn>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    
+    <InternalsVisibleToAllTestsProjects>True</InternalsVisibleToAllTestsProjects>
   </PropertyGroup>
-
 
   <!--    Stenn MSBuild extensions-->
   <ItemGroup>
-    <PackageReference Include="Stenn.MSBuild.Extensions" Version="1.0.13">
+    <PackageReference Include="Stenn.MSBuild.Extensions" Version="1.0.18">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -21,6 +22,12 @@
   <PropertyGroup>
     <EnableExtension_SourceLinkGitHub>true</EnableExtension_SourceLinkGitHub>
     <EnableExtension_AssemblyInfo>true</EnableExtension_AssemblyInfo>
+    <EnableExtension_NugetPackageVersionsSingleFile>true</EnableExtension_NugetPackageVersionsSingleFile>
   </PropertyGroup>
+
+  <!--  Enable checks for nuget.packages.versions files-->
+  <ItemGroup>
+    <NugetVersionsFilePath Include="$(MSBuildThisFileDirectory)**\*nuget.packages.versions.targets"/>
+  </ItemGroup>
 
 </Project>

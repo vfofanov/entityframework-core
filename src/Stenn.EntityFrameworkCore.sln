@@ -9,6 +9,11 @@ ProjectSection(SolutionItems) = preProject
 	.msbuild\package.props = .msbuild\package.props
 	.msbuild\product.props = .msbuild\product.props
 	.msbuild\version.props = .msbuild\version.props
+	.msbuild\nuget.packages.versions.targets = .msbuild\nuget.packages.versions.targets
+	.msbuild\tfm.constants.props = .msbuild\tfm.constants.props
+	.msbuild\allTestsProjToInternalsVisibleTo.targets = .msbuild\allTestsProjToInternalsVisibleTo.targets
+	.msbuild\work.root.dir.props = .msbuild\work.root.dir.props
+	.msbuild\repository.root.dir.props = .msbuild\repository.root.dir.props
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.StaticMigrations", "Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj", "{3762C10B-20AE-432E-AE0A-6261886D4A54}"

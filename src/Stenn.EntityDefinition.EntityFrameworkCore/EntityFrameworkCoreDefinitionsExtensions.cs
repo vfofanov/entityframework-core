@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.Writer;
+using Stenn.Shared.Tables;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore
 {

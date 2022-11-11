@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.EntityFrameworkCore;
-using Stenn.EntityDefinition.Writer;
+using Stenn.Shared.AspNetCore;
 
 namespace Stenn.EntityDefinition.AspNetCore
 {

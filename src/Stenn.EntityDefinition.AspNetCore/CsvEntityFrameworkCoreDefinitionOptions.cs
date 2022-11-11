@@ -2,14 +2,13 @@
 
 namespace Stenn.EntityDefinition.AspNetCore
 {
-    public interface ICsvEntityFrameworkCoreDefinitionOptions:IEntityFrameworkCoreDefinitionOptions
+    public interface ICsvEntityFrameworkCoreDefinitionOptions : IEntityFrameworkCoreDefinitionOptions
     {
         char Delimiter { get; set; }
     }
 
-    public sealed class CsvEntityFrameworkCoreDefinitionOptions: EntityFrameworkCoreDefinitionOptions, ICsvEntityFrameworkCoreDefinitionOptions
+    public sealed class CsvEntityFrameworkCoreDefinitionOptions : EntityFrameworkCoreDefinitionOptions, ICsvEntityFrameworkCoreDefinitionOptions
     {
-        public  char Delimiter { get; set; } = ',';
-
+        public char Delimiter { get; set; } = ',';
     }
 }

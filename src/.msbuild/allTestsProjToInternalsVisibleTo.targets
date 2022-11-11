@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <InternalsVisibleToAllTestsProjects Condition="'$(InternalsVisibleToAllTestsProjects)'=='' Or '$(InternalsVisibleToAllTestsProjects)'=='True'">true</InternalsVisibleToAllTestsProjects>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(InternalsVisibleToAllTestsProjects)'=='true' And '$(RepositoryRootDir)'!=''">
+    <InternalVisibleToProj Include="$(RepositoryRootDir)**\*.Tests.csproj"/>
+    <InternalsVisibleTo Include="@(InternalVisibleToProj->'%(Filename)')"/>
+  </ItemGroup>
+
+  <Target Condition="'$(InternalsVisibleToAllTestsProjects)'=='true'" Name="AllTestsInternalsVisibleTo" BeforeTargets="BeforeCompile">
+    <!--Check that RepositoryRootDir set-->
+    <Error Condition="'$(RepositoryRootDir)'==''"
+           Text="The PropertyGroup 'RepositoryRootDir' is empty. Fill 'RepositoryRootDir' or set 'InternalsVisibleToAllTestsProjects' to false"
+           File="$(MSBuildProjectFullPath)"/>
+
+  </Target>
+
+</Project>

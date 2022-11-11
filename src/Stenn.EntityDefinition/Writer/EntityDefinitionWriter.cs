@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.Shared.Tables;
 
 namespace Stenn.EntityDefinition.Writer
 {
@@ -50,7 +51,6 @@ namespace Stenn.EntityDefinition.Writer
                    _options.CommonConverts.FirstOrDefault(c => c.Type == column.Info.ValueType)?.ConvertToString
                    ?? column.Info.ConvertToString;
         }
-
 
         public void Write(IDefinitionMap map, ITableWriter<object?> writer)
         {
@@ -109,12 +109,4 @@ namespace Stenn.EntityDefinition.Writer
     }
 
     public record EntityDefinitionWriterColumn(TableWriterColumn WriterColumn, IDefinitionColumn Column, Func<object?, string?> ConvertToString);
-
-    public record TableWriterColumn(string Name, Type ColumnType);
-
-    public interface ITableWriter<in T>
-    {
-        void SetColumns(params TableWriterColumn[] columns);
-        void WriteRow(T?[] values);
-    }
 }
