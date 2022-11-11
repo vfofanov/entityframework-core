@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Stenn.EntityFrameworkCore.Relational;
 using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
