@@ -48,6 +48,31 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             return false;
         }
 
+        private List<IStaticMigrationConditionItem> GetChangedMigrations()
+        {
+            var historyRows = _historyRepository.GetAppliedMigrations();
+
+            var result = new List<IStaticMigrationConditionItem>();
+
+            FillChangedMigrations(_initialSqlMigrations, historyRows, result);
+            FillChangedMigrations(_sqlMigrations, historyRows, result);
+
+            return result;
+        }
+
+        private void FillChangedMigrations(StaticMigrationItem<IStaticSqlMigration>[] items, IReadOnlyList<StaticMigrationHistoryRow> historyRows, List<IStaticMigrationConditionItem> resultList)
+        {
+            for (var i = 0; i < items.Length; i++)
+            {
+                var migrationItem = items[i];
+                var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
+                if (row == null || !row.Hash.SequenceEqual(migrationItem.GetHash()))
+                {
+                    resultList.Add(new StaticMigrationConditionItem { Name = migrationItem.Name });
+                }
+            }
+        }
+
         public virtual void CheckForSuppressTransaction(string migrationName, MigrationOperation operation)
         {
             if (operation is SqlOperation { SuppressTransaction: true })
@@ -198,7 +223,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private bool CheckCondition(Func<StaticMigrationConditionOptions, bool>? condition)
         {
             if (condition == null) return true;
-            var ConditionOptions = new StaticMigrationConditionOptions(new List<IStaticMigrationConditionItem>()); // todo: pass changed migrations here
+            var ConditionOptions = new StaticMigrationConditionOptions(GetChangedMigrations());
             return condition.Invoke(ConditionOptions);
         }
     }
