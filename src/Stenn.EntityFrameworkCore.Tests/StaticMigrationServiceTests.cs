@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.StaticMigrations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
+using Stenn.Shared.Resources;
 using Stenn.StaticMigrations;
 using Stenn.StaticMigrations.MigrationConditions;
 using System;

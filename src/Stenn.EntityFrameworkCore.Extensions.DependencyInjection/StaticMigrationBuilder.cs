@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.Shared.Resources;
 using Stenn.StaticMigrations;
 using Stenn.StaticMigrations.MigrationConditions;
 

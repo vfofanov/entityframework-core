@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Stenn.Shared.Resources;
 using Stenn.StaticMigrations;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations

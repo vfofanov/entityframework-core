@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
+namespace Stenn.EntityFrameworkCore.Relational
 {
     public static class EntityModelExtensions
     {

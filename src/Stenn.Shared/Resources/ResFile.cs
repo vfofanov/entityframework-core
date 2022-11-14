@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Stenn.StaticMigrations
+namespace Stenn.Shared.Resources
 {
     public class ResFile
     {
