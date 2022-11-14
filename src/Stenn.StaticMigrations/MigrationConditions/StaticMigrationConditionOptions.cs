@@ -8,12 +8,13 @@ namespace Stenn.StaticMigrations.MigrationConditions
 {
     public class StaticMigrationConditionOptions
     {
-        public StaticMigrationConditionOptions(List<IStaticMigrationConditionItem> changedMigrations)
+        public StaticMigrationConditionOptions(List<IStaticMigrationConditionItem> changedMigrations, List<string> migrationTags)
         {
             ChangedMigrations = changedMigrations;
+            MigrationTags = migrationTags;
         }
 
-        public List<string> ChangedMigrationNames { get; } = new();
+        public List<string> MigrationTags { get; } = new();
 
         public List<IStaticMigrationConditionItem> ChangedMigrations { get; } = new();
     }

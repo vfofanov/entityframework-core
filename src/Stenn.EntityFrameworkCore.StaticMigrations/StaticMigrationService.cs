@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
@@ -15,6 +16,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IStaticMigrationHistoryRepository _historyRepository;
         private readonly StaticMigrationItem<IStaticSqlMigration>[] _sqlMigrations;
         private readonly StaticMigrationItem<IStaticSqlMigration>[] _initialSqlMigrations;
+        private List<string> Tags { get; set; } = new List<string>();
 
         public StaticMigrationsService(IStaticMigrationHistoryRepository historyRepository,
             ICurrentDbContext currentDbContext,
@@ -71,6 +73,11 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                     resultList.Add(new StaticMigrationConditionItem { Name = migrationItem.Name });
                 }
             }
+        }
+
+        public void FillActionTagsFrom(IReadOnlyList<Migration> efMigrations)
+        {
+            Tags = efMigrations.OfType<IMigrationWithTag>().Select(i=>i.Tag).Distinct().ToList() ?? new List<string>();
         }
 
         public virtual void CheckForSuppressTransaction(string migrationName, MigrationOperation operation)
@@ -223,7 +230,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private bool CheckCondition(Func<StaticMigrationConditionOptions, bool>? condition)
         {
             if (condition == null) return true;
-            var ConditionOptions = new StaticMigrationConditionOptions(GetChangedMigrations());
+            var ConditionOptions = new StaticMigrationConditionOptions(GetChangedMigrations(), Tags);
             return condition.Invoke(ConditionOptions);
         }
     }

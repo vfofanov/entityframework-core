@@ -146,6 +146,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                         yield return command;
                     }
                 }
+
+                StaticMigrationsService.FillActionTagsFrom(context.MigrationsToApply);
             }
             
             foreach (var command in GenerateCommands(StaticMigrationsService.GetApplyOperations(context.MigrationDate, false).ToList()))
