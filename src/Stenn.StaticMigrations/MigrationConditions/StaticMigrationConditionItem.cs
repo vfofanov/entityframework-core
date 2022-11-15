@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Stenn.StaticMigrations.MigrationConditions
+﻿namespace Stenn.StaticMigrations.MigrationConditions
 {
-    public class StaticMigrationConditionItem : IStaticMigrationConditionItem
-    {
-        public string Name { get; set; } = String.Empty;
-        public string Tag { get; set; } = String.Empty;
-    }
+    // public class StaticMigrationConditionItem : IStaticMigrationConditionItem
+    // {
+    //     public string Name { get; set; } = string.Empty;
+    //     public string Tag { get; set; } = string.Empty;
+    // }
 }

@@ -19,8 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="EmbeddedMigrations\migration2.sql" />
+    <EmbeddedResource Include="EmbeddedMigrations\ActionActivate\migration2.sql" />
     <EmbeddedResource Include="EmbeddedMigrations\migration1.sql" />
+    <EmbeddedResource Include="EmbeddedMigrations\migrationAction.sql" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ using Stenn.StaticMigrations;
 using Stenn.StaticMigrations.MigrationConditions;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -18,21 +19,23 @@ namespace Stenn.EntityFrameworkCore.Tests
 {
     public class StaticMigrationServiceTests
     {
-        private readonly IStaticMigrationsService _staticMigrationsService;
+        private readonly StaticMigrationsService _staticMigrationsService;
         private readonly HistoryRepositoryMock _staticMigrationHistoryRepository;
 
         private StaticMigrationCollection<IStaticSqlMigration, Microsoft.EntityFrameworkCore.DbContext> _sqlMigrations { get; set; }
 
-        private static ResStaticSqlMigration migration1 = new ResStaticSqlMigration(ResFile.Relative("EmbeddedMigrations\\migration1.sql"), null);
-        private static ResStaticSqlMigration migration2 = new ResStaticSqlMigration(ResFile.Relative("EmbeddedMigrations\\migration2.sql"), null);
+        private static ResStaticSqlMigration migration1 = new(ResFile.Relative(@"EmbeddedMigrations\migration1.sql"), null);
+        private static ResStaticSqlMigration migration2 = new(ResFile.Relative(@"EmbeddedMigrations\ActionActivate\migration2.sql"), null);
+        private static ResStaticSqlMigration migrationAction = new(ResFile.Relative(@"EmbeddedMigrations\migrationAction.sql"), null);
 
         public StaticMigrationServiceTests()
         {
             _staticMigrationHistoryRepository = new HistoryRepositoryMock();
 
             _sqlMigrations = new StaticMigrationCollection<IStaticSqlMigration, Microsoft.EntityFrameworkCore.DbContext>();
-            _sqlMigrations.Add("migration1", _ => migration1, null);
-            _sqlMigrations.Add("migration2", _ => migration2, (x) => { return x.ChangedMigrations.Where(i => i.Name.Contains("_Rls")).Any(); });
+            _sqlMigrations.Add("migration1", _ => migration1);
+            _sqlMigrations.Add("migration2", _ => migration2);
+            _sqlMigrations.Add("migrationAction", _ => migrationAction, x => { return x.ChangedMigrations.Any(i => i.Name.Contains("ActionActivate")); });
 
             _staticMigrationsService = new StaticMigrationsService(_staticMigrationHistoryRepository, new CurrentDbContextMock(), _sqlMigrations);
         }
@@ -40,39 +43,40 @@ namespace Stenn.EntityFrameworkCore.Tests
         [Test]
         public void ServiceShouldGetConditionsFromMigrationsCollection()
         {
-            var items = GetInstanceField(typeof(StaticMigrationsService), _staticMigrationsService, "_sqlMigrations") as StaticMigrationItem<IStaticSqlMigration>[];
-            items.Count().Should().NotBe(0);
+            _staticMigrationsService.SQLMigrations.Length.Should().NotBe(0);
         }
 
         [Test]
         public void ServiceShouldReturnApplyOperations()
         {
-            var ops = _staticMigrationsService.GetApplyOperations(DateTime.Now, false);
+            var ops = _staticMigrationsService.GetApplyOperations(DateTime.Now, ImmutableHashSet<string>.Empty, false);
             ops.Count().Should().NotBe(0);
         }
 
         [Test]
-        public void ServiceShouldReturnChangedMigraions()
+        public void ServiceShouldReturnChangedMigrations()
         {
             // adding migration1 to history mock. GetChangedMigrations should return only one migration - migration2
-            _staticMigrationHistoryRepository.Rows.Add(new StaticMigrationHistoryRow("migration1", StaticMigrationServiceTests.migration1.GetHash(), DateTime.Now.AddDays(-1)));
+            _staticMigrationHistoryRepository.Rows.Add(new StaticMigrationHistoryRow("migration1", migration1.GetHash(), DateTime.Now.AddDays(-1)));
 
-            MethodInfo dynMethod = _staticMigrationsService.GetType().GetMethod("GetChangedMigrations", BindingFlags.NonPublic | BindingFlags.Instance);
-            List<IStaticMigrationConditionItem> migrations = (List<IStaticMigrationConditionItem>)dynMethod.Invoke(_staticMigrationsService, null);
+            var allRunItems = _staticMigrationsService.ConvertToRunItems(_staticMigrationsService.SQLMigrations).ToList();
+            
+            allRunItems.Count.Should().Be(3);
+            
+            allRunItems.Count(i => !i.IsChanged).Should().Be(1);
+            allRunItems.Single(i => !i.IsChanged).Name.Should().Be("migration1");
 
-            migrations.Count().Should().Be(1);
-            migrations[0].Name.Should().Be("migration2");
-        }
+            allRunItems.Count(i => i.IsChanged).Should().Be(2);
+            
+            var runItems = _staticMigrationsService.GetRunItems(_staticMigrationsService.SQLMigrations, true, ImmutableHashSet<string>.Empty).ToList();
 
-        /// <summary>
-        /// Uses reflection to get the field value from an object.
-        /// </summary>
-        internal static object GetInstanceField(Type type, object instance, string fieldName)
-        {
-            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-                | BindingFlags.Static;
-            FieldInfo field = type.GetField(fieldName, bindFlags);
-            return field.GetValue(instance);
+            runItems.Count.Should().Be(2);
+            
+            runItems.Count(i => !i.IsChanged).Should().Be(1);
+            runItems.Single(i => !i.IsChanged).Name.Should().Be("migration1");
+
+            runItems.Count(i => i.IsChanged).Should().Be(1);
+            runItems.Single(i => i.IsChanged).Name.Should().Be("migration2");
         }
     }
 
@@ -87,12 +91,12 @@ namespace Stenn.EntityFrameworkCore.Tests
 
         public bool Exists()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public Task<bool> ExistsAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(true);
         }
 
         public IReadOnlyList<StaticMigrationHistoryRow> GetAppliedMigrations()

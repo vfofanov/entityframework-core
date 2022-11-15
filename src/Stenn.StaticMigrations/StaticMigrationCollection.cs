@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
@@ -29,7 +30,7 @@ namespace Stenn.StaticMigrations
             return GetEnumerator();
         }
 
-        public void Add(string name, Func<TContext, T> factory, Func<StaticMigrationConditionOptions, bool>? condition = null)
+        public void Add(string name, Func<TContext, T> factory, Func<StaticMigrationConditionOptions, bool>? condition = null, params string[]? tags)
         {
             if (name == null)
             {
@@ -40,7 +41,8 @@ namespace Stenn.StaticMigrations
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Add(new StaticMigrationItemFactory<T,TContext>(name, factory, condition));
+            var tagsSet = tags?.ToImmutableSortedSet() ?? ImmutableSortedSet<string>.Empty;
+            Add(new StaticMigrationItemFactory<T, TContext>(name, factory, tagsSet, condition));
         }
 
         public void Add(StaticMigrationItemFactory<T,TContext> item)

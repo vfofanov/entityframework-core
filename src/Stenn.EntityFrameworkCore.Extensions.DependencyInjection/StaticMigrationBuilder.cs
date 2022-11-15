@@ -37,7 +37,9 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="condition">
         ///     Migration will be executed only if condition returns true.
         /// </param>
-        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile, Func<StaticMigrationConditionOptions, bool>? condition = null)
+        /// <param name="tags"></param>
+        public void AddResSql(string name, ResFile? applyFile, ResFile? revertFile, Func<StaticMigrationConditionOptions, bool>? condition = null,
+            params string[]? tags)
         {
             if (name == null)
             {
@@ -48,7 +50,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(applyFile));
             }
             var migration = new ResStaticSqlMigration(applyFile, revertFile);
-            AddStaticSqlFactory(name, _ => migration, condition);
+            AddStaticSqlFactory(name, _ => migration, condition, tags);
         }
 
         /// <summary>
@@ -91,9 +93,11 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             AddStaticSqlFactory(name, _ => migration);
         }
 
-        public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory, Func<StaticMigrationConditionOptions, bool>? condition = null)
+        public void AddStaticSqlFactory(string name, Func<DbContext, IStaticSqlMigration> migrationFactory,
+            Func<StaticMigrationConditionOptions, bool>? condition = null,
+            params string[]? tags)
         {
-            SQLMigrations.Add(name, migrationFactory, condition);
+            SQLMigrations.Add(name, migrationFactory, condition, tags);
         }
     }
 }

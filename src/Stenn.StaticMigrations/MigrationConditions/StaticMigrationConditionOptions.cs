@@ -1,21 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 
 namespace Stenn.StaticMigrations.MigrationConditions
 {
     public class StaticMigrationConditionOptions
     {
-        public StaticMigrationConditionOptions(List<IStaticMigrationConditionItem> changedMigrations, List<string> migrationTags)
+        public StaticMigrationConditionOptions(IImmutableList<IStaticMigrationConditionItem> changedMigrations, IImmutableSet<string> tags)
         {
-            ChangedMigrations = changedMigrations;
-            MigrationTags = migrationTags;
+            ChangedMigrations = changedMigrations ?? throw new ArgumentNullException(nameof(changedMigrations));
+            ForcedRunActionTags = tags ?? throw new ArgumentNullException(nameof(tags));
         }
 
-        public List<string> MigrationTags { get; } = new();
-
-        public List<IStaticMigrationConditionItem> ChangedMigrations { get; } = new();
+        /// <summary>
+        /// Static actions' tags forced to run
+        /// </summary>
+        public IImmutableSet<string> ForcedRunActionTags { get; }
+        
+        /// <summary>
+        /// Changed migrations from previous run
+        /// </summary>
+        public IImmutableList<IStaticMigrationConditionItem> ChangedMigrations { get; }
     }
 }

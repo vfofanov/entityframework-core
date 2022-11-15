@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Stenn.StaticMigrations.MigrationConditions
+﻿namespace Stenn.StaticMigrations.MigrationConditions
 {
-    public interface IMigrationWithTag
+    public interface IWithStaticMigrationActionTag
     {
-        public string Tag { get; set; }
+        public string[] Tags { get; }
     }
 }

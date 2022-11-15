@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations;
 using Stenn.StaticMigrations;
@@ -11,12 +11,25 @@ using Stenn.StaticMigrations.MigrationConditions;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
+    public record StaticMigrationRunItem<T>(StaticMigrationItem<T> Item, StaticMigrationHistoryRow? Row, bool IsChanged) : IStaticMigrationConditionItem
+        where T : IStaticMigration
+    {
+        public bool IsNew => Row is null;
+
+        public T Migration => Item.Migration;
+        
+        /// <inheritdoc />
+        public string Name => Item.Name;
+
+        /// <inheritdoc />
+        IImmutableSet<string> IStaticMigrationConditionItem.Tags => Item.Tags;
+    }
+
     public class StaticMigrationsService : IStaticMigrationsService
     {
         private readonly IStaticMigrationHistoryRepository _historyRepository;
-        private readonly StaticMigrationItem<IStaticSqlMigration>[] _sqlMigrations;
-        private readonly StaticMigrationItem<IStaticSqlMigration>[] _initialSqlMigrations;
-        private List<string> Tags { get; set; } = new List<string>();
+        internal StaticMigrationItem<IStaticSqlMigration>[] SQLMigrations { get; }
+        internal StaticMigrationItem<IStaticSqlMigration>[] InitialSqlMigrations { get; }
 
         public StaticMigrationsService(IStaticMigrationHistoryRepository historyRepository,
             ICurrentDbContext currentDbContext,
@@ -25,61 +38,44 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             _historyRepository = historyRepository;
             var dbContext = currentDbContext.Context;
 
-            var migrations = sqlMigrations.Select(item => new StaticMigrationItem<IStaticSqlMigration>(item.Name, item.Factory(dbContext), item.Condition)).ToList();
+            var migrations = sqlMigrations.Select(item => new StaticMigrationItem<IStaticSqlMigration>(item.Name, item.Factory(dbContext),item.Tags, item.Condition)).ToList();
 
-            _sqlMigrations = migrations.Where(m => !m.Migration.IsInitialMigration).ToArray();
-            _initialSqlMigrations = migrations.Where(m => m.Migration.IsInitialMigration).ToArray();
+            SQLMigrations = migrations.Where(m => !m.Migration.IsInitialMigration).ToArray();
+            InitialSqlMigrations = migrations.Where(m => m.Migration.IsInitialMigration).ToArray();
         }
 
-        private bool GetChanges(StaticMigrationItem<IStaticSqlMigration>[] items, bool force, out IReadOnlyList<StaticMigrationHistoryRow> historyRows)
+        private static StaticMigrationConditionOptions GetOptions(IEnumerable<StaticMigrationRunItem<IStaticSqlMigration>> items, IImmutableSet<string> tags)
         {
-            historyRows = _historyRepository.GetAppliedMigrations();
-            if (force)
-            {
-                return true;
-            }
-            for (var i = 0; i < items.Length; i++)
-            {
-                var migrationItem = items[i];
-                var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row == null || !row.Hash.SequenceEqual(migrationItem.GetHash()))
-                {
-                    return true;
-                }
-            }
-            return false;
+            var conditionItems = items.Where(i => i.IsChanged).Cast<IStaticMigrationConditionItem>().ToImmutableArray();
+            return new StaticMigrationConditionOptions(conditionItems, tags);
         }
 
-        private List<IStaticMigrationConditionItem> GetChangedMigrations()
+        internal IEnumerable<StaticMigrationRunItem<IStaticSqlMigration>> ConvertToRunItems(IEnumerable<StaticMigrationItem<IStaticSqlMigration>> items)
         {
             var historyRows = _historyRepository.GetAppliedMigrations();
-
-            var result = new List<IStaticMigrationConditionItem>();
-
-            FillChangedMigrations(_initialSqlMigrations, historyRows, result);
-            FillChangedMigrations(_sqlMigrations, historyRows, result);
-
-            return result;
-        }
-
-        private void FillChangedMigrations(StaticMigrationItem<IStaticSqlMigration>[] items, IReadOnlyList<StaticMigrationHistoryRow> historyRows, List<IStaticMigrationConditionItem> resultList)
-        {
-            for (var i = 0; i < items.Length; i++)
+            foreach (var migrationItem in items)
             {
-                var migrationItem = items[i];
                 var row = historyRows.FirstOrDefault(r => r.Name == migrationItem.Name);
-                if (row == null || !row.Hash.SequenceEqual(migrationItem.GetHash()))
-                {
-                    resultList.Add(new StaticMigrationConditionItem { Name = migrationItem.Name });
-                }
+                yield return new(migrationItem, row, row == null || !row.Hash.SequenceEqual(migrationItem.GetHash()));
             }
         }
 
-        public void FillActionTagsFrom(IReadOnlyList<Migration> efMigrations)
+        internal IEnumerable<StaticMigrationRunItem<IStaticSqlMigration>> GetRunItems(
+            IEnumerable<StaticMigrationItem<IStaticSqlMigration>> items, 
+            bool force, 
+            IImmutableSet<string> activeTags)
         {
-            Tags = efMigrations.OfType<IMigrationWithTag>().Select(i=>i.Tag).Distinct().ToList() ?? new List<string>();
-        }
+            var runItems = ConvertToRunItems(items).ToList();
+            var hasActions = runItems.Any(i => i.Item.IsAction());
+            var options = GetOptions(runItems, activeTags);
 
+            if (!force && !options.ChangedMigrations.Any())
+            {
+                return Enumerable.Empty<StaticMigrationRunItem<IStaticSqlMigration>>();
+            }
+            return !hasActions ? runItems : runItems.Where(runItem => runItem.Item.CanRun(options));
+        }
+        
         public virtual void CheckForSuppressTransaction(string migrationName, MigrationOperation operation)
         {
             if (operation is SqlOperation { SuppressTransaction: true })
@@ -88,126 +84,87 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                     $"Migration: {migrationName}. SqlOperation.SuppressTransaction == true only allowed in Initial static migrations. Rewrite your migration to use SuppressTransaction in initial static migrations only.");
             }
         }
-        
+
         /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetInitialOperations(DateTime migrationDate, bool force)
+        public IEnumerable<MigrationOperation> GetInitialOperations(DateTime migrationDate, IImmutableSet<string> staticMigrationTags, bool force)
         {
-            var migrationItems = _initialSqlMigrations;
+            if (!_historyRepository.Exists())
+            {
+                yield return CreateIfNotExistsHistoryTable();
+            }
+
+            var runItems = GetRunItems(InitialSqlMigrations, force, staticMigrationTags);
+            foreach (var runItem in runItems)
+            {
+                if (runItem.Row != null)
+                {
+                    yield return DeleteHistoryRow(runItem.Row);
+                }
+                foreach (var operation in runItem.Migration.GetApplyOperations())
+                {
+                    yield return operation;
+                }
+                yield return InsertHistoryRow(runItem.Item, migrationDate);
+            }
+        }
+
+        private bool HasInitialMigrationsToRun(IImmutableSet<string> staticMigrationTags, bool force)
+        {
+            return GetRunItems(InitialSqlMigrations, force, staticMigrationTags).Any();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<MigrationOperation> GetRevertOperations(DateTime migrationDate, IImmutableSet<string> staticMigrationTags, bool force)
+        {
+            if (!_historyRepository.Exists())
+            {
+                yield return CreateIfNotExistsHistoryTable();
+            }
+
+            force |= HasInitialMigrationsToRun(staticMigrationTags, force);
+            var runItems = GetRunItems(SQLMigrations, force, staticMigrationTags).ToList();
+
+            for (var i = runItems.Count - 1; i >= 0; i--)
+            {
+                var runItem = runItems[i];
+                if (runItem.Row != null)
+                {
+                    yield return DeleteHistoryRow(runItem.Row);
+                }
+                foreach (var operation in runItem.Migration.GetRevertOperations())
+                {
+                    CheckForSuppressTransaction($"{runItem.Name}(Static Revert)", operation);
+                    yield return operation;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<MigrationOperation> GetApplyOperations(DateTime migrationDate, IImmutableSet<string> staticMigrationTags, bool force)
+        {
+            var migrationItems = SQLMigrations;
             
             if (!_historyRepository.Exists())
             {
                 yield return CreateIfNotExistsHistoryTable();
-                
-                for (var i = 0; i < migrationItems.Length; i++)
-                {
-                    var item = migrationItems[i];
-                    foreach (var operation in item.Migration.GetApplyOperations())
-                    {
-                        yield return operation;
-                    }
-                    yield return InsertHistoryRow(item, migrationDate);
-                }
-                yield break;
-            }
-
-            var hasChanges = GetChanges(migrationItems, force, out var historyRows);
-            if (!hasChanges)
-            {
-                yield break;
-            }
-
-            for (var i = 0; i < migrationItems.Length; i++)
-            {
-                var item = migrationItems[i];
-                
-                var row = historyRows.FirstOrDefault(r => r.Name == item.Name);
-                if (row != null)
-                {
-                    yield return DeleteHistoryRow(row);
-                }
-                foreach (var operation in item.Migration.GetApplyOperations())
-                {
-                    yield return operation;
-                }
-                yield return InsertHistoryRow(item, migrationDate);
-            }
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetRevertOperations(DateTime migrationDate, bool force)
-        {
-            var migrationItems = _sqlMigrations;
-            
-            if (!_historyRepository.Exists())
-            {
-                for (var i = migrationItems.Length - 1; i >= 0; i--)
-                {
-                    var (name, migration, _) = migrationItems[i];
-                    foreach (var operation in migration.GetRevertOperations())
-                    {
-                        CheckForSuppressTransaction($"{name}(Static Revert)", operation);
-                        yield return operation;
-                    }
-                }
-                yield break;
             }
             
-            var hasChanges = GetChanges(migrationItems, force, out var historyRows) ||
-                             GetChanges(_initialSqlMigrations, force, out _);
-            if (!hasChanges)
-            {
-                yield break;
-            }
-            for (var i = migrationItems.Length - 1; i >= 0; i--)
-            {
-                var (name, migration, _) = migrationItems[i];
-                var row = historyRows.FirstOrDefault(r => r.Name == name);
-
-                if (row != null)
-                {
-                    yield return DeleteHistoryRow(row);
-                }
-                foreach (var operation in migration.GetRevertOperations())
-                {
-                    CheckForSuppressTransaction($"{name}(Static Revert)", operation);
-                    yield return operation;
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<MigrationOperation> GetApplyOperations(DateTime migrationDate, bool force)
-        {
-            var migrationItems = _sqlMigrations;
+            force |= HasInitialMigrationsToRun(staticMigrationTags, force);
+            var runItems = GetRunItems(SQLMigrations, force, staticMigrationTags).ToList();
             
-            yield return CreateIfNotExistsHistoryTable();
-            var hasChanges = GetChanges(migrationItems, force, out var historyRows) ||
-                             GetChanges(_initialSqlMigrations, force, out _);
-            if (!hasChanges)
+            for (var i = runItems.Count - 1; i >= 0; i--)
             {
-                yield break;
-            }
-
-            for (var i = 0; i < migrationItems.Length; i++)
-            {
-                var item = migrationItems[i];
-
-                if (!CheckCondition(item.Condition))
+                var runItem = runItems[i];
+                if (runItem.Row != null)
                 {
-                    continue;
+                    yield return DeleteHistoryRow(runItem.Row);
                 }
-
-                var row = historyRows.FirstOrDefault(r => r.Name == item.Name);
-                if (row != null)
+                foreach (var operation in runItem.Migration.GetApplyOperations())
                 {
-                    yield return DeleteHistoryRow(row);
-                }
-                foreach (var operation in item.Migration.GetApplyOperations())
-                {
-                    CheckForSuppressTransaction($"{item.Name}(Static Apply)", operation);
+                    CheckForSuppressTransaction($"{runItem.Name}(Static Apply)", operation);
                     yield return operation;
                 }
-                yield return InsertHistoryRow(item, migrationDate);
+                yield return InsertHistoryRow(runItem.Item, migrationDate);
             }
         }
 
@@ -227,11 +184,9 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
         }
 
-        private bool CheckCondition(Func<StaticMigrationConditionOptions, bool>? condition)
+        private static bool CheckCondition(StaticMigrationConditionOptions options, Func<StaticMigrationConditionOptions, bool>? condition)
         {
-            if (condition == null) return true;
-            var ConditionOptions = new StaticMigrationConditionOptions(GetChangedMigrations(), Tags);
-            return condition.Invoke(ConditionOptions);
+            return condition == null || condition.Invoke(options);
         }
     }
 }
