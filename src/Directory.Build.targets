@@ -2,5 +2,6 @@
 <Project>
 
   <Import Project="$(MSBuildThisFileDirectory).msbuild\nuget.packages.versions.targets" />
-
+  <Import Project="$(MSBuildThisFileDirectory).msbuild\allTestsProjToInternalsVisibleTo.targets" />
+  
 </Project>

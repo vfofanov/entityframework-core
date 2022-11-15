@@ -7,8 +7,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591;EF1001</NoWarn>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    
-    <InternalsVisibleToAllTestsProjects>True</InternalsVisibleToAllTestsProjects>
   </PropertyGroup>
 
   <!--    Stenn MSBuild extensions-->
@@ -28,5 +26,14 @@
   <ItemGroup>
     <NugetVersionsFilePath Include="$(MSBuildThisFileDirectory)**\*nuget.packages.versions.targets"/>
   </ItemGroup>
+
+  <PropertyGroup>
+    <TestsDir>$(MSBuildThisFileDirectory)..\</TestsDir>
+    <!--
+    This automatically applies InternalsVisibleToAttribute to all the projects
+    so their internal classes will be visible to all the projects with '.Tests' name ending.
+    -->
+    <InternalsVisibleToAllTestsProjects>true</InternalsVisibleToAllTestsProjects>
+  </PropertyGroup>
 
 </Project>
