@@ -46,6 +46,12 @@ namespace Stenn.EntityDefinition
         /// <returns></returns>
         public static MemberInfoDefinition<string> GetXmlDescription(Func<Assembly, XPathDocument?>? getCommentDoc = null)
             => new XmlDescriptionMemberInfoDefinition(XmlDescription, getCommentDoc);
+        
+        /// <summary>
+        /// Clr type of a property
+        /// </summary>
+        public static MemberInfoDefinition<TypeInfo> PropertyClrType =
+            new PropertyClrTypeDefinition("ClrType");
 
         public static class Converts
         {

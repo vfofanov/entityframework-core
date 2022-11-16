@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Xml.XPath;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore
@@ -37,11 +38,18 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
             public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _, _) => property?.IsShadowProperty() ?? false);
 
+            public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation", (property, _, _, _, _) => property is INavigation);
+            
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsNullable =
                 new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _, _) => property.IsNullable);
+
+            /// <summary>
+            ///     Gets a clr type of property
+            /// </summary>
+            public static readonly EFPropertyDefinition<TypeInfo> ClrType = CommonDefinitions.PropertyClrType.ToProperty();
 
             /// <summary>
             /// Gets definition for <see cref="CommonDefinitions.XmlDescription"/>

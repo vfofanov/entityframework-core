@@ -76,10 +76,12 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
 
                 options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.ClrType);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnName);
-                options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnType);
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.DbColumnType);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.IsColumnNullable);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsNavigation);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete, convertToString: x => x ? "X" : null);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());

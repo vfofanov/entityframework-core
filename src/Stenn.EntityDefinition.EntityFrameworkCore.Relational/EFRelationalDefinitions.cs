@@ -23,7 +23,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             public static readonly EFPropertyDefinition<string> ColumnName =
                 new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _, _) => property.GetFinalColumnName());
 
-            public static readonly EFPropertyDefinition<string> ColumnType =
+            public static readonly EFPropertyDefinition<string> DbColumnType =
                 new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _, _) => property.GetColumnType());
 
             /// <summary>

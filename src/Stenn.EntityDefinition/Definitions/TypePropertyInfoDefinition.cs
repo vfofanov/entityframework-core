@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.Definitions
@@ -27,5 +29,7 @@ namespace Stenn.EntityDefinition.Definitions
             
             return member?.Name;
         }
+
+        
     }
 }

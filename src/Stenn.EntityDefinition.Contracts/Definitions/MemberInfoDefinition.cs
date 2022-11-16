@@ -14,11 +14,8 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         protected MemberInfoDefinition(string name, Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
-
         }
+
         public abstract T? Extract(MemberInfo? member, T? parentValue, DefinitionContext context);
-
     }
-
-    
 }
