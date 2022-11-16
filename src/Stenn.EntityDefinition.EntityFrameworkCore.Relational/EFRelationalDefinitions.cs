@@ -21,10 +21,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
         public static class Properties
         {
             public static readonly EFPropertyDefinition<string> ColumnName =
-                new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _, _) => property.GetFinalColumnName());
+                new EFScalarPropertyDefinition<string>("ColumnName", (property, _, _, _, _, _) => property.GetFinalColumnName());
 
             public static readonly EFPropertyDefinition<string> DbColumnType =
-                new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _, _) => property.GetColumnType());
+                new EFScalarPropertyDefinition<string>("ColumnType", (property, _, _, _, _, _) => property.GetColumnType());
 
             /// <summary>
             ///     <para>
@@ -37,7 +37,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             ///     </para>
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsColumnNullable =
-                new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _, _) => property.IsColumnNullable());
+                new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _, _, _, _) => property.IsColumnNullable());
         }
     }
 }

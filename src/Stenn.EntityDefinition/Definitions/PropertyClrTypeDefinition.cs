@@ -6,13 +6,13 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
     public sealed class PropertyClrTypeDefinition : MemberInfoDefinition<TypeInfo>
     {
         /// <inheritdoc />
-        public PropertyClrTypeDefinition(DefinitionInfo<TypeInfo> info) 
+        public PropertyClrTypeDefinition(DefinitionInfo<TypeInfo> info)
             : base(info)
         {
         }
 
         /// <inheritdoc />
-        public PropertyClrTypeDefinition(string name) 
+        public PropertyClrTypeDefinition(string name)
             : base(name, ConvertToString)
         {
         }
@@ -23,11 +23,16 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         }
 
         /// <inheritdoc />
-        public override TypeInfo? Extract(MemberInfo? member, TypeInfo? parentValue, DefinitionContext context)
+        public override TypeInfo? Extract(MemberInfo? member, TypeInfo? parentValue,
+            EntityDefinitionRow entityRow, PropertyDefinitionRow? row, DefinitionContext context)
         {
             if (member is PropertyInfo propertyInfo)
             {
                 return propertyInfo.PropertyType.GetTypeInfo();
+            }
+            if (member is FieldInfo fieldInfo)
+            {
+                return fieldInfo.FieldType.GetTypeInfo();
             }
             return default;
         }

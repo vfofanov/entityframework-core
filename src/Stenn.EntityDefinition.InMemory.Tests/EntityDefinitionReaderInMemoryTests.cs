@@ -57,9 +57,10 @@ namespace Stenn.EntityDefinition.InMemory.Tests
                 options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
 
                 options.AddEntityColumn(CustomDefinitions.Domain.ToEntity(), "Entity:Domain");
-                options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
-
                 options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+                options.AddPropertyColumn(CustomDefinitions.IsDomainDifferent.ToProperty());
+                
+                options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete);

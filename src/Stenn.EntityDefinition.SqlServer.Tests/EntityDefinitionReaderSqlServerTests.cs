@@ -70,11 +70,13 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
 
                 options.AddEntityColumn(CustomDefinitions.Domain.ToEntity(), "Entity:Domain");
+                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+                options.AddPropertyColumn(CustomDefinitions.IsDomainDifferent.ToProperty());
+                
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName, "Entity:DbName");
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
-
-                options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+                
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.ClrType);
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.ColumnName);

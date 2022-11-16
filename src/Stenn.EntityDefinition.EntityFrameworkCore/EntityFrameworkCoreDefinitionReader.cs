@@ -37,9 +37,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             _propertyDefinitions = propertyDefinitions;
             _options = options.ReaderOptions;
             _filterEntities = options.GetEntitiesFilter();
-            
+
             _filterProperties = options.GetPropertiesFilter();
-            _filterOwnedTypeProperties= options.GetOwnedTypePropertiesFilter();
+            _filterOwnedTypeProperties = options.GetOwnedTypePropertiesFilter();
         }
 
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                 var entityBuilder = map.Add(entityType.Name);
                 foreach (var definition in _entityDefinitions)
                 {
-                    var val = definition.Extract(entityType, null, context);
+                    var val = definition.Extract(entityType, entityBuilder.Row, context);
                     entityBuilder.AddDefinition(definition.Info, val);
                 }
 
@@ -113,9 +113,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             var propertyBuilder = entityBuilder.AddProperty(name, namePrefix);
             foreach (var definition in _propertyDefinitions)
             {
-                var val = definition.Extract(property, propertyInfo,
-                    propertyBuilder.Row.Name,
-                    entityBuilder.Row.Values.GetValueOrDefault(definition.Info), context);
+                var parentValue = entityBuilder.Row.Values.GetValueOrDefault(definition.Info);
+                var val = definition.Extract(property, propertyInfo, parentValue, entityBuilder.Row, propertyBuilder.Row, context);
 
                 propertyBuilder.AddDefinition(definition.Info, val);
             }

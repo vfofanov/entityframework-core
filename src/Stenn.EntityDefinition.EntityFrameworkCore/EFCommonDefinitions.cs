@@ -30,21 +30,21 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
         public static class Properties
         {
-            public static readonly EFPropertyDefinition<string> Name = new("Name", (_, _, name, _, _) => name);
+            public static readonly EFPropertyDefinition<string> Name = new("Name", (_, _, _, _, row, _) => row.Name);
             public static readonly EFPropertyDefinition<string> Remark = CommonDefinitions.Remark.ToProperty();
 
             public static readonly EFPropertyDefinition<bool> IsObsolete = CommonDefinitions.IsObsolete.ToProperty();
             public static readonly EFPropertyDefinition<string> ObsoleteMessage = CommonDefinitions.ObsoleteMessage.ToProperty();
 
-            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _, _) => property?.IsShadowProperty() ?? false);
+            public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _, _, _) => property?.IsShadowProperty() ?? false);
 
-            public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation", (property, _, _, _, _) => property is INavigation);
-            
+            public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation", (property, _, _, _, _, _) => property is INavigation);
+
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsNullable =
-                new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _, _) => property.IsNullable);
+                new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _, _, _, _) => property.IsNullable);
 
             /// <summary>
             ///     Gets a clr type of property

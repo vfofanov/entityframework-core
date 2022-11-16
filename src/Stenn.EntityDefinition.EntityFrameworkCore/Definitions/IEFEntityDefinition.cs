@@ -1,24 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
     public interface IEFEntityDefinition : IDefinition
     {
-        object? Extract(IEntityType type, object? parentValue, DefinitionContext context);
+        object? Extract(IEntityType type, EntityDefinitionRow row, DefinitionContext context);
     }
 
     public interface IEFEntityDefinition<T> : IEFEntityDefinition, IDefinition<T>
     {
         /// <inheritdoc />
-        object? IEFEntityDefinition.Extract(IEntityType type, object? parentValue, DefinitionContext context)
+        object? IEFEntityDefinition.Extract(IEntityType type, EntityDefinitionRow row, DefinitionContext context)
         {
-            return parentValue is null 
-                // ReSharper disable once ArrangeDefaultValueWhenTypeNotEvident
-                ? Extract(type, default(T?), context) 
-                : Extract(type,(T?) parentValue, context);
+            return Extract(type, row, context);
         }
 
-        T? Extract(IEntityType type, T? parentValue, DefinitionContext context);
+        new T? Extract(IEntityType type, EntityDefinitionRow row, DefinitionContext context);
     }
 }

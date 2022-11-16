@@ -2,6 +2,12 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public interface IDefinition
     {
+        /// <summary>
+        /// Read definition order. Lower first 
+        /// </summary>
+        /// <returns></returns>
+        int ReadOrder => 0;
+
         DefinitionInfo Info { get; }
     }
 

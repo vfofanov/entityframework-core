@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.Model.Definitions
@@ -9,6 +11,27 @@ namespace Stenn.EntityDefinition.Model.Definitions
         /// Name definition based on <see cref="MemberInfo.Name"/>
         /// </summary>
         public static MemberInfoDefinition<Domain> Domain =
-            new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain", true);
+            new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain", true) { ReadOrder = 0 };
+
+        /// <summary>
+        /// Is entity's domain and property's domain are different
+        /// </summary>
+        public static MemberInfoDefinition<bool> IsDomainDifferent =
+            new CustomMemberInfoDefinition<bool>("IsDomainDifferent", (_, _, entityRow, row, _) =>
+            {
+                if (row == null)
+                {
+                    throw new NotSupportedException("Can't use IsDomainDifferent with entity");
+                }
+                if (!entityRow.Values.TryGetValue(Domain, out var entityDomain))
+                {
+                    throw new NotSupportedException("Can't use IsDomainDifferent. Read Domain declaration for entity first");
+                }
+                if (!row.Values.TryGetValue(Domain, out var domain))
+                {
+                    throw new NotSupportedException("Can't use IsDomainDifferent. Read Domain declaration for property first");
+                }
+                return !entityDomain?.Equals(domain) ?? false;
+            }) { ReadOrder = 1 };
     }
 }

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Stenn.EntityDefinition.Contracts
+﻿namespace Stenn.EntityDefinition.Contracts
 {
     public class DefinitionBuilder<T>
         where T : DefinitionRowBase
