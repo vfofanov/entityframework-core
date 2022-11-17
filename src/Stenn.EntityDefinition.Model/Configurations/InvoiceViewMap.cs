@@ -9,6 +9,10 @@ namespace Stenn.EntityDefinition.Model.Configurations
         public void Configure(EntityTypeBuilder<InvoiceView> builder)
         {
             builder.ToView("vInvoices");
+
+            builder.HasDiscriminator<string>("Discriminator")
+                .HasValue<InvoiceViewExtended>("Extended");
+            
             builder.HasKey(x => x.Id);
 
             builder.OwnsOne(x => x.Fee,
@@ -17,6 +21,15 @@ namespace Stenn.EntityDefinition.Model.Configurations
                     c.Property(x => x.Amount);
                     c.OwnsOne(x => x.Currency, currency => { currency.Property(a => a.IsoNumericCode); });
                 });
+        }
+    }
+    
+    public class InvoiceViewExtendedMap : IEntityTypeConfiguration<InvoiceViewExtended>
+    {
+        /// <inheritdoc />
+        public void Configure(EntityTypeBuilder<InvoiceViewExtended> builder)
+        {
+            builder.HasBaseType<InvoiceView>();
         }
     }
 }

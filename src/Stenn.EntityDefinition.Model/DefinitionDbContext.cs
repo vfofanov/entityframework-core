@@ -24,6 +24,8 @@ namespace Stenn.EntityDefinition.Model
             modelBuilder.ApplyConfiguration(new UserRoleMap());
             
             modelBuilder.ApplyConfiguration(new InvoiceMap());
+            modelBuilder.ApplyConfiguration(new InvoiceViewMap());
+            modelBuilder.ApplyConfiguration(new InvoiceViewExtendedMap());
 
             base.OnModelCreating(modelBuilder);
         }

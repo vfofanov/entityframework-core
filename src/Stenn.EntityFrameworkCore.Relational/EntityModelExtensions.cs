@@ -22,7 +22,5 @@ namespace Stenn.EntityFrameworkCore.Relational
         {
             return property.GetColumnName(identifier) ?? property.GetColumnBaseName();
         }
-
-
     }
 }

@@ -38,6 +38,18 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsColumnNullable =
                 new EFScalarPropertyDefinition<bool>("IsColumnNullable", (property, _, _, _, _, _) => property.IsColumnNullable());
+            
+            /// <summary>
+            ///     Is property computed or not
+            /// </summary>
+            public static readonly EFPropertyDefinition<bool> IsComputed =
+                new EFScalarPropertyDefinition<bool>("IsComputed", (property, _, _, _, _, _) => property.IsComputed());
+            
+            /// <summary>
+            ///     Gets sql body for computed property
+            /// </summary>
+            public static readonly EFPropertyDefinition<string> ComputedSql =
+                new EFScalarPropertyDefinition<string>("ComputedSql", (property, _, _, _, _, _) => property.GetComputedColumnSql());
         }
     }
 }

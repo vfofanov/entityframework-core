@@ -8,7 +8,7 @@ namespace Stenn.EntityDefinition.Model.Configurations
         /// <inheritdoc />
         public void Configure(EntityTypeBuilder<Invoice> builder)
         {
-            builder.ToTable("Invoices");
+            //builder.ToTable("Invoices");
             builder.HasKey(x => x.Id);
 
             builder.OwnsOne(x => x.Fee,
@@ -17,6 +17,8 @@ namespace Stenn.EntityDefinition.Model.Configurations
                     c.Property(x => x.Amount);
                     c.OwnsOne(x => x.Currency, currency => { currency.Property(a => a.IsoNumericCode); });
                 });
+
+            builder.Property<int>("ShadowComputed").HasComputedColumnSql("Id + 1");
         }
     }
 }
