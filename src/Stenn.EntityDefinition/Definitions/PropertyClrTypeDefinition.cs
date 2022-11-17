@@ -1,7 +1,8 @@
-using System;
 using System.Reflection;
+using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Definitions;
 
-namespace Stenn.EntityDefinition.Contracts.Definitions
+namespace Stenn.EntityDefinition.Definitions
 {
     public sealed class PropertyClrTypeDefinition : MemberInfoDefinition<TypeInfo>
     {

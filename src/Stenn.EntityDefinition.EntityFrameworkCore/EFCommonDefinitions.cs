@@ -19,7 +19,13 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
             public static readonly EFEntityDefinition<bool> IsObsolete = CommonDefinitions.IsObsolete.ToEntity();
             public static readonly EFEntityDefinition<string> ObsoleteMessage = CommonDefinitions.ObsoleteMessage.ToEntity();
-
+            
+            /// <summary>
+            /// Base type for entity
+            /// </summary>
+            public static readonly EFEntityDefinition<string?> BaseEntityName = new("BaseEntityName", 
+                (entity, _, _) => entity.BaseType?.ClrType?.Name);
+            
             /// <summary>
             /// Gets definition for <see cref="CommonDefinitions.XmlDescription"/>
             /// </summary>
@@ -45,7 +51,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             /// </summary>
             public static readonly EFPropertyDefinition<bool> IsNullable =
                 new EFScalarPropertyDefinition<bool>("IsNullable", (property, _, _, _, _, _) => property.IsNullable);
-
+            
             /// <summary>
             ///     Gets a clr type of property
             /// </summary>

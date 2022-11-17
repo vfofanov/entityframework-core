@@ -54,6 +54,7 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 
                 options.AddEntityColumn(CustomDefinitions.Domain.ToEntity());
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Name);
+                options.AddEntityColumn(EFCommonDefinitions.Entities.BaseEntityName);
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName);
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
@@ -84,8 +85,11 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 options.AddPropertyColumn(EFRelationalDefinitions.Properties.IsColumnNullable);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Remark);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsNavigation);
-                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete, convertToString: x => x ? "X" : null);
+                options.AddPropertyColumn(EFCommonDefinitions.Properties.IsObsolete);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.IsComputed);
+                options.AddPropertyColumn(EFRelationalDefinitions.Properties.ComputedSql);
+                
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
             });
         }

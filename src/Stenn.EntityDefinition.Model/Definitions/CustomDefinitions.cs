@@ -10,13 +10,13 @@ namespace Stenn.EntityDefinition.Model.Definitions
         /// <summary>
         /// Name definition based on <see cref="MemberInfo.Name"/>
         /// </summary>
-        public static MemberInfoDefinition<Domain> Domain =
+        public static readonly MemberInfoDefinition<Domain> Domain =
             new AttributeDefinition<Domain, DefinitionDomainAttribute>("Domain", true) { ReadOrder = 0 };
 
         /// <summary>
         /// Is entity's domain and property's domain are different
         /// </summary>
-        public static MemberInfoDefinition<bool> IsDomainDifferent =
+        public static readonly MemberInfoDefinition<bool> IsDomainDifferent =
             new CustomMemberInfoDefinition<bool>("IsDomainDifferent", (_, _, entityRow, row, _) =>
             {
                 if (row == null)
