@@ -14,7 +14,7 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         }
 
         /// <inheritdoc />
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             foreach (var value in _dict.Values.OfType<IDisposable>())
             {

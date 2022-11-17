@@ -30,7 +30,8 @@ namespace Stenn.EntityDefinition.Definitions
         }
 
         /// <inheritdoc />
-        public override string? Extract(MemberInfo? member, string? parentValue, DefinitionContext context)
+        public override string? Extract(MemberInfo? member, string? parentValue,
+            EntityDefinitionRow entityRow, PropertyDefinitionRow? row, DefinitionContext context)
         {
             var extractContext = context.GetOrAdd(Info, () => new ExtractContext(_getCommentDoc));
 
@@ -43,22 +44,22 @@ namespace Stenn.EntityDefinition.Definitions
             {
                 return null;
             }
-            
+
             //based on https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/95cb4d370e08e54eb04cf14e7e6388ca974a686e/src/Swashbuckle.AspNetCore.SwaggerGen/XmlComments/XmlCommentsParameterFilter.cs 
-            
+
             var memberName = member switch
             {
                 TypeInfo typeInfo => XmlCommentsNodeNameHelper.GetMemberNameForType(typeInfo),
                 PropertyInfo => XmlCommentsNodeNameHelper.GetMemberNameForFieldOrProperty(member),
                 _ => throw new NotSupportedException($"Member type '{member.MemberType}' doesn't supported.")
             };
-            
+
             var propertyNode = navigator.SelectSingleNode($"/doc/members/member[@name='{memberName}']");
 
             var summaryNode = propertyNode?.SelectSingleNode("summary");
             return summaryNode != null ? XmlCommentsTextHelper.Humanize(summaryNode.InnerXml) : null;
         }
-        
+
         private sealed class ExtractContext
         {
             private readonly ConcurrentDictionary<Assembly, XPathNavigator?> _docs = new();
@@ -71,7 +72,7 @@ namespace Stenn.EntityDefinition.Definitions
 
             public XPathNavigator? GetNavigator(Assembly assembly)
             {
-               return _docs.GetOrAdd(assembly, CreateNavigator);
+                return _docs.GetOrAdd(assembly, CreateNavigator);
             }
 
             private XPathNavigator? CreateNavigator(Assembly assembly)

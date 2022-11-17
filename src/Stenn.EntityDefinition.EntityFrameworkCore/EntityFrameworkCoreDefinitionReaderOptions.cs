@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
@@ -87,12 +88,12 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
         internal IEFEntityDefinition[] GetEntityDefinitions()
         {
-            return _entityDefinitions.ToArray();
+            return _entityDefinitions.OrderBy(d => d.ReadOrder).ToArray();
         }
 
         internal IEFPropertyDefinition[] GetPropertyDefinitions()
         {
-            return _propertyDefinitions.ToArray();
+            return _propertyDefinitions.OrderBy(d => d.ReadOrder).ToArray();
         }
     }
 }

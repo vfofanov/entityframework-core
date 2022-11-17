@@ -16,7 +16,8 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
         }
 
         /// <inheritdoc />
-        public override T? Extract(MemberInfo? member, T? parentValue, DefinitionContext context)
+        public override T? Extract(MemberInfo? member, T? parentValue, EntityDefinitionRow entityRow, PropertyDefinitionRow? row,
+            DefinitionContext context)
         {
             TAttr? attr = null;
             if (member is { })
