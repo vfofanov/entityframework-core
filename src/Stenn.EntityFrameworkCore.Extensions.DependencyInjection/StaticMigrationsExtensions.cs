@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using Stenn.StaticMigrations.MigrationConditions;
+using System;
+using System.Reflection;
 
 namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 {
@@ -60,15 +62,17 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         /// <param name="mainFileName">File name or path with name without extension</param>
         /// <param name="type">Type of added resources</param>
         /// <param name="assembly">Assembly with embedded resources</param>
+        /// <param name="condition">Migration will be applied if condition is true or null</param>
         public static void AddSqlResFile(this StaticMigrationBuilder migrations, string mainFileName, ResSqlFile type = ResSqlFile.All,
-            Assembly? assembly = null)
+            Assembly? assembly = null, Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             assembly ??= Assembly.GetCallingAssembly();
 
             migrations.AddResSql(mainFileName,
                 type.HasFlag(ResSqlFile.Apply) ? GetApplyFilePath(mainFileName) : null,
                 type.HasFlag(ResSqlFile.Revert) ? GetRevertFilePath(mainFileName) : null,
-                assembly);
+                assembly,
+                condition);
         }
     }
 }

@@ -183,10 +183,5 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         {
             return new SqlOperation { Sql = _historyRepository.GetDeleteScript(row) };
         }
-
-        private static bool CheckCondition(StaticMigrationConditionOptions options, Func<StaticMigrationConditionOptions, bool>? condition)
-        {
-            return condition == null || condition.Invoke(options);
-        }
     }
 }
