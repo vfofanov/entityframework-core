@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Linq;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -7,6 +9,7 @@ using Stenn.EntityDefinition.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
+using Stenn.EntityFrameworkCore.Relational;
 
 namespace Stenn.EntityDefinition.InMemory.Tests
 {
@@ -67,6 +70,26 @@ namespace Stenn.EntityDefinition.InMemory.Tests
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.IsShadow);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
             });
+        }
+
+
+        [TestCase(typeof(Invoice), true)]
+        [TestCase(typeof(InvoiceView), false)]
+        [TestCase(typeof(InvoiceViewExtended), false)]
+        [TestCase(typeof(User), true)]
+        [TestCase(typeof(StandardUser), true)]
+        [TestCase(typeof(SuperUser), true)]
+        [TestCase(typeof(Role), true)]
+        [TestCase(typeof(UserRole), true)]
+        public void CheckEntityType(Type type, bool isTable)
+        {
+            var isView = !isTable;
+            var context = _dbContext;
+
+            var entityType = context.Model.GetEntityTypes().First(t => t.ClrType == type);
+
+            entityType.IsView().Should().Be(isView);
+            entityType.IsTable().Should().Be(isTable);
         }
     }
 }
