@@ -62,17 +62,18 @@ namespace Stenn.EntityFrameworkCore.Relational
 
         public static EntityType GetEntityType(this IEntityType entity)
         {
-            if (entity.FindAnnotation(RelationalAnnotationNames.TableName) != null ||
+            if (entity.FindAnnotation(RelationalAnnotationNames.TableName)?.Value != null ||
                 entity.FindAnnotation(RelationalAnnotationNames.TableMappings) != null)
             {
                 return EntityType.Table;
             }
-            if (entity.FindAnnotation(RelationalAnnotationNames.ViewName) != null ||
-                entity.FindAnnotation(RelationalAnnotationNames.ViewMappings) != null)
+            if (entity.FindAnnotation(RelationalAnnotationNames.ViewName)?.Value != null ||
+                entity.FindAnnotation(RelationalAnnotationNames.ViewMappings) != null||
+                entity.FindAnnotation(RelationalAnnotationNames.ViewDefinitionSql) != null)
             {
                 return EntityType.View;
             }
-            if (entity.FindAnnotation(RelationalAnnotationNames.FunctionName) != null ||
+            if (entity.FindAnnotation(RelationalAnnotationNames.FunctionName)?.Value != null ||
                 entity.FindAnnotation(RelationalAnnotationNames.FunctionMappings) != null)
             {
                 return EntityType.Function;
