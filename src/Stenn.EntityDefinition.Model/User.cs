@@ -9,7 +9,7 @@ namespace Stenn.EntityDefinition.Model
     /// </summary>
     [DefinitionDomain(Domain.Security)]
     [DefinitionRemark("Users' remark")]
-    public class User
+    public abstract class User
     {
         /// <summary>
         /// Primary key

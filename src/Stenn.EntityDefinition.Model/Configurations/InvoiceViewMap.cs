@@ -23,13 +23,4 @@ namespace Stenn.EntityDefinition.Model.Configurations
                 });
         }
     }
-    
-    public class InvoiceViewExtendedMap : IEntityTypeConfiguration<InvoiceViewExtended>
-    {
-        /// <inheritdoc />
-        public void Configure(EntityTypeBuilder<InvoiceViewExtended> builder)
-        {
-            builder.HasBaseType<InvoiceView>();
-        }
-    }
 }
