@@ -56,7 +56,7 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Name);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.BaseEntityName);
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName);
-                options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.Type);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Remark);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.IsObsolete);
                 options.AddEntityColumn(EFCommonDefinitions.Entities.GetXmlDescription());
@@ -76,7 +76,7 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 
                 options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
                 options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName, "Entity:DbName");
-                options.AddEntityColumn(EFRelationalDefinitions.Entities.IsTable);
+                options.AddEntityColumn(EFRelationalDefinitions.Entities.Type, "Entity:Type");
                 
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
                 options.AddPropertyColumn(EFCommonDefinitions.Properties.ClrType);

@@ -13,6 +13,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Relational
         {
             public static readonly EFEntityDefinition<string> DbName = new("DbName", (type, _, _) => type.GetTableName() ?? type.GetViewName());
 
+            public static readonly EFEntityDefinition<EntityMappingType> Type = new("Type", (type, _, _) => type.GetEntityType());
+            
             public static readonly EFEntityDefinition<bool> IsTable = new("IsTable", (type, _, _) => type.IsTable());
 
             public static readonly EFEntityDefinition<bool> IsView = new("IsView", (type, _, _) => type.IsView());
