@@ -1,5 +1,6 @@
 ﻿using System;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Table;
 
 namespace Stenn.EntityDefinition.Writer
 {

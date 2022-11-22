@@ -27,6 +27,12 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                 (entity, _, _) => entity.BaseType?.ClrType?.Name);
             
             /// <summary>
+            /// Is entity type abstract
+            /// </summary>
+            public static readonly EFEntityDefinition<bool> IsAbstract = new("IsAbstract", 
+                (entity, _, _) => entity.IsAbstract());
+            
+            /// <summary>
             /// Gets definition for <see cref="CommonDefinitions.XmlDescription"/>
             /// </summary>
             /// <returns></returns>
