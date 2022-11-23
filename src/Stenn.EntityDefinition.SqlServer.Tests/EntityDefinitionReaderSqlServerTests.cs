@@ -7,6 +7,7 @@ using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityDefinition.EntityFrameworkCore.Relational;
 using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
+using static Stenn.EntityDefinition.EntityFrameworkCore.EntityFrameworkDefinitionReaderOptions;
 
 namespace Stenn.EntityDefinition.SqlServer.Tests
 {
@@ -67,6 +68,12 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
             var table = _dbContext.Model.GenerateEntityDefinitionTable(InitPropertiesReaderOptions);
         }
         
+        [Test]
+        public void TestDefTableNavProperties()
+        {
+            var table = _dbContext.Model.GenerateEntityDefinitionTable(InitNavPropertiesReaderOptions);
+        }
+        
         private static void InitEntitiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
         {
             options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
@@ -106,6 +113,21 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
             options.AddPropertyColumn(EFRelationalDefinitions.Properties.ComputedSql);
 
             options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
+        }
+
+        private void InitNavPropertiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
+        {
+            options.ReaderOptions = ExcludeScalarProperties | ExcludeIgnoredProperties;
+            
+            //Nav
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.DeclaringEntityType);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.DeclaringProperty);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.ForeignKey);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.TargetEntityType);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsNavigationCollection);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsOnDependent);
+            
+            InitPropertiesReaderOptions(options);
         }
     }
 }

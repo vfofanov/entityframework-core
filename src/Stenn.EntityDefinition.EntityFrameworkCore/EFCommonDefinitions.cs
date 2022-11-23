@@ -69,6 +69,48 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             /// <returns></returns>
             public static EFPropertyDefinition<string> GetXmlDescription(Func<Assembly, XPathDocument?>? getCommentDoc = null) =>
                 CommonDefinitions.GetXmlDescription(getCommentDoc).ToProperty();
+            
+            /// <summary>
+            /// Navigation specific definitions
+            /// </summary>
+            public static class Navigation
+            {
+                /// <summary>
+                /// Gets the entity type that this navigation property will hold an instance(s) of.
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<INavigation?> DeclaringProperty =
+                    new("Navigation_DeclaringProperty", (property, _, _, _, _, _) => property);
+                
+                /// <summary>
+                /// Gets the entity type that this navigation property belongs to.
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<IEntityType?> DeclaringEntityType =
+                    new("Navigation_DeclaringEntityType", (property, _, _, _, _, _) => property?.DeclaringEntityType);
+                
+                /// <summary>
+                /// Gets the entity type that this navigation property will hold an instance(s) of.
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<IForeignKey?> ForeignKey =
+                    new("Navigation_DeclaringEntityType", (property, _, _, _, _, _) => property?.ForeignKey);
+                
+                /// <summary>
+                /// Gets the entity type that this navigation property will hold an instance(s) of.
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<IEntityType?> TargetEntityType =
+                    new("Navigation_DeclaringEntityType", (property, _, _, _, _, _) => property?.TargetEntityType);
+                
+                /// <summary>
+                /// Is navigation property collection or not
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<bool?> IsNavigationCollection =
+                    new("Navigation_IsCollection", (property, _, _, _, _, _) => property?.IsCollection);
+
+                /// <summary>
+                ///     Gets a value indicating whether the navigation property is defined on the dependent side of the underlying foreign key.
+                /// </summary>
+                public static readonly EFRelationNavigationPropertyDefinition<bool?> IsOnDependent =
+                    new("Navigation_IsOnDependent", (property, _, _, _, _, _) => property?.IsOnDependent);    
+            }
         }
     }
 }
