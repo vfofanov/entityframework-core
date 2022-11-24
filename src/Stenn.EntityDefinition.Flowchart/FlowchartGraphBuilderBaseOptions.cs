@@ -12,8 +12,10 @@ namespace Stenn.EntityDefinition.Flowchart
     {
         private Func<PropertyDefinitionRow, bool> _propertyFilter = _ => true;
         private Action<FlowchartStyleClass> _initAbstractEntityStyleClassAction = InitArstractEntityStyleClassDefault;
-
-
+        private Action<FlowchartStyleClass> _initRelationNodeStyleClassActionAction = InitRelationNodeStyleClassDefault;
+        
+        public bool DrawRelationAsNode { get; set; }
+        
         public FlowchartGraphDirection Direction { get; set; } = FlowchartGraphDirection.LR;
 
         public List<FlowchartGraphGrouping> GraphGroupings { get; } = new();
@@ -38,8 +40,22 @@ namespace Stenn.EntityDefinition.Flowchart
             styleClass.SetModifier("font-style", "italic");
             styleClass.SetModifier("color", ColorTranslator.ToHtml(Color.Blue));
         }
+        
+        public void InitRelationNodeStyleClass(Action<FlowchartStyleClass> init)
+        {
+            _initRelationNodeStyleClassActionAction = init ?? throw new ArgumentNullException(nameof(init));
+        }
 
+        public Action<FlowchartStyleClass> InitRelationNodeStyleClassAction => _initRelationNodeStyleClassActionAction;
 
+        private static void InitRelationNodeStyleClassDefault(FlowchartStyleClass styleClass)
+        {
+            //styleClass.SetModifier("font-style", "italic");
+            styleClass.SetModifier("fill", ColorTranslator.ToHtml(Color.Azure));
+            styleClass.SetModifier("font-size", "80%");
+            styleClass.SetModifier("color", ColorTranslator.ToHtml(Color.DimGray));
+        }
+        
         IFlowchartEntityOptions IFlowchartGraphBuilderOptions.Entity => Entity;
         public TEntityOptions Entity { get; } = new();
 

@@ -46,6 +46,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
             options.TryAddPropertyColumn(Options.Property.TargetType);
             options.TryAddPropertyColumn(Options.Property.TargetId);
             options.TryAddPropertyColumn(Options.Property.RelationCaption);
+            options.TryAddPropertyColumn(Options.Property.RelationTooltip);
         }
     }
 }

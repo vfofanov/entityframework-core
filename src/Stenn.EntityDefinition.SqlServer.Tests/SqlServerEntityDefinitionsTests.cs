@@ -12,11 +12,12 @@ using Stenn.EntityDefinition.EntityFrameworkCore.Relational;
 using Stenn.EntityDefinition.Flowchart;
 using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
+using Stenn.Shared.Mermaid;
 using static Stenn.EntityDefinition.EntityFrameworkCore.EntityFrameworkDefinitionReaderOptions;
 
 namespace Stenn.EntityDefinition.SqlServer.Tests
 {
-    public class EntityDefinitionsTests
+    public class SqlServerEntityDefinitionsTests
     {
         private const string DBName = "stenn_definitions_efcore_tests";
 
@@ -103,11 +104,14 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                 })
             );
 
-
+            options.Property.DrawAsNode = false;
+            options.DrawRelationAsNode = true;
+            
             //options.SetPropertyFilter(propertyRow => propertyRow.GetValueOrDefault(CustomDefinitions.IsDomainDifferent.Info));
 
             var graphBuilder = new EFFlowchartGraphBuilder(options);
-            var output = graphBuilder.Build(_dbContext).ToString();
+            var outputEditor = graphBuilder.Build(_dbContext).ToString(MermaidPrintConfig.Normal);
+            var outputHtml = graphBuilder.Build(_dbContext).ToString(MermaidPrintConfig.ForHtml);
         }
 
         private static void InitEntitiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)

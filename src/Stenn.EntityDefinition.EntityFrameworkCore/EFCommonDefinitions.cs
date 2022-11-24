@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Xml.XPath;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -137,12 +138,40 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
                 public static readonly EFRelationNavigationPropertyDefinition<bool?> IsOnDependent =
                     new("Navigation_IsOnDependent", (property, _, _, _, _, _) => property?.IsOnDependent);
 
+                public static readonly EFRelationNavigationPropertyDefinition<string> RelationCaption =
+                    new("Navigation_RelationCaption",
+                        (property, _, _, _, _, _) =>
+                        {
+                            var foreignKey = property?.ForeignKey;
+
+                            if (foreignKey is null)
+                            {
+                                return null;
+                            }
+
+                            var builder = new StringBuilder();
+                            builder.Append(foreignKey.PrincipalEntityType.DisplayName());
+                            if (foreignKey.PrincipalToDependent != null)
+                            {
+                                builder.Append('.');
+                                builder.Append(foreignKey.PrincipalToDependent.Name);
+                            }
+                            builder.Append("->");
+                            builder.Append(foreignKey.DeclaringEntityType.DisplayName());
+                            if (foreignKey.DependentToPrincipal != null)
+                            {
+                                builder.Append('.');
+                                builder.Append(foreignKey.DependentToPrincipal.Name);
+                            }
+                            return builder.ToString();
+                        });
+
                 /// <summary>
                 ///     Gets a value indicating whether the navigation property is defined on the dependent side of the underlying foreign key.
                 /// </summary>
-                public static readonly EFRelationNavigationPropertyDefinition<string> RelationCaption =
+                public static readonly EFRelationNavigationPropertyDefinition<string> RelationTooltip =
                     new("Navigation_RelationCaption",
-                        (property, _, _, _, _, _) => property?.ForeignKey.ToDebugString(MetadataDebugStringOptions.SingleLineDefault));
+                        (property, _, _, _, _, _) => property?.ForeignKey.ToDebugString(MetadataDebugStringOptions.ShortDefault));
             }
         }
     }

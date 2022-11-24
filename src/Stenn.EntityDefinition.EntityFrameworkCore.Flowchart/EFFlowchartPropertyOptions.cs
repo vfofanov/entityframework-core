@@ -34,6 +34,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
         /// <inheritdoc />
         DefinitionInfo<string> IFlowchartPropertyOptions.RelationCaption => RelationCaption;
 
+        /// <inheritdoc />
+        DefinitionInfo<string> IFlowchartPropertyOptions.RelationTooltip => RelationTooltip;
+
         public EFPropertyDefinition<object> Id { get; set; } = EFCommonDefinitions.Properties.Id;
         public EFPropertyDefinition<string> ItemId { get; set; } = EFCommonDefinitions.Properties.Name;
         public EFPropertyDefinition<string> Caption { get; set; } = EFCommonDefinitions.Properties.Name;
@@ -43,5 +46,6 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
         public EFPropertyDefinition<Type> TargetType { get; set; } = EFCommonDefinitions.Properties.Navigation.TargetEntityType;
         public EFPropertyDefinition<object> TargetId { get; set; } = EFCommonDefinitions.Properties.Navigation.TargetPropertyId;
         public EFPropertyDefinition<string> RelationCaption { get; set; } = EFCommonDefinitions.Properties.Navigation.RelationCaption;
+        public EFPropertyDefinition<string> RelationTooltip { get; set; } = EFCommonDefinitions.Properties.Navigation.RelationTooltip;
     }
 }
