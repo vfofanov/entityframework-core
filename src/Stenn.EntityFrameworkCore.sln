@@ -97,6 +97,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.SqlS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.AspNetCore", "Stenn.EntityDefinition.AspNetCore\Stenn.EntityDefinition.AspNetCore.csproj", "{358EFCFB-25C9-44C0-B859-A59E37871C0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.Flowchart", "Stenn.EntityDefinition.Flowchart\Stenn.EntityDefinition.Flowchart.csproj", "{65573D12-2507-4467-A5DC-9DB3B85E2D91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart", "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart\Stenn.EntityDefinition.EntityFrameworkCore.Flowchart.csproj", "{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +247,14 @@ Global
 		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{358EFCFB-25C9-44C0-B859-A59E37871C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65573D12-2507-4467-A5DC-9DB3B85E2D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65573D12-2507-4467-A5DC-9DB3B85E2D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65573D12-2507-4467-A5DC-9DB3B85E2D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65573D12-2507-4467-A5DC-9DB3B85E2D91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,5 +287,7 @@ Global
 		{2B9CD3CD-EA5F-4A38-AC08-07A27D2F7C37} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{25AE795A-BC2E-44D7-9247-732E160CDE1E} = {4D0A2092-01C6-4396-A117-31263DD64D57}
 		{358EFCFB-25C9-44C0-B859-A59E37871C0E} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
+		{65573D12-2507-4467-A5DC-9DB3B85E2D91} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
+		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
 	EndGlobalSection
 EndGlobal

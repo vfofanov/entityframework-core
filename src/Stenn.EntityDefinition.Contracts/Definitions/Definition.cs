@@ -4,7 +4,6 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public abstract class Definition<T> : IDefinition<T>
     {
-        public static implicit operator DefinitionInfo(Definition<T> v) => v.Info;
         public static implicit operator DefinitionInfo<T>(Definition<T> v) => v.Info;
         
         protected Definition(string name, Func<T, string>? convertToString = null)

@@ -8,6 +8,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
     public class EFPropertyDefinition<T> : Definition<T>, IEFPropertyDefinition<T>
     {
+        public static implicit operator EFPropertyDefinition<T>(MemberInfoDefinition<T> d) => d.ToProperty();
+        
         private readonly Func<IPropertyBase?, PropertyInfo?, T?, EntityDefinitionRow, PropertyDefinitionRow, DefinitionContext, T?> _extract;
 
         /// <inheritdoc />

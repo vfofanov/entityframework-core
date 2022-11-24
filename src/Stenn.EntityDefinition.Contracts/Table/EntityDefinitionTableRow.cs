@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Stenn.EntityDefinition.Contracts.Table
 {
-    [DebuggerTypeProxy(typeof (DebuggerView))]
+    [DebuggerTypeProxy(typeof(DebuggerView))]
     public sealed class EntityDefinitionTableRow
     {
         private readonly EntityDefinitionTable _table;
@@ -20,14 +20,30 @@ namespace Stenn.EntityDefinition.Contracts.Table
 
         public T? Get<T>(DefinitionInfo<T> info, DefinitionColumnType type)
         {
+            return (T?)Get((DefinitionInfo)info, type);
+        }
+
+        public object? Get(DefinitionInfo info, DefinitionColumnType type)
+        {
             var index = _table.GetIndexOfColumn(info, type);
             if (index < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(info), "Can't find column");
             }
-            return (T?)_row[index];
+            return _row[index];
         }
-            
+
+        public T? GetValueOrDefault<T>(DefinitionInfo<T> info, DefinitionColumnType type)
+        {
+            return (T?)GetValueOrDefault((DefinitionInfo)info, type);
+        }
+
+        public object? GetValueOrDefault(DefinitionInfo info, DefinitionColumnType type)
+        {
+            var index = _table.GetIndexOfColumn(info, type);
+            return index < 0 ? null : _row[index];
+        }
+
         public string? GetString(DefinitionInfo info, DefinitionColumnType type)
         {
             var index = _table.GetIndexOfColumn(info, type);
@@ -36,7 +52,7 @@ namespace Stenn.EntityDefinition.Contracts.Table
                 throw new ArgumentOutOfRangeException(nameof(info), "Can't find column");
             }
             var column = _table.Columns[index];
-                
+
             return column.ConvertToStringFunc(_row[index]);
         }
 
@@ -57,8 +73,6 @@ namespace Stenn.EntityDefinition.Contracts.Table
             public EDTRow[] Items =>
                 _items ??= _row._row.Select((v, i) => new EDTRow(v, _row._table.Columns[i].ColumnName)).ToArray();
         }
-
-        
     }
 
     /// <summary>

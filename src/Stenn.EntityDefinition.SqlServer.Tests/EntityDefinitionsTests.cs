@@ -1,10 +1,15 @@
+#nullable enable
 using System;
+using System.Drawing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Stenn.EntityDefinition.Contracts.Table;
 using Stenn.EntityDefinition.EntityFrameworkCore;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
+using Stenn.EntityDefinition.EntityFrameworkCore.Flowchart;
 using Stenn.EntityDefinition.EntityFrameworkCore.Relational;
+using Stenn.EntityDefinition.Flowchart;
 using Stenn.EntityDefinition.Model;
 using Stenn.EntityDefinition.Model.Definitions;
 using static Stenn.EntityDefinition.EntityFrameworkCore.EntityFrameworkDefinitionReaderOptions;
@@ -14,14 +19,15 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
     public class EntityDefinitionsTests
     {
         private const string DBName = "stenn_definitions_efcore_tests";
+
         private static string GetConnectionString(string dbName)
         {
             return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
         }
-        
-        private DefinitionDbContext _dbContext;
 
-        private IServiceProvider _serviceProvider;
+        private DefinitionDbContext _dbContext = default!;
+
+        private IServiceProvider _serviceProvider = default!;
 
         [SetUp]
         public void Setup()
@@ -37,10 +43,7 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
 
             var connectionString = GetConnectionString(DBName);
 
-            services.AddDbContext<TDbContext>(builder =>
-                {
-                    builder.UseSqlServer(connectionString);
-                },
+            services.AddDbContext<TDbContext>(builder => { builder.UseSqlServer(connectionString); },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             return services.BuildServiceProvider();
@@ -51,29 +54,62 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
         {
             var csv = _dbContext.Model.GenerateCsv(InitEntitiesReaderOptions);
         }
+
         [Test]
         public void TestCsvProperties()
         {
             var csv = _dbContext.Model.GenerateCsv(InitPropertiesReaderOptions);
         }
-        
+
         [Test]
         public void TestDefTableEntities()
         {
             var table = _dbContext.Model.GenerateEntityDefinitionTable(InitEntitiesReaderOptions);
         }
+
         [Test]
         public void TestDefTableProperties()
         {
             var table = _dbContext.Model.GenerateEntityDefinitionTable(InitPropertiesReaderOptions);
         }
-        
+
+
         [Test]
-        public void TestDefTableNavProperties()
+        public void TestFlowchart()
         {
-            var table = _dbContext.Model.GenerateEntityDefinitionTable(InitNavPropertiesReaderOptions);
+            //var entitiesTable = _dbContext.Model.GenerateEntityDefinitionTable(InitGraphEntitiesReaderOptions);
+            //var propertiesTable = _dbContext.Model.GenerateEntityDefinitionTable(InitGraphReaderOptions);
+            //----
+            var options = new EFFlowchartGraphBuilderOptions();
+
+            options.InitReaderOptions(opt =>
+            {
+                opt.AddEntityColumn(CustomDefinitions.Domain);
+            });
+
+            options.GraphGroupings.Add(CustomDefinitions.Domain.ToFlowchartGraphGrouping(DefinitionColumnType.Entity, (domain, styleClass) =>
+                {
+                    var color = domain switch
+                    {
+                        Domain.Unknown => Color.LightGray,
+                        Domain.Security => Color.PaleVioletRed,
+                        Domain.Order => Color.Aquamarine,
+                        _ => throw new ArgumentOutOfRangeException(nameof(domain), domain, null)
+                    };
+
+                    styleClass.SetModifier("fill", ColorTranslator.ToHtml(color))
+                        .SetModifier("stroke-width", "2px")
+                        .SetModifier("stroke-dasharray", "2 2");
+                })
+            );
+
+
+            //options.SetPropertyFilter(propertyRow => propertyRow.GetValueOrDefault(CustomDefinitions.IsDomainDifferent.Info));
+
+            var graphBuilder = new EFFlowchartGraphBuilder(options);
+            var output = graphBuilder.Build(_dbContext).ToString();
         }
-        
+
         private static void InitEntitiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
         {
             options.AddCommonConvert<bool>(CommonDefinitions.Converts.BoolToX);
@@ -115,19 +151,41 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
             options.AddPropertyColumn(EFCommonDefinitions.Properties.GetXmlDescription());
         }
 
-        private void InitNavPropertiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
+        private void InitGraphEntitiesReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
         {
+            //Skip base type properties in inherited entities
+            options.SetPropertiesFilter((e, p) => p.DeclaringType == e);
             options.ReaderOptions = ExcludeScalarProperties | ExcludeIgnoredProperties;
-            
-            //Nav
+
+            options.AddEntityColumn(CustomDefinitions.Domain.ToEntity(), "Entity:Domain");
+            options.AddEntityColumn(EFCommonDefinitions.Entities.Name, "Entity:Name");
+            options.AddEntityColumn(EFRelationalDefinitions.Entities.DbName, "Entity:DbName");
+            options.AddEntityColumn(EFCommonDefinitions.Entities.IsAbstract, "Entity: IsAbsctract");
+
+            options.AddEntityColumn(EFCommonDefinitions.Entities.EntityType);
+            options.AddEntityColumn(EFCommonDefinitions.Entities.BaseEntityType);
+        }
+
+        private void InitGraphReaderOptions(IEntityFrameworkCoreDefinitionOptions options)
+        {
+            InitGraphEntitiesReaderOptions(options);
+
+            options.AddPropertyColumn(CustomDefinitions.Domain.ToProperty());
+            options.AddPropertyColumn(CustomDefinitions.IsDomainDifferent.ToProperty());
+
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Id);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Name);
+
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.IsNavigation);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsNavigationCollection);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsOnDependent);
+
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.TargetEntityType);
+            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.TargetPropertyId);
+
             options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.DeclaringEntityType);
             options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.DeclaringProperty);
             options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.ForeignKey);
-            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.TargetEntityType);
-            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsNavigationCollection);
-            options.AddPropertyColumn(EFCommonDefinitions.Properties.Navigation.IsOnDependent);
-            
-            InitPropertiesReaderOptions(options);
         }
     }
 }

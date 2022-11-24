@@ -18,19 +18,63 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
         public EntityFrameworkDefinitionReaderOptions ReaderOptions { get; set; } = ExcludeOwnedTypeShadowProperties |
                                                                                     ExcludeOwnedTypeIgnoredProperties;
 
-        public void SetEntitiesFilter(Func<IEntityType, bool>? filter)
+        public void SetEntitiesFilter(Func<IEntityType, bool> filter)
         {
+            if (_filterEntities == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
             _filterEntities = filter;
+            if (_filterEntities == null)
+            {
+                _filterEntities = filter;
+                return;
+            }
+            
+            var tmp = _filterEntities;
+            _filterEntities = t => tmp(t) && filter(t);
         }
 
-        public void SetPropertiesFilter(Func<IEntityType, IPropertyBase, bool>? filter)
+        public void SetPropertiesFilter(Func<IEntityType, IPropertyBase, bool> filter)
         {
-            _filterProperties = filter;
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+            if (_filterProperties == null)
+            {
+                _filterProperties = filter;
+                return;
+            }
+            
+            var tmp = _filterProperties;
+            _filterProperties = (t, p) => tmp(t, p) && filter(t, p);
+        }
+
+        internal bool TryAddEntityDefinition(IEFEntityDefinition definition)
+        {
+            if (_entityDefinitions.Any(d => d.Info == definition.Info))
+            {
+                return false;
+            }
+            _entityDefinitions.Add(definition);
+            return true;
         }
 
         internal void AddEntityDefinition(IEFEntityDefinition definition)
         {
             _entityDefinitions.Add(definition);
+        }
+
+        internal bool TryAddPropertyDefinition(IEFPropertyDefinition definition)
+        {
+            if (_propertyDefinitions.Any(d => d.Info == definition.Info))
+            {
+                return false;
+            }
+            _propertyDefinitions.Add(definition);
+            return true;
         }
 
         internal void AddPropertyDefinition(IEFPropertyDefinition definition)

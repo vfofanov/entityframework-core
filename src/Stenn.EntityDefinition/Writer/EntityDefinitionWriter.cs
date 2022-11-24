@@ -88,7 +88,7 @@ namespace Stenn.EntityDefinition.Writer
                     for (var i = 0; i < columns.Count; i++)
                     {
                         var column = columns[i];
-                        row[i] = entity.Values[column.Column.Info];
+                        row[i] = entity.Get(column.Column.Info);
                     }
                     writer.WriteRow(row);
                 }
@@ -103,13 +103,13 @@ namespace Stenn.EntityDefinition.Writer
                         for (var i = 0; i < columns.Count; i++)
                         {
                             var column = columns[i];
-                            var values = column.Column.ColumnType switch
+                            DefinitionRowBase definitionRow = column.Column.ColumnType switch
                             {
-                                DefinitionColumnType.Entity => entity.Values,
-                                DefinitionColumnType.Property => property.Values,
+                                DefinitionColumnType.Entity => entity,
+                                DefinitionColumnType.Property => property,
                                 _ => throw new ArgumentOutOfRangeException()
                             };
-                            row[i] = values[column.Column.Info];
+                            row[i] = definitionRow.Get(column.Column.Info);
                         }
                         writer.WriteRow(row);
                     }
