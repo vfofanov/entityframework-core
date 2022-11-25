@@ -36,7 +36,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
             options.TryAddEntityColumn(Options.Entity.Type);
             options.TryAddEntityColumn(Options.Entity.BaseType);
 
-            options.TryAddPropertyColumn(Options.Property.Id);
+            options.TryAddPropertyColumn(Options.Property.PropertyKey);
             options.TryAddPropertyColumn(Options.Property.ItemId);
             options.TryAddPropertyColumn(Options.Property.Caption);
             options.TryAddPropertyColumn(Options.Property.IsNavigation);

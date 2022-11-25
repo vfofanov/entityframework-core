@@ -1,9 +1,9 @@
-﻿using Stenn.Shared.Mermaid.Flowchart;
+﻿using Stenn.EntityDefinition.Contracts;
 
 namespace Stenn.EntityDefinition.Flowchart
 {
-    public abstract class FlowchartEntityOptionsBase
+    public abstract class FlowchartEntityOptionsBase : FlowchartElementOptionsBase<EntityDefinitionRow>
     {
-        public FlowchartGraphDirection GroupDirection { get; set; } = FlowchartGraphDirection.TB;
+        public bool AddInheritRelations { get; set; } = true;
     }
 }

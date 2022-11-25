@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Stenn.EntityDefinition.Contracts;
-using Stenn.EntityDefinition.Contracts.Table;
 using Stenn.Shared.Mermaid.Flowchart;
 using Stenn.Shared.Reflection;
 using static Stenn.Shared.Mermaid.Flowchart.FlowchartRelationLineEnding;
@@ -12,7 +11,7 @@ namespace Stenn.EntityDefinition.Flowchart
     public abstract class FlowchartGraphBuilder<TOptions>
         where TOptions : IFlowchartGraphBuilderOptions
     {
-        public FlowchartGraphBuilder(TOptions options)
+        protected FlowchartGraphBuilder(TOptions options)
         {
             Options = options;
         }
@@ -77,7 +76,7 @@ namespace Stenn.EntityDefinition.Flowchart
                     {
                         graph.AddItemInteractionTooltip(relationItemId, tooltip);
                     }
-                    
+
                     graph.AddRelation(leftItemId, relationItemId, null, leftItemEnding,
                         lineStyle, lineLength / 2, None);
 
@@ -91,11 +90,15 @@ namespace Stenn.EntityDefinition.Flowchart
                 }
             }
 
+            IEnumerable<EntityDefinitionRow> GetEntities() => map.Entities.Where(Options.Entity.Filter);
+            IEnumerable<PropertyDefinitionRow> GetProperties(EntityDefinitionRow entity) => entity.Properties.Where(Options.Property.Filter);
+            HashSet<string> skipFromCleaningList = new();
+            
             #region Entities
-            var entityGroupings = Options.GraphGroupings.Where(g => g.ColumnType == DefinitionColumnType.Entity).ToList();
-            foreach (var entityRow in map.Entities)
+            foreach (var entityRow in GetEntities())
             {
-                var parentItemId = AddOrGetGroupingItemId(graph, entityGroupings, entityRow, null, "E", Options.Entity.GroupDirection);
+                var parentItemId = AddOrGetGraphGroupItemId(graph, skipFromCleaningList,
+                    Options.Entity.GraphGroups, entityRow, null, "E", Options.Entity.GroupDirection);
 
                 var itemId = entityRow.Get(Options.Entity.Id);
                 if (itemId == null)
@@ -122,38 +125,43 @@ namespace Stenn.EntityDefinition.Flowchart
             #endregion
 
             #region Relations: Inheritance
-            foreach (var entityRow in map.Entities)
+            if (Options.Entity.AddInheritRelations)
             {
-                var entityType = entityRow.Get(Options.Entity.Type);
-                var entityBaseType = entityRow.GetValueOrDefault(Options.Entity.BaseType);
-                if (entityBaseType == null)
+                foreach (var entityRow in map.Entities)
                 {
-                    continue;
-                }
-                var leftItemId = entityItemIds[entityBaseType];
-                var rightItemId = GetEntityItemId(entityRow);
-                var toolTip = $"{entityType?.HumanizeName()} inherits from {entityBaseType.HumanizeName()}";
+                    var entityType = entityRow.Get(Options.Entity.Type);
+                    var entityBaseType = entityRow.GetValueOrDefault(Options.Entity.BaseType);
+                    if (entityBaseType == null)
+                    {
+                        continue;
+                    }
+                    var leftItemId = entityItemIds[entityBaseType];
+                    var rightItemId = GetEntityItemId(entityRow);
+                    var toolTip = $"{entityType?.HumanizeName()} inherits from {entityBaseType.HumanizeName()}";
 
-                AddRelation(leftItemId, rightItemId, "<<inherit>>", tooltip: toolTip,
-                    lineStyle: FlowchartRelationLineStyle.BoldLine);
+                    AddRelation(leftItemId, rightItemId, "<<inherit>>", tooltip: toolTip,
+                        lineStyle: FlowchartRelationLineStyle.BoldLine);
+                }
             }
             #endregion
 
             Dictionary<object, string>? propertyItemIds = null;
+            
             if (Options.Property.DrawAsNode)
             {
-                propertyItemIds = new Dictionary<object, string>(map.Entities.Select(e => e.Properties.Count).Sum());
-                var propertyGroupings = Options.GraphGroupings.Where(g => g.ColumnType == DefinitionColumnType.Property).ToList();
+                propertyItemIds = new Dictionary<object, string>(GetEntities().Select(e => e.Properties.Count).Sum());
 
                 #region Property Nodes
-                foreach (var entityRow in map.Entities)
+                foreach (var entityRow in GetEntities())
                 {
                     var entityItemId = GetEntityItemId(entityRow);
-                    foreach (var propertyRow in entityRow.Properties.Where(Options.PropertyFilter))
+                    foreach (var propertyRow in GetProperties(entityRow))
                     {
-                        var parentItemId = AddOrGetGroupingItemId(graph, propertyGroupings, propertyRow, entityItemId, "P", Options.Property.GroupDirection);
+                        var parentItemId = AddOrGetGraphGroupItemId(graph,skipFromCleaningList,
+                            Options.Property.GraphGroups, propertyRow, entityItemId, "P",
+                            Options.Property.GroupDirection);
 
-                        var itemId = propertyRow.Get(Options.Property.ItemId);
+                        var itemId = propertyRow.Get(Options.Property.Id);
                         if (itemId == null)
                         {
                             throw new ApplicationException("Id is null for property");
@@ -176,12 +184,12 @@ namespace Stenn.EntityDefinition.Flowchart
                         graph.GetOrAdd(itemId, itemCaption, parentItemId: parentItemId,
                             styleClassId: itemStyleClassId, shape: propertyShape);
 
-                        var propertyId = propertyRow.Get(Options.Property.Id);
-                        if (propertyId == null)
+                        var propertyKey = propertyRow.Get(Options.Property.PropertyKey);
+                        if (propertyKey == null)
                         {
                             throw new ApplicationException("Id is null for property");
                         }
-                        propertyItemIds.Add(propertyId, itemId);
+                        propertyItemIds.Add(propertyKey, itemId);
                     }
                 }
                 #endregion
@@ -219,12 +227,12 @@ namespace Stenn.EntityDefinition.Flowchart
             }
 
 
-            foreach (var entityRow in map.Entities)
+            foreach (var entityRow in GetEntities())
             {
                 var entityItemId = GetEntityItemId(entityRow);
 
-                foreach (var propertyRow in entityRow.Properties
-                             .Where(p => p.GetValueOrDefault(Options.Property.IsNavigation) && Options.PropertyFilter(p)))
+                foreach (var propertyRow in GetProperties(entityRow)
+                             .Where(p => p.GetValueOrDefault(Options.Property.IsNavigation)))
                 {
                     var propertyTargetId = propertyRow.Get(Options.Property.TargetId);
                     var propertyIsOnDependent = propertyRow.Get(Options.Property.IsOnDependent);
@@ -239,32 +247,44 @@ namespace Stenn.EntityDefinition.Flowchart
 
                     var caption = propertyRow.Get(Options.Property.RelationCaption);
                     var toolTip = propertyRow.GetValueOrDefault(Options.Property.RelationTooltip);
-                    AddRelation(leftItemId, rightItemId, caption, toolTip, 
+                    AddRelation(leftItemId, rightItemId, caption, toolTip,
                         leftItemEnding: propertyTargetId != null ? Arrow : None);
                 }
             }
             #endregion
 
+            if (Options.CleanNodesWithoutRelations)
+            {
+                Func<FlowchartGraphItem, bool> filter =
+                    skipFromCleaningList.Count > 0
+                        ? i => skipFromCleaningList.Contains(i.Id) || Options.SkipFromCleaningFilter(i)
+                        : Options.SkipFromCleaningFilter;
+
+                graph.CleanNodesWithoutRelations(filter);
+            }
+            
             return graph;
         }
 
-        private static string? AddOrGetGroupingItemId(
+        private static string? AddOrGetGraphGroupItemId(
             FlowchartGraph graph,
-            IReadOnlyCollection<FlowchartGraphGrouping> groupings,
+            HashSet<string> skipFromCleaningList, 
+            IReadOnlyCollection<FlowchartGraphGroup> groups,
             DefinitionRowBase row, string? parentItemId, string prefix,
             FlowchartGraphDirection direction)
         {
-            if (groupings.Count <= 0)
+            if (groups.Count <= 0)
             {
                 return parentItemId;
             }
 
-            foreach (var grouping in groupings)
+            foreach (var group in groups)
             {
-                var groupValue = row.Get(grouping.Info);
-                var groupCaption = grouping.Info.ConvertToString(groupValue) ?? "NULL";
-
-                var groupItemId = parentItemId ?? prefix + "_" + groupCaption;
+                var groupValue = row.Get(group.Info);
+                
+                var extractedGroupItemId = group.ExtractItemId(groupValue);
+                var groupItemId = parentItemId ?? prefix + "_" + extractedGroupItemId;
+                var groupCaption = group.ExtractCaption(groupValue) ?? extractedGroupItemId;
 
                 var groupGraphItem = graph.FindItem(groupItemId);
                 if (groupGraphItem is not null)
@@ -274,13 +294,18 @@ namespace Stenn.EntityDefinition.Flowchart
                 else
                 {
                     string? styleClassId = null;
-                    if (grouping.HasStyle)
+                    if (group.HasStyle)
                     {
                         styleClassId = groupItemId + "StyleClass";
                         var styleClass = graph.GetOrAddStyleClass(styleClassId);
-                        grouping.FillStyle(groupValue, styleClass);
+                        group.FillStyle(groupValue, styleClass);
                     }
                     graph.GetOrAdd(groupItemId, groupCaption, parentItemId: parentItemId, styleClassId: styleClassId, direction: direction);
+                    if (group.SkipDuringClean)
+                    {
+                        skipFromCleaningList.Add(groupItemId);
+                    }
+                    
                     parentItemId = groupItemId;
                 }
             }

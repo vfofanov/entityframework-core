@@ -1,6 +1,5 @@
 ﻿using System;
 using Stenn.EntityDefinition.Contracts;
-using Stenn.EntityDefinition.Contracts.Definitions;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
 using Stenn.EntityDefinition.Flowchart;
 
@@ -9,10 +8,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
     public sealed class EFFlowchartEntityOptions : FlowchartEntityOptionsBase, IFlowchartEntityOptions
     {
         /// <inheritdoc />
-        DefinitionInfo<string> IFlowchartEntityOptions.Id => Id;
+        DefinitionInfo<string> IFlowchartElementOptions<EntityDefinitionRow>.Id => Id;
 
         /// <inheritdoc />
-        DefinitionInfo<string> IFlowchartEntityOptions.Caption => Caption;
+        DefinitionInfo<string> IFlowchartElementOptions<EntityDefinitionRow>.Caption => Caption;
 
         /// <inheritdoc />
         DefinitionInfo<Type> IFlowchartEntityOptions.Type => Type;

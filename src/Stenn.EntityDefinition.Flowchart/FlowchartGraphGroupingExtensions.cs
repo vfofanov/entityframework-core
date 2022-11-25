@@ -1,23 +1,26 @@
 ﻿using System;
 using Stenn.EntityDefinition.Contracts;
 using Stenn.EntityDefinition.Contracts.Definitions;
-using Stenn.EntityDefinition.Contracts.Table;
 using Stenn.Shared.Mermaid.Flowchart;
 
 namespace Stenn.EntityDefinition.Flowchart
 {
-    public static class FlowchartGraphGroupingExtensions
+    public static class FlowchartGraphGroupExtensions
     {
-        public static FlowchartGraphGrouping ToFlowchartGraphGrouping<T>(this Definition<T> definition, DefinitionColumnType columnType,
-            Action<T?, FlowchartStyleClass>? fillStyle = null)
+        public static FlowchartGraphGroup ToFlowchartGraphGroup<T>(this Definition<T> definition,
+            Action<T?, FlowchartStyleClass>? fillStyle = null,
+            Func<T?, string>? extractItemId = null,
+            Func<T?, string?>? extractCaption = null, bool skipDuringClean = false)
         {
-            return FlowchartGraphGrouping.Create(definition, columnType, fillStyle);
+            return FlowchartGraphGroup.Create(definition, fillStyle, extractItemId, extractCaption, skipDuringClean);
         }
 
-        public static FlowchartGraphGrouping ToFlowchartGraphGrouping<T>(this DefinitionInfo<T> info, DefinitionColumnType columnType,
-            Action<T?, FlowchartStyleClass>? fillStyle = null)
+        public static FlowchartGraphGroup ToFlowchartGraphGroup<T>(this DefinitionInfo<T> info,
+            Action<T?, FlowchartStyleClass>? fillStyle = null,
+            Func<T?, string>? extractItemId = null,
+            Func<T?, string?>? extractCaption = null, bool skipDuringClean = false)
         {
-            return FlowchartGraphGrouping.Create(info, columnType, fillStyle);
+            return FlowchartGraphGroup.Create(info, fillStyle, extractItemId, extractCaption, skipDuringClean);
         }
     }
 }

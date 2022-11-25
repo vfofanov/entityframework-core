@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using Stenn.EntityDefinition.Contracts;
 using Stenn.Shared.Mermaid.Flowchart;
 
 namespace Stenn.EntityDefinition.Flowchart
@@ -10,24 +8,31 @@ namespace Stenn.EntityDefinition.Flowchart
         where TEntityOptions : class, IFlowchartEntityOptions, new()
         where TPropertyOptions : class, IFlowchartPropertyOptions, new()
     {
-        private Func<PropertyDefinitionRow, bool> _propertyFilter = _ => true;
         private Action<FlowchartStyleClass> _initAbstractEntityStyleClassAction = InitArstractEntityStyleClassDefault;
         private Action<FlowchartStyleClass> _initRelationNodeStyleClassActionAction = InitRelationNodeStyleClassDefault;
+        private Func<FlowchartGraphItem, bool> _skipForCleaningFilter = _ => false;
         
         public bool DrawRelationAsNode { get; set; }
         
-        public FlowchartGraphDirection Direction { get; set; } = FlowchartGraphDirection.LR;
-
-        public List<FlowchartGraphGrouping> GraphGroupings { get; } = new();
-
-        Func<PropertyDefinitionRow, bool> IFlowchartGraphBuilderOptions.PropertyFilter => _propertyFilter;
-
-        Action<FlowchartStyleClass> IFlowchartGraphBuilderOptions.InitAbstractEntityStyleClassAction => _initAbstractEntityStyleClassAction;
-
-        public void SetPropertyFilter(Func<PropertyDefinitionRow, bool> filter)
+        /// <summary>
+        /// Remove all nodes from graph without relations including groups
+        /// </summary>
+        public bool CleanNodesWithoutRelations { get; set; }
+        
+        /// <inheritdoc />
+        bool IFlowchartGraphBuilderOptions.SkipFromCleaningFilter(FlowchartGraphItem cleaningItem)
         {
-            _propertyFilter = filter ?? throw new ArgumentNullException(nameof(filter));
+            return _skipForCleaningFilter(cleaningItem);
         }
+
+        public void SetSkipFromCleaningFilter(Func<FlowchartGraphItem, bool> filter)
+        {
+            _skipForCleaningFilter = filter ?? throw new ArgumentNullException(nameof(filter));
+        }
+
+        public FlowchartGraphDirection Direction { get; set; } = FlowchartGraphDirection.LR;
+        
+        Action<FlowchartStyleClass> IFlowchartGraphBuilderOptions.InitAbstractEntityStyleClassAction => _initAbstractEntityStyleClassAction;
 
         public void InitArstractEntityStyleClass(Action<FlowchartStyleClass> init)
         {

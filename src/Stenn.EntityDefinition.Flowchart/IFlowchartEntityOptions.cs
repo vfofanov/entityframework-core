@@ -4,13 +4,15 @@ using Stenn.Shared.Mermaid.Flowchart;
 
 namespace Stenn.EntityDefinition.Flowchart
 {
-    public interface IFlowchartEntityOptions
+    public interface IFlowchartEntityOptions : IFlowchartElementOptions<EntityDefinitionRow>
     {
-        FlowchartGraphDirection GroupDirection { get;  }
-        DefinitionInfo<string> Id { get;  }
-        DefinitionInfo<string> Caption { get;  }
-        DefinitionInfo<Type> Type { get;  }
-        DefinitionInfo<Type> BaseType { get;  }
-        DefinitionInfo<bool> IsAbstract { get;  }
+        /// <summary>
+        /// Add entities inheritance relations
+        /// </summary>
+        bool AddInheritRelations { get; }
+
+        DefinitionInfo<Type> Type { get; }
+        DefinitionInfo<Type> BaseType { get; }
+        DefinitionInfo<bool> IsAbstract { get; }
     }
 }

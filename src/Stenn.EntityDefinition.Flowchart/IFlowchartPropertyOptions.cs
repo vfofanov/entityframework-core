@@ -1,10 +1,9 @@
 ﻿using System;
 using Stenn.EntityDefinition.Contracts;
-using Stenn.Shared.Mermaid.Flowchart;
 
 namespace Stenn.EntityDefinition.Flowchart
 {
-    public interface IFlowchartPropertyOptions
+    public interface IFlowchartPropertyOptions : IFlowchartElementOptions<PropertyDefinitionRow>
     {
         /// <summary>
         /// Use individual graph node for draw property
@@ -12,10 +11,7 @@ namespace Stenn.EntityDefinition.Flowchart
         /// <returns></returns>
         bool DrawAsNode { get; }
 
-        FlowchartGraphDirection GroupDirection { get; }
-        DefinitionInfo<object> Id { get; }
-        DefinitionInfo<string> ItemId { get; }
-        DefinitionInfo<string> Caption { get; }
+        DefinitionInfo<object> PropertyKey { get; }
         DefinitionInfo<bool> IsNavigation { get; }
         DefinitionInfo<bool?> IsNavigationCollection { get; }
         DefinitionInfo<bool?> IsOnDependent { get; }

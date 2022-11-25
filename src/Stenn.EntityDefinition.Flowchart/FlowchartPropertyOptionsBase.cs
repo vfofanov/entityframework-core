@@ -1,11 +1,12 @@
-﻿using Stenn.Shared.Mermaid.Flowchart;
+﻿using Stenn.EntityDefinition.Contracts;
 
 namespace Stenn.EntityDefinition.Flowchart
 {
-    public abstract class FlowchartPropertyOptionsBase
+    public abstract class FlowchartPropertyOptionsBase : FlowchartElementOptionsBase<PropertyDefinitionRow>
     {
-        public bool DrawAsNode { get; set; } = true;
-
-        public FlowchartGraphDirection GroupDirection { get; set; } = FlowchartGraphDirection.TB;
+        /// <summary>
+        /// Draw property as individual node
+        /// </summary>
+        public bool DrawAsNode { get; set; }
     }
 }

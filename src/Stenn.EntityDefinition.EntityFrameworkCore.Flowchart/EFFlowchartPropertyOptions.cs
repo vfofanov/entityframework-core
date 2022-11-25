@@ -8,13 +8,13 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
     public sealed class EFFlowchartPropertyOptions : FlowchartPropertyOptionsBase, IFlowchartPropertyOptions
     {
         /// <inheritdoc />
-        DefinitionInfo<object> IFlowchartPropertyOptions.Id => Id;
+        DefinitionInfo<object> IFlowchartPropertyOptions.PropertyKey => PropertyKey;
 
         /// <inheritdoc />
-        DefinitionInfo<string> IFlowchartPropertyOptions.ItemId => ItemId;
-
+        DefinitionInfo<string> IFlowchartElementOptions<PropertyDefinitionRow>.Caption => Caption;
+        
         /// <inheritdoc />
-        DefinitionInfo<string> IFlowchartPropertyOptions.Caption => Caption;
+        DefinitionInfo<string> IFlowchartElementOptions<PropertyDefinitionRow>.Id => ItemId;
 
         /// <inheritdoc />
         DefinitionInfo<bool> IFlowchartPropertyOptions.IsNavigation => IsNavigation;
@@ -37,7 +37,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
         /// <inheritdoc />
         DefinitionInfo<string> IFlowchartPropertyOptions.RelationTooltip => RelationTooltip;
 
-        public EFPropertyDefinition<object> Id { get; set; } = EFCommonDefinitions.Properties.Id;
+        public EFPropertyDefinition<object> PropertyKey { get; set; } = EFCommonDefinitions.Properties.PropertyKey;
         public EFPropertyDefinition<string> ItemId { get; set; } = EFCommonDefinitions.Properties.Name;
         public EFPropertyDefinition<string> Caption { get; set; } = EFCommonDefinitions.Properties.Name;
         public EFPropertyDefinition<bool> IsNavigation { get; set; } = EFCommonDefinitions.Properties.IsNavigation;
@@ -45,7 +45,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Flowchart
         public EFPropertyDefinition<bool?> IsOnDependent { get; set; } = EFCommonDefinitions.Properties.Navigation.IsOnDependent;
         public EFPropertyDefinition<Type> TargetType { get; set; } = EFCommonDefinitions.Properties.Navigation.TargetEntityType;
         public EFPropertyDefinition<object> TargetId { get; set; } = EFCommonDefinitions.Properties.Navigation.TargetPropertyId;
-        public EFPropertyDefinition<string> RelationCaption { get; set; } = EFCommonDefinitions.Properties.Navigation.RelationCaption;
+        public EFPropertyDefinition<string> RelationCaption { get; set; } = EFCommonDefinitions.Properties.Navigation.LongRelationCaption;
         public EFPropertyDefinition<string> RelationTooltip { get; set; } = EFCommonDefinitions.Properties.Navigation.RelationTooltip;
     }
 }
