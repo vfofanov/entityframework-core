@@ -7,6 +7,7 @@ using Stenn.EntityDefinition.EntityFrameworkCore.Flowchart;
 using Stenn.EntityDefinition.Flowchart;
 using Stenn.EntityDefinition.Model.Definitions;
 using Stenn.Shared.Mermaid;
+using Stenn.Shared.Mermaid.Flowchart;
 
 // ReSharper disable UnusedVariable
 
@@ -51,9 +52,10 @@ namespace Stenn.EntityDefinition.SqlServer.Tests
                         _ => throw new ArgumentOutOfRangeException(nameof(domain), domain, null)
                     };
 
-                    styleClass.SetModifier("fill", ColorTranslator.ToHtml(color))
-                        .SetModifier("stroke-width", "2px")
-                        .SetModifier("stroke-dasharray", "2 2");
+                    styleClass
+                        .SetFill(color)
+                        .SetStrokeWidth("2px")
+                        .SetStrokeDashArray("2 2");
                 },
                 extractCaption: domain => $"Domain:{domain}",
                 skipDuringClean: true)

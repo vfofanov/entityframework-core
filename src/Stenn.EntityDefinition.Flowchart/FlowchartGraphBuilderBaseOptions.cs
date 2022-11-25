@@ -41,9 +41,9 @@ namespace Stenn.EntityDefinition.Flowchart
 
         private static void InitArstractEntityStyleClassDefault(FlowchartStyleClass styleClass)
         {
-            //styleClass.SetModifier("font-weight", "bold");
-            styleClass.SetModifier("font-style", "italic");
-            styleClass.SetModifier("color", ColorTranslator.ToHtml(Color.Blue));
+            styleClass.SetFontWeight("bold");
+            styleClass.SetFontStyle("italic");
+            styleClass.SetColor(Color.Blue);
         }
         
         public void InitRelationNodeStyleClass(Action<FlowchartStyleClass> init)
@@ -56,9 +56,9 @@ namespace Stenn.EntityDefinition.Flowchart
         private static void InitRelationNodeStyleClassDefault(FlowchartStyleClass styleClass)
         {
             //styleClass.SetModifier("font-style", "italic");
-            styleClass.SetModifier("fill", ColorTranslator.ToHtml(Color.Azure));
+            styleClass.SetFill(Color.Azure);
             styleClass.SetModifier("font-size", "80%");
-            styleClass.SetModifier("color", ColorTranslator.ToHtml(Color.DimGray));
+            styleClass.SetColor(Color.DimGray);
         }
         
         IFlowchartEntityOptions IFlowchartGraphBuilderOptions.Entity => Entity;
