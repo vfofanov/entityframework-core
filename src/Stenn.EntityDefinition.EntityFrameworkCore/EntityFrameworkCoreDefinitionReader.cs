@@ -113,7 +113,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             var propertyBuilder = entityBuilder.AddProperty(name, namePrefix);
             foreach (var definition in _propertyDefinitions)
             {
-                var parentValue = entityBuilder.Row.Values.GetValueOrDefault(definition.Info);
+                var parentValue = entityBuilder.Row.GetValueOrDefault(definition.Info);
                 var val = definition.Extract(property, propertyInfo, parentValue, entityBuilder.Row, propertyBuilder.Row, context);
 
                 propertyBuilder.AddDefinition(definition.Info, val);

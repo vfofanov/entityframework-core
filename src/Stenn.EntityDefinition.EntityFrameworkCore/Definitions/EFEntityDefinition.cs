@@ -9,6 +9,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
     {
         private readonly Func<IEntityType, EntityDefinitionRow, DefinitionContext, T?> _extract;
 
+        public static implicit operator EFEntityDefinition<T>(MemberInfoDefinition<T> d) => d.ToEntity();
+        
         /// <inheritdoc />
         public EFEntityDefinition(DefinitionInfo<T> info, Func<IEntityType, EntityDefinitionRow, DefinitionContext, T?> extract)
             : base(info)

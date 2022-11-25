@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Definitions Marmaid Flowchart</Description>
+    <Nullable>enable</Nullable>
+  </PropertyGroup> 
+
+  <ItemGroup>
+    <PackageReference Include="Stenn.Shared" />
+    <PackageReference Include="Stenn.Shared.Mermaid" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <Compile Remove="Types\**" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Types\**" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <None Remove="Types\**" />
+  </ItemGroup>
+
+</Project>

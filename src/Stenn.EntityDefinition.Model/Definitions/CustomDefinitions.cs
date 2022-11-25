@@ -23,11 +23,11 @@ namespace Stenn.EntityDefinition.Model.Definitions
                 {
                     throw new NotSupportedException("Can't use IsDomainDifferent with entity");
                 }
-                if (!entityRow.Values.TryGetValue(Domain, out var entityDomain))
+                if (!entityRow.TryGetValue(Domain, out var entityDomain))
                 {
                     throw new NotSupportedException("Can't use IsDomainDifferent. Read Domain declaration for entity first");
                 }
-                if (!row.Values.TryGetValue(Domain, out var domain))
+                if (!row.TryGetValue(Domain, out var domain))
                 {
                     throw new NotSupportedException("Can't use IsDomainDifferent. Read Domain declaration for property first");
                 }

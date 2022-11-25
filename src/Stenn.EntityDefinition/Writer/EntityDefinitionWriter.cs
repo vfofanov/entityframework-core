@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Table;
 using Stenn.Shared.Tables;
 
 namespace Stenn.EntityDefinition.Writer
@@ -54,30 +55,40 @@ namespace Stenn.EntityDefinition.Writer
 
         public void Write(IDefinitionMap map, ITableWriter<object?> writer)
         {
-            var columns = GetColumns(map).ToList();
-            Write(columns, map, writer, (val, _) => val);
+            Write(map, writer.ToDefinitionTableWriter((val, _) => val));
         }
 
         public void Write(IDefinitionMap map, ITableWriter<string?> writer)
         {
-            var columns = GetColumns(map).ToList();
-            Write(columns, map, writer, (val, c) => c.ConvertToString(val));
+            Write(map, writer.ToDefinitionTableWriter((val, c) => c.ConvertToString(val)));
         }
 
-        private static void Write<T>(IReadOnlyList<EntityDefinitionWriterColumn> columns, IDefinitionMap map, ITableWriter<T> writer,
-            Func<object?, EntityDefinitionWriterColumn, T> convert)
+        public EntityDefinitionTable Write(IDefinitionMap map)
         {
-            writer.SetColumns(columns.Select(c => c.WriterColumn).ToArray());
+            var columns = GetColumns(map).ToList();
+            var writer = new EntityDefinitionTableWriter();
+            Write(columns, map, writer);
+            return writer.ToTable();
+        }
+
+        public void Write(IDefinitionMap map, IEntityDefinitionTableWriter writer)
+        {
+            var columns = GetColumns(map).ToList();
+            Write(columns, map, writer);
+        }
+
+        private static void Write(IReadOnlyList<EntityDefinitionWriterColumn> columns, IDefinitionMap map, IEntityDefinitionTableWriter writer)
+        {
+            writer.SetColumns(columns);
             if (columns.All(c => c.Column.ColumnType != DefinitionColumnType.Property))
             {
                 foreach (var entity in map.Entities)
                 {
-                    var row = new T[columns.Count];
+                    var row = new object?[columns.Count];
                     for (var i = 0; i < columns.Count; i++)
                     {
                         var column = columns[i];
-                        var val = convert(entity.Values[column.Column.Info], column);
-                        row[i] = val;
+                        row[i] = entity.Get(column.Column.Info);
                     }
                     writer.WriteRow(row);
                 }
@@ -88,18 +99,17 @@ namespace Stenn.EntityDefinition.Writer
                 {
                     foreach (var property in entity.Properties)
                     {
-                        var row = new T[columns.Count];
+                        var row = new object?[columns.Count];
                         for (var i = 0; i < columns.Count; i++)
                         {
                             var column = columns[i];
-                            var values = column.Column.ColumnType switch
+                            DefinitionRowBase definitionRow = column.Column.ColumnType switch
                             {
-                                DefinitionColumnType.Entity => entity.Values,
-                                DefinitionColumnType.Property => property.Values,
+                                DefinitionColumnType.Entity => entity,
+                                DefinitionColumnType.Property => property,
                                 _ => throw new ArgumentOutOfRangeException()
                             };
-                            var val = convert(values[column.Column.Info], column);
-                            row[i] = val;
+                            row[i] = definitionRow.Get(column.Column.Info);
                         }
                         writer.WriteRow(row);
                     }
@@ -107,6 +117,4 @@ namespace Stenn.EntityDefinition.Writer
             }
         }
     }
-
-    public record EntityDefinitionWriterColumn(TableWriterColumn WriterColumn, IDefinitionColumn Column, Func<object?, string?> ConvertToString);
 }
