@@ -92,6 +92,8 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             }
             else if (migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrationAttribute()) is { Value: { } } historicalMigration)
             {
+                if (_options.DbContextType != null) throw new NotSupportedException("Use one of options for historic DbContext registration: with HistoricalMigrationAttribute or with UseHistoricalMigrations<T>. Currently using both.");
+
                 var historicalMigrationAttribute = historicalMigration.Value.GetHistoricalMigrationAttribute();
                 var historicalMigrations = GetItems(historicalMigrationAttribute.DBContextAssemblyAnchorType);
 
@@ -129,6 +131,15 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                     {
                         yield return migration;
                     }
+                }
+            }
+            else if (_options.DbContextType != null)
+            {
+                var historicalMigrations = GetItems(_options.DbContextType);
+
+                foreach (var migration in historicalMigrations)
+                {
+                    yield return migration;
                 }
             }
 

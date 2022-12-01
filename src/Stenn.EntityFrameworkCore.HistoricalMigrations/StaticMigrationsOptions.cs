@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Reflection;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 {
@@ -8,6 +10,8 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
         /// Use full migrations history and ignore initial migrations
         /// </summary>
         public bool MigrateFromFullHistory { get; init; }
+
+        public Type? DbContextType { get; set; }
 
         /// <inheritdoc />
         public bool Equals(HistoricalMigrationsOptions? other)
