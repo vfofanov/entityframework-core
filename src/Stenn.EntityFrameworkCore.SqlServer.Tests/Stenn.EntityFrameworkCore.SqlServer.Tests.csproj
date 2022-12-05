@@ -18,6 +18,8 @@
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.EF6Initial\Stenn.EntityFrameworkCore.Data.Main.EF6Initial.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute\Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1PlusStep2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1PlusStep2.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj" />

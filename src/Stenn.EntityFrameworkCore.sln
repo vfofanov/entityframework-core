@@ -1,24 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30524.135
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".msbuild", ".msbuild", "{BA3CF70D-79A2-4BD5-AE60-C4485E591D87}"
-ProjectSection(SolutionItems) = preProject
-	.msbuild\build.props = .msbuild\build.props
-	.msbuild\package.props = .msbuild\package.props
-	.msbuild\product.props = .msbuild\product.props
-	.msbuild\version.props = .msbuild\version.props
-	.msbuild\nuget.packages.versions.targets = .msbuild\nuget.packages.versions.targets
-	.msbuild\tfm.constants.props = .msbuild\tfm.constants.props
-	.msbuild\allTestsProjToInternalsVisibleTo.targets = .msbuild\allTestsProjToInternalsVisibleTo.targets
-	.msbuild\work.root.dir.props = .msbuild\work.root.dir.props
-	.msbuild\repository.root.dir.props = .msbuild\repository.root.dir.props
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.msbuild\allTestsProjToInternalsVisibleTo.targets = .msbuild\allTestsProjToInternalsVisibleTo.targets
+		.msbuild\build.props = .msbuild\build.props
+		.msbuild\nuget.packages.versions.targets = .msbuild\nuget.packages.versions.targets
+		.msbuild\package.props = .msbuild\package.props
+		.msbuild\product.props = .msbuild\product.props
+		.msbuild\repository.root.dir.props = .msbuild\repository.root.dir.props
+		.msbuild\tfm.constants.props = .msbuild\tfm.constants.props
+		.msbuild\version.props = .msbuild\version.props
+		.msbuild\work.root.dir.props = .msbuild\work.root.dir.props
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.StaticMigrations", "Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj", "{3762C10B-20AE-432E-AE0A-6261886D4A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.StaticMigrations", "Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj", "{3762C10B-20AE-432E-AE0A-6261886D4A54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer", "Stenn.EntityFrameworkCore.SqlServer\Stenn.EntityFrameworkCore.SqlServer.csproj", "{3416A707-49CC-45BA-A488-9C6A823BAA18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.SqlServer", "Stenn.EntityFrameworkCore.SqlServer\Stenn.EntityFrameworkCore.SqlServer.csproj", "{3416A707-49CC-45BA-A488-9C6A823BAA18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{1EEB475D-C4E1-4DD8-BE10-44D2185F355B}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,79 +27,83 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{4D0A2092-01C6-4396-A117-31263DD64D57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Tests", "Stenn.EntityFrameworkCore.SqlServer.Tests\Stenn.EntityFrameworkCore.SqlServer.Tests.csproj", "{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.SqlServer.Tests", "Stenn.EntityFrameworkCore.SqlServer.Tests\Stenn.EntityFrameworkCore.SqlServer.Tests.csproj", "{DE6BA20E-12D9-4D41-A8BB-10A19E32327A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Initial", "Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj", "{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Initial", "Stenn.EntityFrameworkCore.Data.Initial\Stenn.EntityFrameworkCore.Data.Initial.csproj", "{4760014A-CF66-4FDA-87D5-4A9CEAF7108B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main", "Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj", "{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Main", "Stenn.EntityFrameworkCore.Data.Main\Stenn.EntityFrameworkCore.Data.Main.csproj", "{9AC4BAED-EE42-4E9A-94C8-71B5A43EA764}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj", "{602B6A0A-AE67-49CF-A9FD-2A1934E8BC36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj", "{602B6A0A-AE67-49CF-A9FD-2A1934E8BC36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj", "{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj", "{5BB6F7AA-78F8-4C96-BCBC-E7130B13C505}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.StaticMigrations", "Stenn.StaticMigrations\Stenn.StaticMigrations.csproj", "{863A163D-F238-4EA3-83A0-64DA8F01E05C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.StaticMigrations", "Stenn.StaticMigrations\Stenn.StaticMigrations.csproj", "{863A163D-F238-4EA3-83A0-64DA8F01E05C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection.csproj", "{47F66573-8405-44C1-A58C-93D9CF3D72F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.InMemory.Extensions.DependencyInjection.csproj", "{47F66573-8405-44C1-A58C-93D9CF3D72F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.InMemory.Tests", "Stenn.EntityFrameworkCore.InMemory.Tests\Stenn.EntityFrameworkCore.InMemory.Tests.csproj", "{A78EA959-6F65-498F-A5B7-5CB07747C0EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.InMemory.Tests", "Stenn.EntityFrameworkCore.InMemory.Tests\Stenn.EntityFrameworkCore.InMemory.Tests.csproj", "{A78EA959-6F65-498F-A5B7-5CB07747C0EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore", "Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj", "{1C854E64-04E1-47EA-AE70-B184E0E57401}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore", "Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj", "{1C854E64-04E1-47EA-AE70-B184E0E57401}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Tests", "Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj", "{B7D95CE3-8FDE-490B-932B-E127F4EC6ADE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Tests", "Stenn.EntityFrameworkCore.Tests\Stenn.EntityFrameworkCore.Tests.csproj", "{B7D95CE3-8FDE-490B-932B-E127F4EC6ADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.Contacts", "Stenn.EntityConventions.Contacts\Stenn.EntityConventions.Contacts.csproj", "{8FC76529-1E69-46B1-993F-AA3BF252AB7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityConventions.Contacts", "Stenn.EntityConventions.Contacts\Stenn.EntityConventions.Contacts.csproj", "{8FC76529-1E69-46B1-993F-AA3BF252AB7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions", "Stenn.EntityFrameworkCore.EntityConventions\Stenn.EntityFrameworkCore.EntityConventions.csproj", "{9D173795-BE10-4366-BD34-83BA59B3F486}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.EntityConventions", "Stenn.EntityFrameworkCore.EntityConventions\Stenn.EntityFrameworkCore.EntityConventions.csproj", "{9D173795-BE10-4366-BD34-83BA59B3F486}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conventions", "Conventions", "{883F8EE3-E05C-4066-BD02-7F23BE62080D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1", "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1.csproj", "{F19D4945-4921-40EF-90C5-19AB688EB617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1", "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1.csproj", "{F19D4945-4921-40EF-90C5-19AB688EB617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2", "Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj", "{400665A8-CA03-4E79-B154-75CF44DDDAE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2", "Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj", "{400665A8-CA03-4E79-B154-75CF44DDDAE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations", "Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.HistoricalMigrations", "Stenn.EntityFrameworkCore.HistoricalMigrations\Stenn.EntityFrameworkCore.HistoricalMigrations.csproj", "{EBB1B628-BA84-4AA9-94B8-90CE824A3694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInjection.csproj", "{4CD745FF-C7ED-467E-A273-3815D4A40FAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityConventions.TriggerBased.Contacts", "Stenn.EntityConventions.TriggerBased.Contacts\Stenn.EntityConventions.TriggerBased.Contacts.csproj", "{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityConventions.TriggerBased.Contacts", "Stenn.EntityConventions.TriggerBased.Contacts\Stenn.EntityConventions.TriggerBased.Contacts.csproj", "{8C96DFD8-9286-4DB8-AD8F-9AF4AF5C846F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj", "{9834F941-47B0-44CC-9DAE-839BD6F71F65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj", "{9834F941-47B0-44CC-9DAE-839BD6F71F65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial", "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.csproj", "{94A58282-915A-4174-9D30-9A46A28E6D5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial", "Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial\Stenn.EntityFrameworkCore.Data.Main.HistoricalInitial.csproj", "{94A58282-915A-4174-9D30-9A46A28E6D5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection.csproj", "{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.Extensions.DependencyInjection.csproj", "{8B80B54A-6EB7-46A6-8C3C-1E607B094E3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj", "{43720D28-FD68-4953-A360-5D02CF9C67A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection", "Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj", "{43720D28-FD68-4953-A360-5D02CF9C67A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj", "{B5A6B581-554B-4584-AD6D-C0E514E13E0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer", "Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj", "{B5A6B581-554B-4584-AD6D-C0E514E13E0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.EF6Initial", "Stenn.EntityFrameworkCore.Data.Main.EF6Initial\Stenn.EntityFrameworkCore.Data.Main.EF6Initial.csproj", "{EC1B995A-8CC5-4526-A131-C23D64DE5099}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Data.Main.EF6Initial", "Stenn.EntityFrameworkCore.Data.Main.EF6Initial\Stenn.EntityFrameworkCore.Data.Main.EF6Initial.csproj", "{EC1B995A-8CC5-4526-A131-C23D64DE5099}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Relational", "Stenn.EntityFrameworkCore.Relational\Stenn.EntityFrameworkCore.Relational.csproj", "{EC2E874A-E30E-49ED-90D8-BA4FEE398FCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Relational", "Stenn.EntityFrameworkCore.Relational\Stenn.EntityFrameworkCore.Relational.csproj", "{EC2E874A-E30E-49ED-90D8-BA4FEE398FCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Testing", "Stenn.EntityFrameworkCore.Testing\Stenn.EntityFrameworkCore.Testing.csproj", "{C597F4B2-FC7A-45DB-BE85-D086C35A1A0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityFrameworkCore.Testing", "Stenn.EntityFrameworkCore.Testing\Stenn.EntityFrameworkCore.Testing.csproj", "{C597F4B2-FC7A-45DB-BE85-D086C35A1A0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityDefinitions", "EntityDefinitions", "{98BA18D4-FF7C-4775-A133-29C6513CDDD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.Contracts", "Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj", "{68B0AC04-0A8A-4831-ADE9-52E84A59AC5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.Contracts", "Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj", "{68B0AC04-0A8A-4831-ADE9-52E84A59AC5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition", "Stenn.EntityDefinition\Stenn.EntityDefinition.csproj", "{3197257D-5609-4CA8-BAE3-E43E744D78A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition", "Stenn.EntityDefinition\Stenn.EntityDefinition.csproj", "{3197257D-5609-4CA8-BAE3-E43E744D78A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.EntityFrameworkCore", "Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj", "{D6BEDCD3-3910-43EC-BEF2-58A7C83619BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.EntityFrameworkCore", "Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj", "{D6BEDCD3-3910-43EC-BEF2-58A7C83619BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.EntityFrameworkCore.Relational", "Stenn.EntityDefinition.EntityFrameworkCore.Relational\Stenn.EntityDefinition.EntityFrameworkCore.Relational.csproj", "{235A1ADC-0B3C-4FEB-9254-E0780C76A569}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.EntityFrameworkCore.Relational", "Stenn.EntityDefinition.EntityFrameworkCore.Relational\Stenn.EntityDefinition.EntityFrameworkCore.Relational.csproj", "{235A1ADC-0B3C-4FEB-9254-E0780C76A569}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.Model", "Stenn.EntityDefinition.Model\Stenn.EntityDefinition.Model.csproj", "{5D3AB714-5232-433A-8C4C-20D59A9C623C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.Model", "Stenn.EntityDefinition.Model\Stenn.EntityDefinition.Model.csproj", "{5D3AB714-5232-433A-8C4C-20D59A9C623C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.InMemory.Tests", "Stenn.EntityDefinition.InMemory.Tests\Stenn.EntityDefinition.InMemory.Tests.csproj", "{2B9CD3CD-EA5F-4A38-AC08-07A27D2F7C37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.InMemory.Tests", "Stenn.EntityDefinition.InMemory.Tests\Stenn.EntityDefinition.InMemory.Tests.csproj", "{2B9CD3CD-EA5F-4A38-AC08-07A27D2F7C37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.SqlServer.Tests", "Stenn.EntityDefinition.SqlServer.Tests\Stenn.EntityDefinition.SqlServer.Tests.csproj", "{25AE795A-BC2E-44D7-9247-732E160CDE1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.SqlServer.Tests", "Stenn.EntityDefinition.SqlServer.Tests\Stenn.EntityDefinition.SqlServer.Tests.csproj", "{25AE795A-BC2E-44D7-9247-732E160CDE1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.AspNetCore", "Stenn.EntityDefinition.AspNetCore\Stenn.EntityDefinition.AspNetCore.csproj", "{358EFCFB-25C9-44C0-B859-A59E37871C0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.AspNetCore", "Stenn.EntityDefinition.AspNetCore\Stenn.EntityDefinition.AspNetCore.csproj", "{358EFCFB-25C9-44C0-B859-A59E37871C0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.Flowchart", "Stenn.EntityDefinition.Flowchart\Stenn.EntityDefinition.Flowchart.csproj", "{65573D12-2507-4467-A5DC-9DB3B85E2D91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.Flowchart", "Stenn.EntityDefinition.Flowchart\Stenn.EntityDefinition.Flowchart.csproj", "{65573D12-2507-4467-A5DC-9DB3B85E2D91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart", "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart\Stenn.EntityDefinition.EntityFrameworkCore.Flowchart.csproj", "{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart", "Stenn.EntityDefinition.EntityFrameworkCore.Flowchart\Stenn.EntityDefinition.EntityFrameworkCore.Flowchart.csproj", "{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute", "Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute\Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute.csproj", "{BB84DD77-FA18-45F6-A9B4-27F59C693BF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1PlusStep2", "Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1PlusStep2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step1PlusStep2.csproj", "{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -255,12 +259,17 @@ Global
 		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB84DD77-FA18-45F6-A9B4-27F59C693BF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB84DD77-FA18-45F6-A9B4-27F59C693BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB84DD77-FA18-45F6-A9B4-27F59C693BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB84DD77-FA18-45F6-A9B4-27F59C693BF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {90A61DCC-4469-4042-B534-C37020F4A7EF}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DE6BA20E-12D9-4D41-A8BB-10A19E32327A} = {4D0A2092-01C6-4396-A117-31263DD64D57}
@@ -289,5 +298,10 @@ Global
 		{358EFCFB-25C9-44C0-B859-A59E37871C0E} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
 		{65573D12-2507-4467-A5DC-9DB3B85E2D91} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
 		{9675133B-FC61-4C1A-B3D6-9C2E5BBCF211} = {98BA18D4-FF7C-4775-A133-29C6513CDDD8}
+		{BB84DD77-FA18-45F6-A9B4-27F59C693BF7} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+		{4C8823C1-CBB9-4EFF-A0A4-D7C51B63CD7A} = {4D0A2092-01C6-4396-A117-31263DD64D57}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90A61DCC-4469-4042-B534-C37020F4A7EF}
 	EndGlobalSection
 EndGlobal
