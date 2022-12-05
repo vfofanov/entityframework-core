@@ -277,8 +277,7 @@ namespace Stenn.EntityFrameworkCore.Tests
             bool migrateFromFullHistory = false)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
-            var historicalMigrations = GetHistoricalMigrations<TDbContext>(
-                new HistoricalMigrationsOptions { MigrateFromFullHistory = migrateFromFullHistory });
+            var historicalMigrations = GetHistoricalMigrations<TDbContext>(options => options.MigrateFromFullHistory = migrateFromFullHistory);
 
             var actual = historicalMigrations.PopulateMigrations(appliedMigrationEntries).ToList();
             var actualIds = actual.Select(m => m.Key).ToList();
@@ -301,7 +300,7 @@ namespace Stenn.EntityFrameworkCore.Tests
             return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
         }
 
-        private static TDbContext GetContext<TDbContext>(HistoricalMigrationsOptions options)
+        private static TDbContext GetContext<TDbContext>(Action<HistoricalMigrationsOptions> init)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
@@ -311,7 +310,7 @@ namespace Stenn.EntityFrameworkCore.Tests
             services.AddDbContext<TDbContext>(builder =>
                 {
                     builder.UseSqlServer(connectionString);
-                    builder.UseHistoricalMigrations(options);
+                    builder.UseHistoricalMigrations(init);
                 },
                 ServiceLifetime.Transient, ServiceLifetime.Transient);
 
@@ -319,10 +318,10 @@ namespace Stenn.EntityFrameworkCore.Tests
             return provider.GetRequiredService<TDbContext>();
         }
 
-        private static HistoricalMigrationsAssembly GetHistoricalMigrations<TContext>(HistoricalMigrationsOptions options)
+        private static HistoricalMigrationsAssembly GetHistoricalMigrations<TContext>(Action<HistoricalMigrationsOptions> init)
             where TContext : Microsoft.EntityFrameworkCore.DbContext
         {
-            var context = GetContext<TContext>(options);
+            var context = GetContext<TContext>(init);
             return (HistoricalMigrationsAssembly)context.GetInfrastructure().GetRequiredService<IMigrationsAssembly>();
         }
     }

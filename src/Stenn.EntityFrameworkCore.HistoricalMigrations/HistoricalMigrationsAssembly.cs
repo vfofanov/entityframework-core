@@ -48,11 +48,11 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
         public IEnumerable<KeyValuePair<string, TypeInfo>> PopulateMigrations(IEnumerable<string> appliedMigrationEntries)
         {
             var appliedMigrationEntrySet = new HashSet<string>(appliedMigrationEntries, StringComparer.OrdinalIgnoreCase);
-            return PopulateMigrations(base.Migrations, appliedMigrationEntrySet, null);
+            return PopulateMigrations(base.Migrations, appliedMigrationEntrySet, null, _options.DbContextType);
         }
 
         private IEnumerable<KeyValuePair<string, TypeInfo>> PopulateMigrations(IReadOnlyDictionary<string, TypeInfo> migrations,
-            HashSet<string> appliedMigrationEntrySet, List<string>? allMigrationIds)
+            HashSet<string> appliedMigrationEntrySet, List<string>? allMigrationIds, Type? dbContextHistoryType)
         {
             allMigrationIds ??= new List<string>(migrations.Count);
             if (migrations.SingleOrDefault(m => m.Value.HasEF6InitialMigrationAttribute()) is { Value: { } } ef6HistoricalMigration)
@@ -65,8 +65,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                     var manager = ef6Attr.GetManager();
                     var ef6HistoryRepository = manager.GetRepository(_currentContext);
 
-                    if (appliedMigrationEntrySet.Count == 0 &&
-                        !ef6HistoryRepository.Exists())
+                    if (appliedMigrationEntrySet.Count == 0 && !ef6HistoryRepository.Exists())
                     {
                         //NOTE: Retuns initial migration first
                         yield return ef6HistoricalMigration;
@@ -90,44 +89,55 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                     appliedMigrationEntrySet.Add(initialMigrationId);
                 }
             }
-            else if (migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrationAttribute()) is { Value: { } } historicalMigration)
+            else
             {
-                var historicalMigrationAttribute = historicalMigration.Value.GetHistoricalMigrationAttribute();
-                var historicalMigrations = GetItems(historicalMigrationAttribute.DBContextAssemblyAnchorType);
-
-                if (historicalMigrationAttribute.Initial)
+                var historicalMigration = migrations.SingleOrDefault(m => m.Value.HasHistoricalMigrationAttribute());
+                if (historicalMigration is { Value: { } } || dbContextHistoryType is { })
                 {
-                    var initialMigrationId = historicalMigration.Key;
-                    if (appliedMigrationEntrySet.Count == 0 && !_options.MigrateFromFullHistory)
+                    var historicalMigrationAttribute = historicalMigration.Value?.GetHistoricalMigrationAttribute();
+                    var historicalMigrations = GetItems(historicalMigrationAttribute?.DBContextAssemblyAnchorType ?? dbContextHistoryType);
+
+                    if (historicalMigrationAttribute?.Initial == true)
                     {
-                        //NOTE: Retuns initial migration first 
-                        yield return historicalMigration;
-                        appliedMigrationEntrySet.Add(initialMigrationId);
+                        var initialMigrationId = historicalMigration.Key;
+                        if (appliedMigrationEntrySet.Count == 0 && !_options.MigrateFromFullHistory)
+                        {
+                            //NOTE: Retuns initial migration first 
+                            yield return historicalMigration;
+                            appliedMigrationEntrySet.Add(initialMigrationId);
+                        }
+                        else if (!appliedMigrationEntrySet.Contains(initialMigrationId))
+                        {
+                            //NOTE: Returns all historical migrations and after remove history rows about them
+                            var allHistoricalMigrationIds = new List<string>(historicalMigrations.Count);
+                            foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allHistoricalMigrationIds, null))
+                            {
+                                yield return migration;
+                            }
+
+                            //NOTE: Replace original initial migration with InitialReplaceMigration if full history turned off
+                            if (!_options.MigrateFromFullHistory)
+                            {
+                                var initialReplaceMigration =
+                                    CreateInitialMigrationReplaceType<InitialReplaceMigration>(initialMigrationId, allHistoricalMigrationIds.ToArray());
+                                yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
+                            }
+                            appliedMigrationEntrySet.Add(initialMigrationId);
+                        }
                     }
-                    else if (!appliedMigrationEntrySet.Contains(initialMigrationId))
+                    else
                     {
-                        //NOTE: Returns all historical migrations and after remove history rows about them
-                        var allHistoricalMigrationIds = new List<string>(historicalMigrations.Count);
-                        foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allHistoricalMigrationIds))
+                        if (historicalMigrationAttribute is not null && dbContextHistoryType is not null)
+                        {
+                            throw new NotSupportedException(
+                                "Use one of options for historic DbContext registration: with HistoricalMigrationAttribute on migration or with UseHistoricalMigrations<TDbContextHistory>." +
+                                " Currently using both.");
+                        }
+                        
+                        foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allMigrationIds, null))
                         {
                             yield return migration;
                         }
-
-                        //NOTE: Replace original initial migration with InitialReplaceMigration if full history turned off
-                        if (!_options.MigrateFromFullHistory)
-                        {
-                            var initialReplaceMigration =
-                                CreateInitialMigrationReplaceType<InitialReplaceMigration>(initialMigrationId, allHistoricalMigrationIds.ToArray());
-                            yield return new KeyValuePair<string, TypeInfo>(initialMigrationId, initialReplaceMigration);
-                        }
-                        appliedMigrationEntrySet.Add(initialMigrationId);
-                    }
-                }
-                else
-                {
-                    foreach (var migration in PopulateMigrations(historicalMigrations, appliedMigrationEntrySet, allMigrationIds))
-                    {
-                        yield return migration;
                     }
                 }
             }
@@ -159,8 +169,13 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             return migration;
         }
 
-        private IReadOnlyDictionary<string, TypeInfo> GetItems(Type dbContextType)
+        private IReadOnlyDictionary<string, TypeInfo> GetItems(Type? dbContextType)
         {
+            if (dbContextType == null)
+            {
+                throw new ArgumentNullException(nameof(dbContextType));
+            }
+
             var migrationsAssembly = new ItemMigrationsAssembly(dbContextType, _currentContext, _dbContextOptions, _idGenerator, _logger);
             return migrationsAssembly.Migrations;
         }

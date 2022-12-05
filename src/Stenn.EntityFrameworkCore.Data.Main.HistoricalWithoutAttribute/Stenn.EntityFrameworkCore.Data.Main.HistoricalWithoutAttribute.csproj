@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.Data.Main.MigrationsV2\Stenn.EntityFrameworkCore.Data.Main.Migrations.Step2.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.EntityConventions.SqlServer.Extensions.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.SqlServer.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased\Stenn.EntityFrameworkCore.EntityConventions.TriggerBased.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.Extensions.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection\Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Stenn.EntityFrameworkCore.StaticMigrations\Stenn.EntityFrameworkCore.StaticMigrations.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+        <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Migrations.Static\Sql\InitDB.sql" />
+        <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Apply.sql" />
+        <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Revert.sql" />
+        <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Apply.sql" />
+        <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Revert.sql" />
+    </ItemGroup>
+
+</Project>
