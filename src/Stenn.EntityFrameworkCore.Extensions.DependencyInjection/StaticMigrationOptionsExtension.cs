@@ -23,7 +23,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
         private readonly Action<StaticMigrationBuilder>? _initMigrations;
 
         private StaticMigrationBuilder? _staticMigrationBuilder;
-        
+
 
         public StaticMigrationOptionsExtension(IStaticMigrationsProviderConfigurator configurator,
             StaticMigrationsOptions options, Action<StaticMigrationBuilder>? initMigrations)
@@ -54,7 +54,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
             }
 
             var builder = new StaticMigrationBuilder();
-            
+
             if (_options.EnableEnumTables)
             {
                 builder.AddEnumTables();
@@ -177,13 +177,14 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
                     return _logFragment;
                 }
             }
-
+#if NET6_0_OR_GREATER
             /// <inheritdoc />
             public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
             {
                 return other is ExtensionInfo otherInfo &&
                        otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
             }
+#endif
 
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
@@ -194,8 +195,11 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
                 debugInfo["Static Migrations: Configurator"] = Extension._configurator.GetType().Name;
             }
-
+#if NET5_0
+            public override long GetServiceProviderHashCode()
+#else
             public override int GetServiceProviderHashCode()
+#endif
             {
                 if (_serviceProviderHash != null)
                 {

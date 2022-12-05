@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.XPath;
+#if NET5_0
 using Microsoft.EntityFrameworkCore;
+#endif
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;
+using Stenn.EntityFrameworkCore;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore
 {
@@ -64,7 +67,8 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
             public static readonly EFPropertyDefinition<bool> IsShadow = new("IsShadow", (property, _, _, _, _, _) => property?.IsShadowProperty() ?? false);
 
-            public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation", (property, _, _, _, _, _) => property is INavigation);
+            public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation",
+                (property, _, _, _, _, _) => property is INavigation p && !p.IsOwned());
 
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.

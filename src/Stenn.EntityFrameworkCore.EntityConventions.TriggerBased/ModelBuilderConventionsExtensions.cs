@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Stenn.EntityConventions.Contacts;
 using Stenn.EntityConventions.Contacts.TriggerBased;
+using Stenn.EntityFrameworkCore.Relational;
 
 namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased
 {
@@ -13,10 +17,10 @@ namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased
                 .AddUpdateAudited()
                 .AddSoftDelete();
         }
-        
+
         public static IEntityConventionsBuilder AddUpdateAudited(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConventionProperty<IUpdateAuditedEntityConvention>(x => x.ModifiedAt,
+            builder.AddInterfaceConventionPropertyTriggerBased<IUpdateAuditedEntityConvention>(x => x.ModifiedAt,
                 (_, _, p) => p.IsRequired()
                     .ValueGeneratedOnAddOrUpdate()
                     .HasAnnotation(ConventionsAnnotationNames.SqlDefault_CurrentDateTime, true)
@@ -28,7 +32,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased
 
         public static IEntityConventionsBuilder AddSoftDelete(this IEntityConventionsBuilder builder)
         {
-            builder.AddInterfaceConvention<ISoftDeleteEntityConvention>(
+            builder.AddInterfaceConventionTriggerBased<ISoftDeleteEntityConvention>(
                 e =>
                 {
                     e.HasAnnotation(ConventionsAnnotationNames.SoftDelete, true);
@@ -37,12 +41,12 @@ namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased
                         .IsRequired()
                         .HasDefaultValue(false)
                         .HasComment(
-                            "Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+                            "Row deleted flag. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntityConvention'");
 
                     e.Property(typeof(DateTime?), nameof(ISoftDeleteEntityConvention.Deleted))
                         .IsRequired(false)
                         .HasComment(
-                            "Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntity'");
+                            "Row deleted  datetime. Used for soft delete row. Updated by 'instead of' trigger. Configured by convention 'ISoftDeleteEntityConvention'");
 
                     e.HasIndex(nameof(ISoftDeleteEntityConvention.IsDeleted));
 
@@ -57,6 +61,64 @@ namespace Stenn.EntityFrameworkCore.EntityConventions.TriggerBased
 
             return builder;
         }
-        
+
+        public static void AddInterfaceConventionTriggerBased<TConvention>(this IEntityConventionsBuilder builder,
+            Action<EntityTypeBuilder> configure, params string[]? triggerNames)
+            where TConvention : IEntityConventionContract
+        {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+            if (triggerNames == null || triggerNames.Length == 0)
+            {
+                triggerNames = new[] { typeof(TConvention).Name };
+            }
+
+            builder.AddInterfaceConvention<TConvention>(
+                e =>
+                {
+                    AddTriggersAnnotation(e, triggerNames);
+                    configure(e);
+                });
+        }
+
+        public static void AddInterfaceConventionPropertyTriggerBased<TConvention>(this IEntityConventionsBuilder builder,
+            Expression<Func<TConvention, object?>> propertyExpression,
+            Action<EntityTypeBuilder, PropertyInfo, PropertyBuilder> configure, params string[]? triggerNames)
+            where TConvention : IEntityConventionContract
+        {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+            if (triggerNames == null || triggerNames.Length == 0)
+            {
+                triggerNames = new[] { typeof(TConvention).Name };
+            }
+
+
+            builder.AddInterfaceConventionProperty(propertyExpression,
+                (e, pi, p) =>
+                {
+                    AddTriggersAnnotation(e, triggerNames);
+                    configure(e, pi, p);
+                });
+        }
+
+        private static void AddTriggersAnnotation(EntityTypeBuilder e, string[] triggerNames)
+        {
+            //NOTE: https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/breaking-changes#sql-server-tables-with-triggers-or-certain-computed-columns-now-require-special-ef-core-configuration
+#if NET7_0_OR_GREATER
+            if (!e.Metadata.IsTable())
+            {
+                return;
+            }
+            foreach (var triggerName in triggerNames)
+            {
+                e.ToTable(tb => tb.HasTrigger(triggerName));
+            }
+#endif
+        }
     }
 }

@@ -21,23 +21,43 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IRelationalConnection _connection;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
+#if NET5_0
+        private readonly IDiagnosticsLogger<DbLoggerCategory.Database.Command> _commandLogger;
+#else
         private readonly IRelationalCommandDiagnosticsLogger _commandLogger;
+#endif
+
         private readonly IHistoryRepository _historyRepository;
         private readonly IRelationalDatabaseCreator _databaseCreator;
         private readonly IMigrationCommandExecutor _migrationCommandExecutor;
         private readonly IMigrationsSqlGenerator _migrationsSqlGenerator;
         private readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
 
+#if NET5_0
+        public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
+            IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
+            IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
+            Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure.IConventionSetBuilder conventionSetBuilder, 
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
+            IDiagnosticsLogger<DbLoggerCategory.Database.Command> commandLogger, IDatabaseProvider databaseProvider,
+            IStaticMigrationsService staticMigrationsService)
+            : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
+                rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, conventionSetBuilder, logger, commandLogger,
+                databaseProvider)
+#else   
         /// <inheritdoc />
         public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
             IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
             IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
-            IModelRuntimeInitializer modelRuntimeInitializer, IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
-            IRelationalCommandDiagnosticsLogger commandLogger, IDatabaseProvider databaseProvider,
+            IModelRuntimeInitializer modelRuntimeInitializer,
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
+            IRelationalCommandDiagnosticsLogger commandLogger,
+            IDatabaseProvider databaseProvider,
             IStaticMigrationsService staticMigrationsService)
             : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
                 rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, modelRuntimeInitializer, logger, commandLogger,
                 databaseProvider)
+#endif
         {
             StaticMigrationsService = staticMigrationsService;
             _historyRepository = historyRepository;
@@ -58,7 +78,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         {
             MigrateGuard(targetMigration);
             var modified = DateTime.UtcNow;
-            
+
             _logger.MigrateUsingConnection(this, _connection);
 
             if (!_historyRepository.Exists())
@@ -74,10 +94,10 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 command.ExecuteNonQuery(
                     new RelationalCommandParameterObject(_connection, null, null, _currentContext.Context, _commandLogger));
             }
-            
+
             var appliedMigrations = _historyRepository.GetAppliedMigrations();
             var migrateContext = GetMigrateContext(appliedMigrations, modified);
-            
+
             _migrationCommandExecutor.ExecuteNonQuery(GetMigrationCommands(migrateContext), _connection);
         }
 
@@ -106,7 +126,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
 
             var appliedMigrations = await _historyRepository.GetAppliedMigrationsAsync(cancellationToken).ConfigureAwait(false);
             var migrateContext = GetMigrateContext(appliedMigrations, migrationDate);
-                
+
             await _migrationCommandExecutor.ExecuteNonQueryAsync(GetMigrationCommands(migrateContext), _connection, cancellationToken).ConfigureAwait(false);
         }
 
@@ -118,7 +138,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             }
         }
 
-        private IEnumerable<MigrationCommand> GetMigrationCommands(MigrateContext context, MigrationsSqlGenerationOptions options= MigrationsSqlGenerationOptions.Default)
+        private IEnumerable<MigrationCommand> GetMigrationCommands(MigrateContext context,
+            MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {
             foreach (var command in GenerateCommands(StaticMigrationsService.GetInitialOperations(context.MigrationDate, false).ToList()))
             {
@@ -146,13 +167,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                     }
                 }
             }
-            
+
             foreach (var command in GenerateCommands(StaticMigrationsService.GetApplyOperations(context.MigrationDate, false).ToList()))
             {
                 yield return command;
             }
         }
-        
+
         protected virtual MigrateContext GetMigrateContext(IEnumerable<HistoryRow> appliedMigrationEntries, DateTime migrationDate)
         {
             PopulateMigrations(appliedMigrationEntries.Select(t => t.MigrationId),
@@ -160,12 +181,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 out var migrationsToApply,
                 out _,
                 out _);
-            
+
             return new MigrateContext(migrationsToApply, migrationDate);
         }
 
         /// <inheritdoc />
-        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration? previousMigration, MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
+        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration? previousMigration,
+            MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {
             throw new NotSupportedException("Down migration doesn't supported by migrator with static migrations");
         }

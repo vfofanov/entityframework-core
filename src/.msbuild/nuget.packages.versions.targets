@@ -3,15 +3,21 @@
     <!--    Nuget packages versions and assets for all Onbording projects-->
     <!--    Read details https://www.notion.so/Nuget-props-f3f3e6a4f85c4a5cae4bd3ed83c4f196-->
 
+    <PropertyGroup>
+        <StennSharedVersion>7.0.3</StennSharedVersion>
+    </PropertyGroup>
+    
     <PropertyGroup Condition="'$(IsNETSTANDARD21)'=='True' OR '$(IsNET5)'=='True'">
         <EntityFrameworkCoreVersion Condition="'$(EntityFrameworkCoreVersion)'==''">5.0.17</EntityFrameworkCoreVersion>
-        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">5.0.2</StennSharedVersion>
         <MicrosoftExtensionsVersion Condition="'$(MicrosoftExtensionsVersion)'==''">5.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(IsNET6)'=='True'">
         <EntityFrameworkCoreVersion Condition="'$(EntityFrameworkCoreVersion)'==''">6.0.7</EntityFrameworkCoreVersion>
-        <StennSharedVersion Condition="'$(StennSharedVersion)'==''">6.0.2</StennSharedVersion>
         <MicrosoftExtensionsVersion Condition="'$(MicrosoftExtensionsVersion)'==''">6.0.0</MicrosoftExtensionsVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsNET7)'=='True'">
+        <EntityFrameworkCoreVersion Condition="'$(EntityFrameworkCoreVersion)'==''">7.0.0</EntityFrameworkCoreVersion>
+        <MicrosoftExtensionsVersion Condition="'$(MicrosoftExtensionsVersion)'==''">7.0.0</MicrosoftExtensionsVersion>
     </PropertyGroup>
 
     <!--   Assets   -->
@@ -49,13 +55,13 @@
         <PackageReference Update="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkCoreVersion)" />
         <PackageReference Update="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(EntityFrameworkCoreVersion)" />
         
-        <PackageReference Update="FluentAssertions" Version="6.7.0" />
+        <PackageReference Update="FluentAssertions" Version="6.8.0" />
         <PackageReference Update="Moq" Version="4.18.2" />
         <PackageReference Update="Moq.EntityFrameworkCore" Version="5.0.0.2"/>
 
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.0" />
         <PackageReference Update="NUnit" Version="3.13.3" />
-        <PackageReference Update="NUnit3TestAdapter" Version="4.2.1" />
+        <PackageReference Update="NUnit3TestAdapter" Version="4.3.1" />
         <PackageReference Update="coverlet.collector" Version="3.1.0" />
         
         <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />

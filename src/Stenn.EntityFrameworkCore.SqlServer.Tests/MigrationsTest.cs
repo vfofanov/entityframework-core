@@ -28,7 +28,13 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
     public class MigrationsTest
     {
-        private const string DBName = "stenn_efcore_tests";
+#if NET5_0
+        private const string DBName = "stenn_efcore_tests_net5";
+#elif NET6_0
+        private const string DBName = "stenn_efcore_tests_net6";
+#elif NET7_0
+        private const string DBName = "stenn_efcore_tests_net7";
+#endif
         private InitialDbContext _dbContextInitial = null!;
         private MainDbContext _dbContextMain = null!;
         private HistoricalInitialMainDbContext _dbContextMainHistoricalInitial = null!;
@@ -41,7 +47,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
         private static string GetConnectionString(string dbName)
         {
-            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
+            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI;Encrypt=False";
         }
 
         [SetUp]

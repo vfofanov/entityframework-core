@@ -27,7 +27,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
         {
 #pragma warning disable EF1001
             return provider.GetRequiredService<IDbContextServices>().ContextOptions
-                .FindExtension<EntityConventionsOptionsExtension>()??
+                       .FindExtension<EntityConventionsOptionsExtension>() ??
                    throw new Exception("Can't find EF extension: EntityConventionsOptionsExtension");
 #pragma warning restore EF1001
         }
@@ -65,7 +65,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
             return _entityConventionsService = builder;
         }
-        
+
         private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
         {
             private string? _logFragment;
@@ -96,13 +96,14 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
                     return _logFragment;
                 }
             }
-
+#if NET6_0_OR_GREATER
             /// <inheritdoc />
             public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
             {
                 return other is ExtensionInfo otherInfo &&
                        otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
             }
+#endif
 
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
@@ -113,11 +114,17 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
                 debugInfo["Entity Conventions: IncludeCommonConventions"] = Extension._options.IncludeCommonConventions.ToString();
             }
-
+#if NET5_0
+            public override long GetServiceProviderHashCode()
+            {
+                return 0;
+            }
+#else
             public override int GetServiceProviderHashCode()
             {
                 return 0;
             }
+#endif
         }
     }
 }

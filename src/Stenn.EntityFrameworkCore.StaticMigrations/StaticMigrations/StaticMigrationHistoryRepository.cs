@@ -129,7 +129,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
 
             // Use public API to remove the convention, issue #214
             ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(DbSetFindingConvention));
-            ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(RelationalDbFunctionAttributeConvention));
+#if NET5_0
+            if (!(AppContext.TryGetSwitch("Microsoft.EntityFrameworkCore.Issue23312", out var enabled) && enabled))
+            {
+                ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(RelationalDbFunctionAttributeConvention));
+            }
+#else
+           ConventionSet.Remove(conventionSet.ModelInitializedConventions, typeof(RelationalDbFunctionAttributeConvention));
+#endif           
 
             var modelBuilder = new ModelBuilder(conventionSet);
             modelBuilder.Entity<StaticMigrationHistoryRow>(
@@ -139,9 +146,15 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.StaticMigrations
                     x.ToTable(TableName, TableSchema);
                 });
 
-            return _model = Dependencies.ModelRuntimeInitializer.Initialize((IModel)modelBuilder.Model);
+#if NET5_0
+            _model = modelBuilder.FinalizeModel();
+#else
+            _model = Dependencies.ModelRuntimeInitializer.Initialize((IModel)modelBuilder.Model);
+            
+#endif
+            return _model;
         }
-
+        
         /// <summary>
         ///     Checks whether or not the history table exists.
         /// </summary>
