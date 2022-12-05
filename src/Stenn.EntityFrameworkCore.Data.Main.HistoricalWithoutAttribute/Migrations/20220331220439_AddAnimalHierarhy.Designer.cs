@@ -9,7 +9,7 @@ using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainTypeRegistrationDbContext))]
     [Migration("20220331220439_AddAnimalHierarhy")]
     partial class AddAnimalHierarhy
     {

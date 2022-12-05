@@ -4,15 +4,15 @@ using Stenn.EntityFrameworkCore.EntityConventions;
 
 namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute
 {
-    public class MainDbContext: Microsoft.EntityFrameworkCore.DbContext
+    public class MainTypeRegistrationDbContext: Microsoft.EntityFrameworkCore.DbContext
     {
         /// <inheritdoc />
-        protected MainDbContext()
+        protected MainTypeRegistrationDbContext()
         {
         }
 
         /// <inheritdoc />
-        public MainDbContext(DbContextOptions<MainDbContext> options)
+        public MainTypeRegistrationDbContext(DbContextOptions<MainTypeRegistrationDbContext> options)
             : base(options)
         {
         }

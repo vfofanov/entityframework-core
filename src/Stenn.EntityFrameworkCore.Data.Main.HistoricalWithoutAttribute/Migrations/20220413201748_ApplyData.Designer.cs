@@ -9,7 +9,7 @@ using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainTypeRegistrationDbContext))]
     [Migration("20220413201748_ApplyData")]
     partial class ApplyData
     {

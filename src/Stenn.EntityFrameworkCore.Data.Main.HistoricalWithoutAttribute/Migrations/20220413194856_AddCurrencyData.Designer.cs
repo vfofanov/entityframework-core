@@ -8,7 +8,7 @@ using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Main.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainTypeRegistrationDbContext))]
     [Migration("20220413194856_AddCurrencyData")]
     partial class AddCurrencyData
     {

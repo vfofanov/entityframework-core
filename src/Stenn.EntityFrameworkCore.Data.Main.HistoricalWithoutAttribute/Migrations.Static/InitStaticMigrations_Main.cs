@@ -2,7 +2,7 @@
 
 namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute.Migrations.Static
 {
-    public static class MainStaticMigrations
+    public static class MainWithoutAttributeStaticMigrations
     {
         public static void Init(StaticMigrationBuilder migrations)
         {

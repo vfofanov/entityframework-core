@@ -9,11 +9,11 @@ using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute
 {
     // ReSharper disable once UnusedType.Global
-    public class MainDbContextFactory : IDesignTimeDbContextFactory<MainDbContext>
+    public class MainWithoutAttributeDbContextFactory : IDesignTimeDbContextFactory<MainTypeRegistrationDbContext>
     {
-        public MainDbContext CreateDbContext(string[] args)
+        public MainTypeRegistrationDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<MainDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<MainTypeRegistrationDbContext>();
             
             optionsBuilder.UseSqlServer();
             optionsBuilder.UseEntityConventionsSqlServer(b =>
@@ -23,12 +23,12 @@ namespace Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute
             
             optionsBuilder.UseStaticMigrationsSqlServer(b =>
                 {
-                    MainStaticMigrations.Init(b);
+                    MainWithoutAttributeStaticMigrations.Init(b);
                     b.AddTriggerBasedEntityConventionsMigrationSqlServer();
                 }
             );
             
-            return new MainDbContext(optionsBuilder.Options);
+            return new MainTypeRegistrationDbContext(optionsBuilder.Options);
         }
     }
 }

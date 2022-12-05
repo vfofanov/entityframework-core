@@ -9,7 +9,7 @@ using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainTypeRegistrationDbContext))]
     partial class MainDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

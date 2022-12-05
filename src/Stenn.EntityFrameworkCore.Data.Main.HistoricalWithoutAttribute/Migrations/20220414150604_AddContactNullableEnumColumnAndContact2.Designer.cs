@@ -9,7 +9,7 @@ using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    [DbContext(typeof(MainDbContext))]
+    [DbContext(typeof(MainTypeRegistrationDbContext))]
     [Migration("20220414150604_AddContactNullableEnumColumnAndContact2")]
     partial class AddContactNullableEnumColumnAndContact2
     {

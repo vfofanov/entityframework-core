@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿#nullable enable
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -12,6 +13,7 @@ using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInject
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute.Migrations.Static;
 using Main = Stenn.EntityFrameworkCore.Data.Main;
 using MainWithoutAttribute = Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
 
@@ -21,13 +23,11 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
     {
         private const string DBName = "stenn_efcore_historic_migrations_tests";
 
-        private Main.MainDbContext _dbContextMain = null!;
-        private MainWithoutAttribute.MainDbContext _dbContextMainHistoricalWithoutAttribute = null!;
+        private MainDbContext _dbContextMain = null!;
+        private MainWithoutAttribute.MainTypeRegistrationDbContext _dbContextMainTypeRegistration = null!;
+        private MainWithoutAttribute.MainTypeRegistrationDbContext _dbContextMainTypeRegistrationChain = null!;
         private Main.MainDbContext _dbContextMainTwoRegistrations = null!;
 
-        private IServiceProvider _serviceProviderMain = null!;
-        private IServiceProvider _serviceProviderMainHistoricalWithoutAttribute = null!;
-        private IServiceProvider _serviceProviderMainTwoRegistrations = null!;
 
         private static string GetConnectionString(string dbName)
         {
@@ -40,33 +40,39 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             InitDbContext(MainStaticMigrations.Init,
                 false,
                 true,
-                out _serviceProviderMain,
+                out _,
                 out _dbContextMain);
 
-            InitDbContext(MainStaticMigrations.Init,
+            InitDbContext(MainWithoutAttributeStaticMigrations.Init,
                 true,
                 true,
-                out _serviceProviderMainHistoricalWithoutAttribute,
-                out _dbContextMainHistoricalWithoutAttribute);
+                out _,
+                out _dbContextMainTypeRegistration);
+            
+            InitDbContext(MainWithoutAttributeStaticMigrations.Init,
+                true,
+                true,
+                out _,
+                out _dbContextMainTypeRegistrationChain, typeof(MainDbContext_Step2));
 
             InitDbContext(MainStaticMigrations.Init,
                 true,
                 true,
-                out _serviceProviderMainTwoRegistrations,
+                out _,
                 out _dbContextMainTwoRegistrations);
         }
 
         private static void InitDbContext<TContext>(Action<StaticMigrationBuilder> init, bool useGenericRegistration, bool includeCommonConventions,
             out IServiceProvider serviceProvider,
-            out TContext dbContext)
+            out TContext dbContext, Type? dbContextHistoryType = null)
             where TContext : Microsoft.EntityFrameworkCore.DbContext
         {
-            serviceProvider = GetServices<TContext>(init, useGenericRegistration, includeCommonConventions);
+            serviceProvider = GetServices<TContext>(init, useGenericRegistration, includeCommonConventions, dbContextHistoryType: dbContextHistoryType);
             dbContext = serviceProvider.GetRequiredService<TContext>();
         }
 
         private static IServiceProvider GetServices<TDbContext>(Action<StaticMigrationBuilder> init, bool useGenericRegistration,
-            bool includeCommonConventions, string dbName = DBName)
+            bool includeCommonConventions, string dbName = DBName, Type? dbContextHistoryType = null)
             where TDbContext : Microsoft.EntityFrameworkCore.DbContext
         {
             var services = new ServiceCollection();
@@ -87,7 +93,14 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
                 if (useGenericRegistration)
                 {
-                    builder.UseHistoricalMigrations<MainDbContext_Step1PlusStep2>();
+                    if (dbContextHistoryType != null)
+                    {
+                        builder.UseHistoricalMigrations(options => options.DbContextType = dbContextHistoryType);
+                    }
+                    else
+                    {
+                        builder.UseHistoricalMigrations<MainDbContext_Step1PlusStep2>();
+                    }
                 }
                 else
                 {
@@ -121,13 +134,13 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         [Test]
         public async Task EnsureCreated_MainHistoricalWithoutAttribute()
         {
-            await EnsureCreated(_dbContextMainHistoricalWithoutAttribute);
+            await EnsureCreated(_dbContextMainTypeRegistration);
 
-            var actual = await _dbContextMainHistoricalWithoutAttribute.Set<MainWithoutAttribute.Currency>().ToListAsync();
+            var actual = await _dbContextMainTypeRegistration.Set<MainWithoutAttribute.Currency>().ToListAsync();
             var expected = MainWithoutAttribute.StaticMigrations.DictEntities.CurrencyDeclaration.GetActual();
             actual.Should().BeEquivalentTo(expected);
 
-            var actualRoles = await _dbContextMainHistoricalWithoutAttribute.Set<MainWithoutAttribute.Role>().ToListAsync();
+            var actualRoles = await _dbContextMainTypeRegistration.Set<MainWithoutAttribute.Role>().ToListAsync();
             var expectedRoles = MainWithoutAttribute.StaticMigrations.DictEntities.RoleDeclaration.GetActual();
             actualRoles.Should().BeEquivalentTo(expectedRoles);
         }
@@ -139,9 +152,15 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [Test]
-        public async Task Migrate_MainHistoricalWithoutAttribute_Should_Run()
+        public async Task Migrate_MainTypeRegistration_Should_Run()
         {
-            await RunMigrations(_dbContextMainHistoricalWithoutAttribute, true);
+            await RunMigrations(_dbContextMainTypeRegistration, true);
+        }
+        
+        [Test]
+        public async Task Migrate_MainTypeRegistration_Chain_Should_Run()
+        {
+            await RunMigrations(_dbContextMainTypeRegistrationChain, true);
         }
 
         [Test]
