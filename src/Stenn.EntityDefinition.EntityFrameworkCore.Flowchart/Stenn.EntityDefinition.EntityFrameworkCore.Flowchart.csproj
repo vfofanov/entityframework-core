@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Definitions Marmaid Flowchart. Entity Framework implementation</Description>
+    <Nullable>enable</Nullable>
+  </PropertyGroup> 
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup> 
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.Flowchart\Stenn.EntityDefinition.Flowchart.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
+  </ItemGroup>
+
+</Project>

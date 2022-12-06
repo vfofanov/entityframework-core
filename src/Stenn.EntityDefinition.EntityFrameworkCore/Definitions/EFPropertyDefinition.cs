@@ -6,12 +6,15 @@ using Stenn.EntityDefinition.Contracts.Definitions;
 
 namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 {
-    public class EFPropertyDefinition<T> : Definition<T>, IEFPropertyDefinition
+    public class EFPropertyDefinition<T> : Definition<T>, IEFPropertyDefinition<T>
     {
-        private readonly Func<IPropertyBase?, PropertyInfo?, string, T?, DefinitionContext, T?> _extract;
+        public static implicit operator EFPropertyDefinition<T>(MemberInfoDefinition<T> d) => d.ToProperty();
+        
+        private readonly Func<IPropertyBase?, PropertyInfo?, T?, EntityDefinitionRow, PropertyDefinitionRow, DefinitionContext, T?> _extract;
 
         /// <inheritdoc />
-        public EFPropertyDefinition(DefinitionInfo<T> info, Func<IPropertyBase?, PropertyInfo?, string, T?, DefinitionContext, T?> extract)
+        public EFPropertyDefinition(DefinitionInfo<T> info,
+            Func<IPropertyBase?, PropertyInfo?, T?, EntityDefinitionRow, PropertyDefinitionRow, DefinitionContext, T?> extract)
             : base(info)
         {
             _extract = extract ?? throw new ArgumentNullException(nameof(extract));
@@ -19,25 +22,18 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore.Definitions
 
 
         /// <inheritdoc />
-        public EFPropertyDefinition(string name, Func<IPropertyBase?, PropertyInfo?, string, T?, DefinitionContext, T?> extract,
+        public EFPropertyDefinition(string name,
+            Func<IPropertyBase?, PropertyInfo?, T?, EntityDefinitionRow, PropertyDefinitionRow, DefinitionContext, T?> extract,
             Func<T, string>? convertToString = null)
             : base(name, convertToString)
         {
             _extract = extract ?? throw new ArgumentNullException(nameof(extract));
         }
 
-        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, string name, T? parentValue, DefinitionContext context)
+        public T? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, T? parentValue,
+            EntityDefinitionRow entityRow, PropertyDefinitionRow row, DefinitionContext context)
         {
-            return _extract(property, propertyInfo, name, parentValue, context);
-        }
-
-        /// <inheritdoc />
-        public object? Extract(IPropertyBase? property, PropertyInfo? propertyInfo, string name, object? parentValue, DefinitionContext context)
-        {
-            return parentValue is null
-                // ReSharper disable once ArrangeDefaultValueWhenTypeNotEvident
-                ? Extract(property, propertyInfo, name, default(T?), context)
-                : Extract(property, propertyInfo, name, (T?)parentValue, context);
+            return _extract(property, propertyInfo, parentValue, entityRow, row, context);
         }
     }
 }

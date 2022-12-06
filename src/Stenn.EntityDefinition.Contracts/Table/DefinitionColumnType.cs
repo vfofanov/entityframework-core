@@ -1,4 +1,4 @@
-﻿namespace Stenn.EntityDefinition.Writer
+﻿namespace Stenn.EntityDefinition.Contracts.Table
 {
     public enum DefinitionColumnType
     {

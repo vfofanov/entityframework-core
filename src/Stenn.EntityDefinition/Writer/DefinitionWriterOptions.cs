@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Stenn.EntityDefinition.Contracts;
+using Stenn.EntityDefinition.Contracts.Table;
 
 namespace Stenn.EntityDefinition.Writer
 {

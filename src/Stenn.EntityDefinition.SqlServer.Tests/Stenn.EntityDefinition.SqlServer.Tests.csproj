@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Stenn.Shared.Mermaid" />
+    
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
@@ -16,8 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore.Flowchart\Stenn.EntityDefinition.EntityFrameworkCore.Flowchart.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore.Relational\Stenn.EntityDefinition.EntityFrameworkCore.Relational.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Stenn.EntityDefinition.Flowchart\Stenn.EntityDefinition.Flowchart.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition.Model\Stenn.EntityDefinition.Model.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
   </ItemGroup>

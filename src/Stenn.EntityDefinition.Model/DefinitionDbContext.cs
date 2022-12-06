@@ -19,11 +19,16 @@ namespace Stenn.EntityDefinition.Model
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.ApplyConfiguration(new UserMap());
-            // modelBuilder.ApplyConfiguration(new RoleMap());
-            // modelBuilder.ApplyConfiguration(new UserRoleMap());
+            modelBuilder.ApplyConfiguration(new UserMap());
+            modelBuilder.ApplyConfiguration(new StandardUserMap());
+            modelBuilder.ApplyConfiguration(new SuperUserMap());
+            
+            modelBuilder.ApplyConfiguration(new RoleMap());
+            modelBuilder.ApplyConfiguration(new UserRoleMap());
             
             modelBuilder.ApplyConfiguration(new InvoiceMap());
+            modelBuilder.ApplyConfiguration(new InvoiceViewMap());
+            modelBuilder.ApplyConfiguration(new InvoiceViewExtendedMap());
 
             base.OnModelCreating(modelBuilder);
         }

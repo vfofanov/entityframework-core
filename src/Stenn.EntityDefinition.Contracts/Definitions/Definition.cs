@@ -4,10 +4,15 @@ namespace Stenn.EntityDefinition.Contracts.Definitions
 {
     public abstract class Definition<T> : IDefinition<T>
     {
+        public static implicit operator DefinitionInfo<T>(Definition<T> v) => v.Info;
+        
         protected Definition(string name, Func<T, string>? convertToString = null)
             : this(new DefinitionInfo<T>(name, convertToString))
         {
         }
+
+        /// <inheritdoc />
+        public int ReadOrder { get; init; } = 0;
 
         protected Definition(DefinitionInfo<T> info)
         {

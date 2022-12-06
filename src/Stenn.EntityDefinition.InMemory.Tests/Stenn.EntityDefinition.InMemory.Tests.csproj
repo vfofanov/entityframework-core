@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Stenn.EntityDefinition.EntityFrameworkCore\Stenn.EntityDefinition.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition.Model\Stenn.EntityDefinition.Model.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore.Relational\Stenn.EntityFrameworkCore.Relational.csproj" />
   </ItemGroup>
 
 </Project>
