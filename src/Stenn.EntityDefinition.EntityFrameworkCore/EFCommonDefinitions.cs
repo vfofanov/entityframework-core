@@ -70,6 +70,9 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             public static readonly EFPropertyDefinition<bool> IsNavigation = new("IsNavigation",
                 (property, _, _, _, _, _) => property is INavigation p && !p.IsOwned());
 
+            public static readonly EFPropertyDefinition<bool> IsOwned = new("IsOwned",
+                (property, _, _, _, _, _) => property.IsOwned());
+            
             /// <summary>
             ///     Gets a value indicating whether this property can contain <see langword="null" />.
             /// </summary>
@@ -93,7 +96,7 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
             /// </summary>
             public static readonly EFPropertyDefinition<object> PropertyKey =
                 new("PropertyUniqueId", (property, _, _, _, _, _) => property);
-
+            
             /// <summary>
             /// Navigation specific definitions
             /// </summary>

@@ -20,12 +20,10 @@ namespace Stenn.EntityDefinition.EntityFrameworkCore
 
         public void SetEntitiesFilter(Func<IEntityType, bool> filter)
         {
-            if (_filterEntities == null)
+            if (filter == null)
             {
                 throw new ArgumentNullException(nameof(filter));
             }
-
-            _filterEntities = filter;
             if (_filterEntities == null)
             {
                 _filterEntities = filter;

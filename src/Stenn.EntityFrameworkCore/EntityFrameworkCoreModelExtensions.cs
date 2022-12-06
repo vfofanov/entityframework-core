@@ -5,9 +5,9 @@ namespace Stenn.EntityFrameworkCore
 {
     public static class EntityFrameworkCoreModelExtensions
     {
-        public static bool IsOwned(this INavigation property)
+        public static bool IsOwned(this IPropertyBase? property)
         {
-            return property.ForeignKey.IsOwnership && property.TargetEntityType.IsOwned();
+            return property is INavigation p && p.ForeignKey.IsOwnership && p.TargetEntityType.IsOwned();
         }
     }
 }
