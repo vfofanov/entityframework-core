@@ -34,7 +34,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 
         private sealed class ExtensionInfo : DbContextOptionsExtensionInfo
         {
-            private long? _serviceProviderHash;
+            private int? _serviceProviderHash;
             private string? _logFragment;
 
             public ExtensionInfo(HistoricalMigrationsOptionsExtension extension)
@@ -64,6 +64,14 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
                 }
             }
 
+#if NET6_0_OR_GREATER
+            /// <inheritdoc />
+            public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            {
+                return other is ExtensionInfo otherInfo &&
+                       otherInfo.GetServiceProviderHashCode() == GetServiceProviderHashCode();
+            }
+#endif
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
                 if (debugInfo == null)
@@ -73,7 +81,19 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 
                 debugInfo["Historical Migrations: MigrateFromFullHistory"] = Extension.Options.MigrateFromFullHistory.ToString();
             }
+#if NET6_0_OR_GREATER
+            public override int GetServiceProviderHashCode()
+            {
+                if (_serviceProviderHash != null)
+                {
+                    return _serviceProviderHash.Value;
+                }
+                var hashCode = Extension.Options.GetHashCode();
+                _serviceProviderHash = hashCode;
 
+                return _serviceProviderHash.Value;
+            }
+#else
             public override long GetServiceProviderHashCode()
             {
                 if (_serviceProviderHash != null)
@@ -85,6 +105,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
 
                 return _serviceProviderHash.Value;
             }
+#endif
         }
     }
 }

@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Stenn.EntityDefinition.Contracts\Stenn.EntityDefinition.Contracts.csproj" />
     <ProjectReference Include="..\Stenn.EntityDefinition\Stenn.EntityDefinition.csproj" />
+    <ProjectReference Include="..\Stenn.EntityFrameworkCore\Stenn.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

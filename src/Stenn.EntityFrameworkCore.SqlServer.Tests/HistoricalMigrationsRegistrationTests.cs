@@ -13,6 +13,8 @@ using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInject
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute.Migrations.Static;
 using Main = Stenn.EntityFrameworkCore.Data.Main;
 using MainWithoutAttribute = Stenn.EntityFrameworkCore.Data.Main.HistoricalWithoutAttribute;
@@ -21,7 +23,13 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
     public class HistoricalMigrationsRegistrationTests
     {
-        private const string DBName = "stenn_efcore_historic_migrations_tests";
+#if NET5_0
+        private const string DBName = "stenn_efcore_historic_migrations_tests_net5";
+#elif NET6_0
+        private const string DBName = "stenn_efcore_historic_migrations_tests_net6";
+#elif NET7_0
+        private const string DBName = "stenn_efcore_historic_migrations_tests_net7";
+#endif
 
         private MainDbContext _dbContextMain = null!;
         private MainWithoutAttribute.MainTypeRegistrationDbContext _dbContextMainTypeRegistration = null!;
@@ -31,7 +39,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 
         private static string GetConnectionString(string dbName)
         {
-            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
+            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI;Encrypt=False";
         }
 
         [SetUp]
@@ -48,7 +56,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
                 true,
                 out _,
                 out _dbContextMainTypeRegistration);
-            
+
             InitDbContext(MainWithoutAttributeStaticMigrations.Init,
                 true,
                 true,
@@ -80,39 +88,39 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             var connectionString = GetConnectionString(dbName);
 
             services.AddDbContext<TDbContext>(builder =>
-            {
-                builder.UseSqlServer(connectionString);
-                builder.UseStaticMigrationsSqlServer(b =>
                 {
-                    init.Invoke(b);
-                    if (includeCommonConventions)
+                    builder.UseSqlServer(connectionString);
+                    builder.UseStaticMigrationsSqlServer(b =>
                     {
-                        b.AddTriggerBasedEntityConventionsMigrationSqlServer();
-                    }
-                });
+                        init.Invoke(b);
+                        if (includeCommonConventions)
+                        {
+                            b.AddTriggerBasedEntityConventionsMigrationSqlServer();
+                        }
+                    });
 
-                if (useGenericRegistration)
-                {
-                    if (dbContextHistoryType != null)
+                    if (useGenericRegistration)
                     {
-                        builder.UseHistoricalMigrations(options => options.DbContextType = dbContextHistoryType);
+                        if (dbContextHistoryType != null)
+                        {
+                            builder.UseHistoricalMigrations(options => options.DbContextType = dbContextHistoryType);
+                        }
+                        else
+                        {
+                            builder.UseHistoricalMigrations<MainDbContext_Step1PlusStep2>();
+                        }
                     }
                     else
                     {
-                        builder.UseHistoricalMigrations<MainDbContext_Step1PlusStep2>();
+                        builder.UseHistoricalMigrations();
                     }
-                }
-                else
-                {
-                    builder.UseHistoricalMigrations();
-                }
 
-                if (includeCommonConventions)
-                {
-                    builder.UseEntityConventionsSqlServer(b => { b.AddTriggerBasedCommonConventions(); });
-                }
-            },
-            ServiceLifetime.Transient, ServiceLifetime.Transient);
+                    if (includeCommonConventions)
+                    {
+                        builder.UseEntityConventionsSqlServer(b => { b.AddTriggerBasedCommonConventions(); });
+                    }
+                },
+                ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             return services.BuildServiceProvider();
         }
@@ -156,7 +164,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         {
             await RunMigrations(_dbContextMainTypeRegistration, true);
         }
-        
+
         [Test]
         public async Task Migrate_MainTypeRegistration_Chain_Should_Run()
         {

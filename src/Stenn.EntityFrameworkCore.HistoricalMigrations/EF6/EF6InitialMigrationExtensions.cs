@@ -2,9 +2,7 @@ using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
 {
@@ -17,10 +15,10 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
 
         public static EF6InitialMigrationAttribute GetEF6InitialMigrationAttribute(this TypeInfo migration)
         {
-            return migration.GetCustomAttribute<EF6InitialMigrationAttribute>() ?? 
+            return migration.GetCustomAttribute<EF6InitialMigrationAttribute>() ??
                    throw new InvalidOperationException();
         }
-        
+
         public static bool IsEF6HistoryRepositoryExists(this ICurrentDbContext currentDbContext)
         {
             return currentDbContext.GetEF6HistoryRepository().Exists();
@@ -30,7 +28,7 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
         {
             var repository = currentDbContext.Context.GetService<IHistoryRepository>();
             var dependencies = currentDbContext.Context.GetService<HistoryRepositoryDependencies>();
-            
+
             //NOTE: Use hack with replace EF Core history table name to EF6 and only check exists
             var relationalOptions = RelationalOptionsExtension.Extract(dependencies.Options);
             var ef6RelationalOptions = relationalOptions.WithMigrationsHistoryTableName("__MigrationHistory");
@@ -41,7 +39,20 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
             var ef6DbContextOptions = (IDbContextOptions)generic.Invoke(dependencies.Options, new object?[] { ef6RelationalOptions })!;
             //var ef6DbContextOptions = ((DbContextOptions)dependencies.Options).WithExtension(ef6RelationalOptions);
 
+#if NET5_0
             var ef6Dependincies = dependencies.With(ef6DbContextOptions);
+#else
+            var ef6Dependincies = new HistoryRepositoryDependencies(dependencies.DatabaseCreator, dependencies.RawSqlCommandBuilder, dependencies.Connection,
+                ef6DbContextOptions, dependencies.ModelDiffer, dependencies.MigrationsSqlGenerator, dependencies.SqlGenerationHelper,
+                dependencies.ConventionSetBuilder, dependencies.ModelDependencies, dependencies.TypeMappingSource, dependencies.CurrentContext,
+                dependencies.ModelRuntimeInitializer,
+#if NET6_0
+#pragma warning disable CS0618
+                dependencies.ModelLogger, 
+#pragma warning restore CS0618
+#endif
+                dependencies.CommandLogger);
+#endif
 
             var ef6HistoryRepository = (IHistoryRepository?)Activator.CreateInstance(repository.GetType(), ef6Dependincies);
 

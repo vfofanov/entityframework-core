@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+#if NET5_0
+using IReadOnlyEntityType = Microsoft.EntityFrameworkCore.Metadata.IEntityType;
+using IReadOnlyProperty = Microsoft.EntityFrameworkCore.Metadata.IProperty;
+#endif
 
 namespace Stenn.EntityFrameworkCore.Relational
 {
@@ -10,7 +14,7 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static bool IsView(this IEntityType entity)
+        public static bool IsView(this IReadOnlyEntityType entity)
         {
             return entity.GetEntityType() == EntityMappingType.View;
         }
@@ -20,17 +24,17 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static bool IsSqlQuery(this IEntityType entity)
+        public static bool IsSqlQuery(this IReadOnlyEntityType entity)
         {
             return entity.GetEntityType() == EntityMappingType.SqlQuery;
         }
-        
+
         /// <summary>
         /// Is entity type mapped to Sql Query
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static bool IsInMemoryQuery(this IEntityType entity)
+        public static bool IsInMemoryQuery(this IReadOnlyEntityType entity)
         {
             return entity.GetEntityType() == EntityMappingType.InMemoryQuery;
         }
@@ -40,7 +44,7 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static bool IsFunction(this IEntityType entity)
+        public static bool IsFunction(this IReadOnlyEntityType entity)
         {
             return entity.GetEntityType() == EntityMappingType.Function;
         }
@@ -50,29 +54,30 @@ namespace Stenn.EntityFrameworkCore.Relational
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static bool IsTable(this IEntityType entity)
+        public static bool IsTable(this IReadOnlyEntityType entity)
         {
             return entity.GetEntityType() == EntityMappingType.Table;
         }
 
-        public static bool IsComputed(this IProperty property)
+        public static bool IsComputed(this IReadOnlyProperty property)
         {
             return property.FindAnnotation(RelationalAnnotationNames.ComputedColumnSql) != null;
         }
 
-        public static EntityMappingType GetEntityType(this IEntityType entity)
+        public static EntityMappingType GetEntityType(this IReadOnlyEntityType entity)
         {
-            if (entity.FindAnnotation(RelationalAnnotationNames.TableName) != null ||
+            if (entity.FindAnnotation(RelationalAnnotationNames.TableName)?.Value != null ||
                 entity.FindAnnotation(RelationalAnnotationNames.TableMappings) != null)
             {
                 return EntityMappingType.Table;
             }
-            if (entity.FindAnnotation(RelationalAnnotationNames.ViewName) != null ||
-                entity.FindAnnotation(RelationalAnnotationNames.ViewMappings) != null)
+            if (entity.FindAnnotation(RelationalAnnotationNames.ViewName)?.Value != null ||
+                entity.FindAnnotation(RelationalAnnotationNames.ViewMappings) != null ||
+                entity.FindAnnotation(RelationalAnnotationNames.ViewDefinitionSql) != null)
             {
                 return EntityMappingType.View;
             }
-            if (entity.FindAnnotation(RelationalAnnotationNames.FunctionName) != null ||
+            if (entity.FindAnnotation(RelationalAnnotationNames.FunctionName)?.Value != null ||
                 entity.FindAnnotation(RelationalAnnotationNames.FunctionMappings) != null)
             {
                 return EntityMappingType.Function;

@@ -20,7 +20,11 @@ namespace Stenn.EntityFrameworkCore.Relational
 
         public static string GetFinalColumnName(this IProperty property, StoreObjectIdentifier identifier)
         {
+#if NET7_0_OR_GREATER
+            return property.GetColumnName(identifier) ?? property.GetColumnName();
+#else
             return property.GetColumnName(identifier) ?? property.GetColumnBaseName();
+#endif
         }
     }
 }

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -24,23 +23,43 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IRelationalConnection _connection;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
+#if NET5_0
         private readonly IDiagnosticsLogger<DbLoggerCategory.Database.Command> _commandLogger;
+#else
+        private readonly IRelationalCommandDiagnosticsLogger _commandLogger;
+#endif
+
         private readonly IHistoryRepository _historyRepository;
         private readonly IRelationalDatabaseCreator _databaseCreator;
         private readonly IMigrationCommandExecutor _migrationCommandExecutor;
         private readonly IMigrationsSqlGenerator _migrationsSqlGenerator;
         private readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
 
-        /// <inheritdoc />
+#if NET5_0
         public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
             IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
             IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
-            IConventionSetBuilder conventionSetBuilder, IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
+            Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure.IConventionSetBuilder conventionSetBuilder, 
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
             IDiagnosticsLogger<DbLoggerCategory.Database.Command> commandLogger, IDatabaseProvider databaseProvider,
             IStaticMigrationsService staticMigrationsService)
             : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
                 rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, conventionSetBuilder, logger, commandLogger,
                 databaseProvider)
+#else   
+        /// <inheritdoc />
+        public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
+            IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
+            IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
+            IModelRuntimeInitializer modelRuntimeInitializer,
+            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
+            IRelationalCommandDiagnosticsLogger commandLogger,
+            IDatabaseProvider databaseProvider,
+            IStaticMigrationsService staticMigrationsService)
+            : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
+                rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, modelRuntimeInitializer, logger, commandLogger,
+                databaseProvider)
+#endif
         {
             StaticMigrationsService = staticMigrationsService;
             _historyRepository = historyRepository;
@@ -170,18 +189,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         }
 
         /// <inheritdoc />
-        protected override void PopulateMigrations(IEnumerable<string> appliedMigrationEntries,
-            string targetMigration,
-            out IReadOnlyList<Migration> migrationsToApply,
-            out IReadOnlyList<Migration> migrationsToRevert,
-            out Migration actualTargetMigration)
-        {
-            //TODO: Use MigrationsSorter here
-            base.PopulateMigrations(appliedMigrationEntries, targetMigration, out migrationsToApply, out migrationsToRevert, out actualTargetMigration);
-        }
-
-        /// <inheritdoc />
-        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration previousMigration,
+        protected override IReadOnlyList<MigrationCommand> GenerateDownSql(Migration migration, Migration? previousMigration,
             MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {
             throw new NotSupportedException("Down migration doesn't supported by migrator with static migrations");

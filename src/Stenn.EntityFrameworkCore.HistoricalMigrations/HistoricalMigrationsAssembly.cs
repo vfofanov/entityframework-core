@@ -37,8 +37,8 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations
             _idGenerator = idGenerator;
             _logger = logger;
 
-            _options = dbContextOptions.FindExtension<HistoricalMigrationsOptionsExtension>().Options;
-
+            _options = dbContextOptions.FindExtension<HistoricalMigrationsOptionsExtension>()?.Options ??
+                       throw new Exception("Can't find EF extension: HistoricalMigrationsOptionsExtension");
         }
 
         /// <inheritdoc />
