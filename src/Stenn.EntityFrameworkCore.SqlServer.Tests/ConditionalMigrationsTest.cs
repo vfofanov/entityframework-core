@@ -20,27 +20,21 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
     public class ConditionStorage
     {
-        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnName = { (x) => x.ChangedMigrations.Where(i => i.Name.Contains("TestViews")).Any() };
-        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnTag = { (x) => x.ForcedRunActionTags.Any(i => i.Contains("vCurrencyTag")) };
-        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnName = { (x) => x.ChangedMigrations.Where(i => i.Name.Contains("NonExistingMagration")).Any() };
-        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnTag = { (x) => x.ForcedRunActionTags.Any(i => i.Contains("NonExistingTag")) };
+        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("TestViews")) };
+        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("vCurrencyTag")) };
+        
+        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("NonExistingMagration")) };
+        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("NonExistingTag")) };
     }
 
-    public class ConditionalMigrationsTest
+    public class ConditionalMigrationsTest: TestBase
     {
-        private const string DBName = "stenn_efcore_tests";
         private InitialDbContext _dbContextInitial = null!;
-
         private IServiceProvider _serviceProviderInitial = null!;
-
-        private static string GetConnectionString(string dbName)
-        {
-            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI";
-        }
 
         public static Action<StaticMigrationBuilder> BuildInit(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
-            Action<StaticMigrationBuilder> action = (migrations) =>
+            Action<StaticMigrationBuilder> action = migrations =>
             {
                 migrations.AddInitialSqlResFile("InitDB", suppressTransaction: true, typeof(InitialDbContext).Assembly);
 
@@ -52,7 +46,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         }
 
         [TestCase(null)]
-        [TestCaseSource(typeof(ConditionStorage), "ConditionOnName")]
+        [TestCaseSource(typeof(ConditionStorage), nameof(ConditionStorage.ConditionOnName))]
         public async Task MigrationsAfterCreateShouldCreateTableAndView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
@@ -64,7 +58,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await VerifyConditionalMigrationsExecuted();
         }
 
-        [TestCaseSource(typeof(ConditionStorage), "ConditionOnTag")]
+        [TestCaseSource(typeof(ConditionStorage), nameof(ConditionStorage.ConditionOnTag))]
         public async Task MigrationsAfterMigrateShouldCreateTableAndView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
@@ -76,8 +70,8 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
             await VerifyConditionalMigrationsExecuted();
         }
 
-        [TestCaseSource(typeof(ConditionStorage), "NegativeConditionOnName")]
-        [TestCaseSource(typeof(ConditionStorage), "NegativeConditionOnTag")]
+        [TestCaseSource(typeof(ConditionStorage), nameof(ConditionStorage.NegativeConditionOnName))]
+        [TestCaseSource(typeof(ConditionStorage), nameof(ConditionStorage.NegativeConditionOnTag))]
         public async Task MigrationsWithNegativeConditionShouldNotCreateView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
