@@ -27,9 +27,9 @@ namespace Stenn.EntityFrameworkCore
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static IQueryable<T> Create(params T[] items)
+        public static IQueryable<T> Create(params T[]? items)
         {
-            return Create((IEnumerable<T>)items);
+            return Create((IEnumerable<T>?)items);
         }
 
         /// <summary>

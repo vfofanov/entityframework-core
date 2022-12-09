@@ -12,25 +12,23 @@ using Stenn.EntityFrameworkCore.HistoricalMigrations.Extensions.DependencyInject
 using Stenn.EntityFrameworkCore.SqlServer.Extensions.DependencyInjection;
 using Stenn.StaticMigrations.MigrationConditions;
 using System;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
-    public class ConditionStorage
+    public class ConditionalStaticMigrationsTest: TestBase
     {
-        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("TestViews")) };
-        public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("vCurrencyTag")) };
+        private static class ConditionStorage
+        {
+            public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("TestViews")) };
+            public static Func<StaticMigrationConditionOptions, bool>[] ConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("vCurrencyTag")) };
         
-        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("NonExistingMagration")) };
-        public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("NonExistingTag")) };
-    }
-
-    public class ConditionalMigrationsTest: TestBase
-    {
+            public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnName = { x => x.ChangedMigrations.Any(i => i.Name.Contains("NonExistingMagration")) };
+            public static Func<StaticMigrationConditionOptions, bool>[] NegativeConditionOnTag = { x => x.ForcedRunActionTags.Any(i => i.Contains("NonExistingTag")) };
+        }
+        
         private InitialDbContext _dbContextInitial = null!;
-        private IServiceProvider _serviceProviderInitial = null!;
 
         public static Action<StaticMigrationBuilder> BuildInit(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
@@ -50,7 +48,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         public async Task MigrationsAfterCreateShouldCreateTableAndView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
-                out _serviceProviderInitial,
+                out _,
                 out _dbContextInitial);
 
             await EnsureCreated(_dbContextInitial);
@@ -62,7 +60,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         public async Task MigrationsAfterMigrateShouldCreateTableAndView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
-                out _serviceProviderInitial,
+                out _,
                 out _dbContextInitial);
 
             await RunMigrations(_dbContextInitial); // need to run migrations here, calling EnsureCreated does not initialize tags
@@ -75,7 +73,7 @@ namespace Stenn.EntityFrameworkCore.SqlServer.Tests
         public async Task MigrationsWithNegativeConditionShouldNotCreateView(Func<StaticMigrationConditionOptions, bool>? condition = null)
         {
             InitDbContext(BuildInit(condition), false,
-                out _serviceProviderInitial,
+                out _,
                 out _dbContextInitial);
 
             await EnsureCreated(_dbContextInitial);
