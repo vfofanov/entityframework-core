@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Storage;
+using Stenn.StaticMigrations.MigrationConditions;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations
 {
@@ -141,12 +143,13 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private IEnumerable<MigrationCommand> GetMigrationCommands(MigrateContext context,
             MigrationsSqlGenerationOptions options = MigrationsSqlGenerationOptions.Default)
         {
-            foreach (var command in GenerateCommands(StaticMigrationsService.GetInitialOperations(context.MigrationDate, false).ToList()))
+            var migrationsTags = context.GetMigrationsTags();
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetInitialOperations(context.MigrationDate, migrationsTags, false).ToList()))
             {
                 yield return command;
             }
 
-            foreach (var command in GenerateCommands(StaticMigrationsService.GetRevertOperations(context.MigrationDate, false).ToList()))
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetRevertOperations(context.MigrationDate, migrationsTags, context.HasMigrations).ToList()))
             {
                 yield return command;
             }
@@ -168,7 +171,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
                 }
             }
 
-            foreach (var command in GenerateCommands(StaticMigrationsService.GetApplyOperations(context.MigrationDate, false).ToList()))
+            foreach (var command in GenerateCommands(StaticMigrationsService.GetApplyOperations(context.MigrationDate, migrationsTags, context.HasMigrations).ToList()))
             {
                 yield return command;
             }
@@ -208,6 +211,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             public IReadOnlyList<Migration> MigrationsToApply { get; }
             public DateTime MigrationDate { get; }
             public bool HasMigrations => MigrationsToApply.Count > 0;
+
+            public IImmutableSet<string> GetMigrationsTags()
+            {
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                return MigrationsToApply.OfType<IWithStaticMigrationActionTag>().SelectMany(m => m.Tags).Distinct().ToImmutableSortedSet();
+            }
         }
     }
 }

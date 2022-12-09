@@ -14,6 +14,14 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="coverlet.collector" />
+    <None Remove="EmbeddedMigrations\migration1.sql" />
+    <None Remove="EmbeddedMigrations\migration2.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedMigrations\ActionActivate\migration2.sql" />
+    <EmbeddedResource Include="EmbeddedMigrations\migration1.sql" />
+    <EmbeddedResource Include="EmbeddedMigrations\migrationAction.sql" />
   </ItemGroup>
 
   <ItemGroup>

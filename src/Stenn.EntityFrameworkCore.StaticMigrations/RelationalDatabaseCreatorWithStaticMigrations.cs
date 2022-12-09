@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -126,12 +127,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
 
         private IReadOnlyList<MigrationOperation> GetInitialOperationsList(DateTime migrationDate)
         {
-            return StaticMigrationsService.GetInitialOperations(migrationDate, true).ToList();
+            return StaticMigrationsService.GetInitialOperations(migrationDate, ImmutableSortedSet<string>.Empty, true).ToList();
         }
         
         private IReadOnlyList<MigrationOperation> GetApplyOperationsList(DateTime migrationDate)
         {
-            return StaticMigrationsService.GetApplyOperations(migrationDate, true).ToList();
+            return StaticMigrationsService.GetApplyOperations(migrationDate, ImmutableSortedSet<string>.Empty, true).ToList();
         }
         
         private IEnumerable<MigrationCommand> GenerateCommands(IReadOnlyList<MigrationOperation> operationList)

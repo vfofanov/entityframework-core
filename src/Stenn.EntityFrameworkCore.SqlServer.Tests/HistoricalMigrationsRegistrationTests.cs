@@ -21,26 +21,12 @@ using MainWithoutAttribute = Stenn.EntityFrameworkCore.Data.Main.HistoricalWitho
 
 namespace Stenn.EntityFrameworkCore.SqlServer.Tests
 {
-    public class HistoricalMigrationsRegistrationTests
+    public class HistoricalMigrationsRegistrationTests: TestBase
     {
-#if NET5_0
-        private const string DBName = "stenn_efcore_historic_migrations_tests_net5";
-#elif NET6_0
-        private const string DBName = "stenn_efcore_historic_migrations_tests_net6";
-#elif NET7_0
-        private const string DBName = "stenn_efcore_historic_migrations_tests_net7";
-#endif
-
         private MainDbContext _dbContextMain = null!;
         private MainWithoutAttribute.MainTypeRegistrationDbContext _dbContextMainTypeRegistration = null!;
         private MainWithoutAttribute.MainTypeRegistrationDbContext _dbContextMainTypeRegistrationChain = null!;
         private Main.MainDbContext _dbContextMainTwoRegistrations = null!;
-
-
-        private static string GetConnectionString(string dbName)
-        {
-            return $@"Data Source=.\SQLEXPRESS;Initial Catalog={dbName};Integrated Security=SSPI;Encrypt=False";
-        }
 
         [SetUp]
         public void Setup()

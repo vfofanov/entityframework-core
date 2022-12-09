@@ -1,10 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Stenn.EntityFrameworkCore.StaticMigrations;
+using Stenn.StaticMigrations.MigrationConditions;
 
 namespace Stenn.EntityFrameworkCore.DbContext.Initial.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Initial : Migration, IWithStaticMigrationActionTag
     {
+        public string[] Tags => new string[] { "vCurrencyTag" };
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
