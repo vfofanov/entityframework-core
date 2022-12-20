@@ -10,6 +10,17 @@ namespace Stenn.EntityFrameworkCore.Data.Main.Migrations.Static
 
             migrations.AddSqlResFile("TestViews");
             migrations.AddSqlResFile("vCurrency");
+            
+            migrations.AddReportingFile("_ReportingSchema", ResSqlFile.Apply);
+            migrations.AddReportingFile("TestReporting");
         }
+    }
+
+    internal static class MainStaticMigrationsExtensions
+    {
+        public static void AddReportingFile(this StaticMigrationBuilder migrations, string mainFileName, ResSqlFile type = ResSqlFile.All)
+        {
+            migrations.AddSqlResFile($@"_Reporting\{mainFileName}", type);
+        } 
     }
 }

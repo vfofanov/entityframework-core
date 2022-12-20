@@ -152,7 +152,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             force |= HasInitialMigrationsToRun(staticMigrationTags, force);
             var runItems = GetRunItems(SQLMigrations, force, staticMigrationTags).ToList();
             
-            for (var i = runItems.Count - 1; i >= 0; i--)
+            for (var i = 0; i < runItems.Count; i++)
             {
                 var runItem = runItems[i];
                 if (runItem.Row != null)

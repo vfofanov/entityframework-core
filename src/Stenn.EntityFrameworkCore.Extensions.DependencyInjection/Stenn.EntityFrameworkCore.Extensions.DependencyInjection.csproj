@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Dependency injection extensions for Stenn.AspNetCore.OData.Versioning</Description>
+        <Description>Dependency injection extensions for Stenn.EntityFrameworkCore</Description>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 

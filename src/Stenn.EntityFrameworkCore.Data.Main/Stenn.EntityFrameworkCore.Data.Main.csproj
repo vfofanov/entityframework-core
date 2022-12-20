@@ -21,11 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Migrations.Static\Sql\InitDB.sql" />
-    <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Apply.sql" />
-    <EmbeddedResource Include="Migrations.Static\Sql\TestViews.Revert.sql" />
-    <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Apply.sql" />
-    <EmbeddedResource Include="Migrations.Static\Sql\vCurrency.Revert.sql" />
+    <EmbeddedResource Include="Migrations.Static\Sql\**\*.sql" />
   </ItemGroup>
 
 </Project>
