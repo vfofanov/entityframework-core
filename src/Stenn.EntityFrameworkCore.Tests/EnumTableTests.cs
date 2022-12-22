@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
 
@@ -51,6 +55,42 @@ namespace Stenn.EntityFrameworkCore.Tests
             table.Rows[1].RowShouldBe(2, "Second", "Second");
         }
 
-        
+        [Flags]
+        public enum FlagsValue
+        {
+            One = 0x1,
+            Two = 0x2,
+            OneAndTwo = One | Two,
+            Four = 0x4
+        }
+
+        [Test]
+        public void ParseFlaggedEnum()
+        {
+            var table = EnumTable.Create<FlagsValue>();
+
+            table.EnumType.Should().Be<FlagsValue>();
+            table.ValueType.Should().Be<int>();
+
+            /*
+            Expected values:
+            One, 
+            Two,
+            OneAndTwo, // Skip One | Two due existed explicit combination
+            Four
+            One | Four
+            Two | Four
+            OneAndTwo | Four // Skip One | Two | Four due existed combination with fewer values
+            */
+            table.Rows.Should().HaveCount(7);
+
+            table.Rows[0].RowShouldBe(1, "One", "One");
+            table.Rows[1].RowShouldBe(2, "Two", "Two");
+            table.Rows[2].RowShouldBe(3, "OneAndTwo", "OneAndTwo");
+            table.Rows[3].RowShouldBe(4, "Four", "Four");
+            table.Rows[4].RowShouldBe(5, "One, Four", "One, Four");
+            table.Rows[5].RowShouldBe(6, "Two, Four", "Two, Four");
+            table.Rows[6].RowShouldBe(7, "OneAndTwo, Four", "OneAndTwo, Four");
+        }
     }
 }

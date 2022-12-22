@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 {
@@ -32,8 +35,17 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             var valueType = enumTableAttribute?.ValueType ?? enumType.GetEnumUnderlyingType();
 
             var enumMembers = enumType.GetMembers(BindingFlags.Static | BindingFlags.Public);
+
             var rows = new List<EnumTableRow>(enumMembers.Length);
             rows.AddRange(enumMembers.Select(member => EnumTableRow.Create(enumType, valueType, member)));
+
+            if (Attribute.IsDefined(enumType, typeof(FlagsAttribute)))
+            {
+                var methodInfo = typeof(EnumTable).GetMethod("AddValueCombinations", BindingFlags.NonPublic | BindingFlags.Static);
+                var getCombinationsGenericMethod = methodInfo!.MakeGenericMethod(enumType);
+                getCombinationsGenericMethod.Invoke(null, new object[] { enumType, valueType, rows });
+            }
+
             return new EnumTable(tableName, enumType, valueType, rows);
         }
 
@@ -43,6 +55,45 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             EnumType = enumType;
             ValueType = valueType;
             Rows = rows;
+        }
+
+        private static void AddValueCombinations<T>(Type enumType, Type valueType, List<EnumTableRow> rows) where T : struct, Enum
+        {
+            var combos = GetEnumValueCombinations<T>();
+
+            foreach (var item in combos)
+            {
+                if (!rows.Any(i => (int)i.Value == (int)(Object)item))
+                {
+                    rows.Add(EnumTableRow.Create(enumType, valueType, item));
+                }
+            }
+        }
+
+        private static HashSet<T> GetEnumValueCombinations<T>() where T : struct, Enum
+        {
+            List<T> allValues = new((IEnumerable<T>)Enum.GetValues(typeof(T)));
+            HashSet<T> allCombos = new();
+
+            for (int i = 1; i < (1 << allValues.Count); i++)
+            {
+                T working = (T)Enum.ToObject(typeof(T), 0);
+                int index = 0;
+                int checker = i;
+                while (checker != 0)
+                {
+                    if ((checker & 0x01) == 0x01)
+                    {
+                        working = (T)Enum.ToObject(typeof(T), (int)(Object)working | (int)(Object)allValues[index]);
+                    }
+
+                    checker >>= 1;
+                    index++;
+                }
+                allCombos.Add(working);
+            }
+
+            return allCombos;
         }
 
         public string TableName { get; }

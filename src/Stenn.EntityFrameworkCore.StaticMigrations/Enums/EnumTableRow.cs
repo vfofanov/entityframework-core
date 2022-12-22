@@ -24,6 +24,15 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 display?.GetDescription() ?? description?.Description ?? string.Empty);
         }
 
+        public static EnumTableRow Create(Type enumType, Type valueType, object enumItem)
+        {
+            string name = enumItem.ToString() ?? string.Empty;
+            var value = Convert.ChangeType(enumItem, valueType);
+            string rawValue = value.ToString() ?? string.Empty;
+
+            return new EnumTableRow(value, rawValue, name, name, string.Empty);
+        }
+
         private EnumTableRow(object value, object rawValue, string name, string displayName, string description)
         {
             Value = value;
