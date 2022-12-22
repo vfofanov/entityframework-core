@@ -24,22 +24,23 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 display?.GetDescription() ?? description?.Description ?? string.Empty);
         }
 
-        public static EnumTableRow Create(Type enumType, Type valueType, object enumItem)
+        public static EnumTableRow CreateFromCombinedEnumValue(Type enumType, Type valueType, object enumItem)
         {
             string name = enumItem.ToString() ?? string.Empty;
             var value = Convert.ChangeType(enumItem, valueType);
             string rawValue = value.ToString() ?? string.Empty;
 
-            return new EnumTableRow(value, rawValue, name, name, string.Empty);
+            return new EnumTableRow(value, rawValue, name, name, string.Empty, true);
         }
 
-        private EnumTableRow(object value, object rawValue, string name, string displayName, string description)
+        private EnumTableRow(object value, object rawValue, string name, string displayName, string description, bool isCombined = false)
         {
             Value = value;
             RawValue = rawValue;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             DisplayName = displayName;
             Description = description;
+            IsCombined = isCombined;
         }
 
         public object Value { get; }
@@ -47,5 +48,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         public string DisplayName { get; }
         public string Description { get; }
         public object RawValue { get; }
+        public bool IsCombined { get; }
     }
 }

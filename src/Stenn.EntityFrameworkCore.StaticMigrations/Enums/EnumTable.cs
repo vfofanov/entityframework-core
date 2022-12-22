@@ -66,7 +66,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             {
                 if (!rows.Any(i => EqualityComparer<T>.Default.Equals((T)i.Value, item)))
                 {
-                    rows.Add(EnumTableRow.Create(enumType, valueType, item));
+                    rows.Add(EnumTableRow.CreateFromCombinedEnumValue(enumType, valueType, item));
                 }
             }
         }

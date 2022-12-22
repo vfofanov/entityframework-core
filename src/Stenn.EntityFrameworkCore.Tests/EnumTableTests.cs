@@ -89,9 +89,9 @@ namespace Stenn.EntityFrameworkCore.Tests
             table.Rows[1].RowShouldBe(2, "Two", "Two");
             table.Rows[2].RowShouldBe(3, "OneAndTwo", "OneAndTwo");
             table.Rows[3].RowShouldBe(4, "Four", "Four");
-            table.Rows[4].RowShouldBe(5, "One, Four", "One, Four");
-            table.Rows[5].RowShouldBe(6, "Two, Four", "Two, Four");
-            table.Rows[6].RowShouldBe(7, "OneAndTwo, Four", "OneAndTwo, Four");
+            table.Rows[4].RowShouldBe(5, "One, Four", "One, Four", true);
+            table.Rows[5].RowShouldBe(6, "Two, Four", "Two, Four", true);
+            table.Rows[6].RowShouldBe(7, "OneAndTwo, Four", "OneAndTwo, Four", true);
         }
     }
 }
