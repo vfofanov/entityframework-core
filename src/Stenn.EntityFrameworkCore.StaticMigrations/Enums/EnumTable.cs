@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -42,8 +43,8 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             if (Attribute.IsDefined(enumType, typeof(FlagsAttribute)))
             {
                 var methodInfo = typeof(EnumTable).GetMethod("AddValueCombinations", BindingFlags.NonPublic | BindingFlags.Static);
-                var getCombinationsGenericMethod = methodInfo!.MakeGenericMethod(enumType);
-                getCombinationsGenericMethod.Invoke(null, new object[] { enumType, valueType, rows });
+                var addCombinationsGenericMethod = methodInfo!.MakeGenericMethod(enumType);
+                addCombinationsGenericMethod.Invoke(null, new object[] { enumType, valueType, rows });
             }
 
             return new EnumTable(tableName, enumType, valueType, rows);
@@ -63,7 +64,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 
             foreach (var item in combos)
             {
-                if (!rows.Any(i => (int)i.Value == (int)(Object)item))
+                if (!rows.Any(i => EqualityComparer<T>.Default.Equals((T)i.Value, item)))
                 {
                     rows.Add(EnumTableRow.Create(enumType, valueType, item));
                 }
@@ -84,7 +85,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 {
                     if ((checker & 0x01) == 0x01)
                     {
-                        working = (T)Enum.ToObject(typeof(T), (int)(Object)working | (int)(Object)allValues[index]);
+                        working = (T)Enum.ToObject(typeof(T), Convert.ToUInt64(working) | Convert.ToUInt64(allValues[index]));
                     }
 
                     checker >>= 1;

@@ -6,6 +6,7 @@ using FluentAssertions;
 using FluentAssertions.Equivalency;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
+using static Humanizer.In;
 
 namespace Stenn.EntityFrameworkCore.Tests
 {
@@ -64,24 +65,24 @@ namespace Stenn.EntityFrameworkCore.Tests
             Four = 0x4
         }
 
+        /// <summary>
+        /// Expected values:
+        /// One, 
+        /// Two,
+        /// OneAndTwo, // Skip One | Two due existed explicit combination
+        /// Four
+        /// One | Four
+        /// Two | Four
+        /// OneAndTwo | Four // Skip One | Two | Four due existed combination with fewer values
+        /// </summary>
         [Test]
         public void ParseFlaggedEnum()
         {
             var table = EnumTable.Create<FlagsValue>();
 
             table.EnumType.Should().Be<FlagsValue>();
-            table.ValueType.Should().Be<int>();
+            table.ValueType.Should().Be(typeof(FlagsValue).GetEnumUnderlyingType());
 
-            /*
-            Expected values:
-            One, 
-            Two,
-            OneAndTwo, // Skip One | Two due existed explicit combination
-            Four
-            One | Four
-            Two | Four
-            OneAndTwo | Four // Skip One | Two | Four due existed combination with fewer values
-            */
             table.Rows.Should().HaveCount(7);
 
             table.Rows[0].RowShouldBe(1, "One", "One");
