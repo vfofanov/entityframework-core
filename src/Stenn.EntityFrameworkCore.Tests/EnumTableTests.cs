@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using FluentAssertions;
-using FluentAssertions.Equivalency;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using Stenn.EntityFrameworkCore.StaticMigrations.Enums;
-using static Humanizer.In;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Stenn.EntityFrameworkCore.Tests
 {
@@ -89,9 +85,9 @@ namespace Stenn.EntityFrameworkCore.Tests
             table.Rows[1].RowShouldBe(2, "Two", "Two");
             table.Rows[2].RowShouldBe(3, "OneAndTwo", "OneAndTwo");
             table.Rows[3].RowShouldBe(4, "Four", "Four");
-            table.Rows[4].RowShouldBe(5, "One, Four", "One, Four", true);
-            table.Rows[5].RowShouldBe(6, "Two, Four", "Two, Four", true);
-            table.Rows[6].RowShouldBe(7, "OneAndTwo, Four", "OneAndTwo, Four", true);
+            table.Rows[4].RowShouldBe(5, "Four, One", "Four, One", true);
+            table.Rows[5].RowShouldBe(6, "Four, Two", "Four, Two", true);
+            table.Rows[6].RowShouldBe(7, "Four, OneAndTwo", "Four, OneAndTwo", true);
         }
     }
 }
