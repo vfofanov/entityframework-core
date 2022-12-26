@@ -1,12 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
 {
@@ -14,9 +10,25 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
     public class EnumTable
     {
         public static EnumTable Create<T>()
-            where T : Enum
+            where T : struct, Enum
         {
-            return FromEnum(typeof(T));
+            var enumType = typeof(T);
+            var enumTableAttribute = enumType.GetCustomAttribute<EnumTableAttribute>();
+            var tableName = enumTableAttribute?.Name ?? enumType.Name;
+            var valueType = enumTableAttribute?.ValueType ?? enumType.GetEnumUnderlyingType();
+
+            var enumMembers = enumType.GetMembers(BindingFlags.Static | BindingFlags.Public);
+
+            var rows = new List<EnumTableRow>(enumMembers.Length);
+            rows.AddRange(enumMembers.Select(member => EnumTableRow.Create(enumType, valueType, member)));
+
+            if (Attribute.IsDefined(enumType, typeof(FlagsAttribute)))
+            {
+                AddValueCombinations<T>(valueType, rows);
+            }
+
+            rows.Sort((one, other) => string.Compare(one.Name, other.Name, StringComparison.Ordinal));
+            return new EnumTable(tableName, enumType, valueType, rows);
         }
 
         public static EnumTable FromEnum(Type enumType)
@@ -30,57 +42,30 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 throw new ArgumentException("Type must be enum", nameof(enumType));
             }
 
+            var methodInfo = typeof(EnumTable).GetMethod(nameof(Create), BindingFlags.Public | BindingFlags.Static);
+            var createMethod = methodInfo!.MakeGenericMethod(enumType);
 
-            var enumTableAttribute = enumType.GetCustomAttribute<EnumTableAttribute>();
-            var tableName = enumTableAttribute?.Name ?? enumType.Name;
-            var valueType = enumTableAttribute?.ValueType ?? enumType.GetEnumUnderlyingType();
-
-            var enumMembers = enumType.GetMembers(BindingFlags.Static | BindingFlags.Public);
-
-            var rows = new List<EnumTableRow>(enumMembers.Length);
-            rows.AddRange(enumMembers.Select(member => EnumTableRow.Create(enumType, valueType, member)));
-
-            if (Attribute.IsDefined(enumType, typeof(FlagsAttribute)))
-            {
-                var methodInfo = typeof(EnumTable).GetMethod("AddValueCombinations", BindingFlags.NonPublic | BindingFlags.Static);
-                var addCombinationsGenericMethod = methodInfo!.MakeGenericMethod(enumType);
-                addCombinationsGenericMethod.Invoke(null, new object[] { enumType, valueType, rows });
-            }
-
-            return new EnumTable(tableName, enumType, valueType, rows);
+            return (EnumTable)createMethod.Invoke(null, null)!;
         }
 
-        private EnumTable(string tableName, Type enumType, Type valueType, IReadOnlyList<EnumTableRow> rows)
-        {
-            TableName = tableName;
-            EnumType = enumType;
-            ValueType = valueType;
-            Rows = rows;
-        }
-
-        private static void AddValueCombinations<T>(Type enumType, Type valueType, List<EnumTableRow> rows) where T : struct, Enum
+        private static void AddValueCombinations<T>(Type valueType, List<EnumTableRow> rows) 
+            where T : struct, Enum
         {
             var combos = GetEnumValueCombinations<T>();
-
-            foreach (var item in combos)
-            {
-                if (!rows.Any(i => EqualityComparer<T>.Default.Equals((T)i.Value, item)))
-                {
-                    rows.Add(EnumTableRow.CreateFromCombinedEnumValue(enumType, valueType, item));
-                }
-            }
+            rows.AddRange(combos.Select(item => EnumTableRow.CreateFromCombinedEnumValue(valueType, item)));
         }
-
-        private static HashSet<T> GetEnumValueCombinations<T>() where T : struct, Enum
+        
+        private static HashSet<T> GetEnumValueCombinations<T>() 
+            where T : struct, Enum
         {
-            List<T> allValues = new((IEnumerable<T>)Enum.GetValues(typeof(T)));
-            HashSet<T> allCombos = new();
+            var allValues = Enum.GetValues<T>();
+            HashSet<T> result = new();
 
-            for (int i = 1; i < (1 << allValues.Count); i++)
+            for (var i = 1; i < (1 << allValues.Length); i++)
             {
-                T working = (T)Enum.ToObject(typeof(T), 0);
-                int index = 0;
-                int checker = i;
+                T working = default;
+                var index = 0;
+                var checker = i;
                 while (checker != 0)
                 {
                     if ((checker & 0x01) == 0x01)
@@ -91,10 +76,22 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                     checker >>= 1;
                     index++;
                 }
-                allCombos.Add(working);
+                if (allValues.Contains(working))
+                {
+                    continue;
+                }
+                result.Add(working);
             }
 
-            return allCombos;
+            return result;
+        }
+        
+        private EnumTable(string tableName, Type enumType, Type valueType, IReadOnlyList<EnumTableRow> rows)
+        {
+            TableName = tableName;
+            EnumType = enumType;
+            ValueType = valueType;
+            Rows = rows;
         }
 
         public string TableName { get; }

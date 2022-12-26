@@ -25,11 +25,12 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
                 display?.GetDescription() ?? description?.Description ?? string.Empty);
         }
 
-        public static EnumTableRow CreateFromCombinedEnumValue(Type enumType, Type valueType, object enumItem)
+        public static EnumTableRow CreateFromCombinedEnumValue<T>(Type valueType, T enumItem)
+            where T : Enum
         {
-            string name = SortCombinedEnumName(enumItem.ToString() ?? string.Empty);
+            var name = SortCombinedEnumName(enumItem.ToString());
             var value = Convert.ChangeType(enumItem, valueType);
-            string rawValue = value.ToString() ?? string.Empty;
+            var rawValue = value.ToString() ?? string.Empty;
 
             return new EnumTableRow(value, rawValue, name, name, string.Empty, true);
         }
@@ -38,7 +39,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
         {
             var parts = name.Split(',').Select(p => p.Trim()).ToList();
             parts.Sort();
-            return String.Join(", ", parts);
+            return string.Join(", ", parts);
         }
 
         private EnumTableRow(object value, object rawValue, string name, string displayName, string description, bool isCombined = false)
