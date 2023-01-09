@@ -54,7 +54,14 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations.Enums
             var combos = GetEnumValueCombinations<T>();
             rows.AddRange(combos.Select(item => EnumTableRow.CreateFromCombinedEnumValue(valueType, item)));
         }
-        
+
+        /// <summary>
+        /// Based on https://stackoverflow.com/a/6117208
+        /// First, grab a list of all the individual values. If you've got 5 values, that's (1 *left shift* 5) = 32 combinations, so iterate from 1 to 31.
+        /// (Don't start at zero, that would mean to include none of the enum values.) 
+        /// When iterating, examine the bits in the number, every one bit in the iteration variable means to include that enum value.
+        /// Put the results into a HashSet, so that there aren't duplicates, since including the 'None' value doesn't change the resulting enum.
+        /// </summary>
         private static HashSet<T> GetEnumValueCombinations<T>() 
             where T : struct, Enum
         {
