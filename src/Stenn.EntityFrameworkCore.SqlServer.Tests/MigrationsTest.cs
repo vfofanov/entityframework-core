@@ -318,8 +318,8 @@ DROP TABLE IF EXISTS [dbo].[__EFMigrationsHistory]
             table.ValueType.Should().Be<byte>();
             table.Rows.Should().HaveCount(2);
 
-            table.Rows[0].RowShouldBe(1, "Person", "Person contact");
-            table.Rows[1].RowShouldBe(2, "Organization", "Organization contact");
+            table.Rows[0].RowShouldBe((byte)2, "Organization", "Organization contact");
+            table.Rows[1].RowShouldBe((byte)1, "Person", "Person contact");
         }
 
         [Test]

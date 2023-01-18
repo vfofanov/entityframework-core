@@ -2,8 +2,8 @@
 <Project>
   <PropertyGroup>
     <!-- Specific package version can be found in csproj files -->
-    <TwoDigitVersion Condition="'$(TwoDigitVersion)'==''">7.8</TwoDigitVersion>
-    <PatchNum Condition="'$(PatchNum)'==''">48</PatchNum>
+    <TwoDigitVersion Condition="'$(TwoDigitVersion)'==''">7.9</TwoDigitVersion>
+    <PatchNum Condition="'$(PatchNum)'==''">49</PatchNum>
 
     <!-- special postfix will be added to patch num if defined -->
     <PatchNumSuffix Condition="'$(PatchNumSuffix)'=='' And '$(Configuration)'!='Release'">debug</PatchNumSuffix>

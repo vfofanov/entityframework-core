@@ -2,9 +2,7 @@
 {
         public class TestBase
         {
-#if NET5_0
-        protected const string DBName = "stenn_efcore_tests_net5";
-#elif NET6_0
+#if NET6_0
                 protected const string DBName = "stenn_efcore_tests_net6";
 #elif NET7_0
         protected const string DBName = "stenn_efcore_tests_net7";

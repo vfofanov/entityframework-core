@@ -15,11 +15,7 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
             _configure = configure ?? throw new ArgumentNullException(nameof(configure));
         }
 
-#if NET5_0
-        public bool Allowed(ITypeBase entity)
-#else
         public bool Allowed(IReadOnlyTypeBase entity)
-#endif
         {
             return entity.ClrType.IsAssignableTo(_conventionType);
         }

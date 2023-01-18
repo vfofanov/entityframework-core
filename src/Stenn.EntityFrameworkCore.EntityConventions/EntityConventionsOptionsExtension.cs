@@ -114,17 +114,11 @@ namespace Stenn.EntityFrameworkCore.EntityConventions
 
                 debugInfo["Entity Conventions: IncludeCommonConventions"] = Extension._options.IncludeCommonConventions.ToString();
             }
-#if NET5_0
-            public override long GetServiceProviderHashCode()
-            {
-                return 0;
-            }
-#else
+
             public override int GetServiceProviderHashCode()
             {
                 return 0;
             }
-#endif
         }
     }
 }

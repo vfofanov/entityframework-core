@@ -23,11 +23,7 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IRelationalConnection _connection;
         private readonly ICurrentDbContext _currentContext;
         private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
-#if NET5_0
-        private readonly IDiagnosticsLogger<DbLoggerCategory.Database.Command> _commandLogger;
-#else
         private readonly IRelationalCommandDiagnosticsLogger _commandLogger;
-#endif
 
         private readonly IHistoryRepository _historyRepository;
         private readonly IRelationalDatabaseCreator _databaseCreator;
@@ -35,18 +31,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
         private readonly IMigrationsSqlGenerator _migrationsSqlGenerator;
         private readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
 
-#if NET5_0
-        public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
-            IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
-            IRelationalConnection connection, ISqlGenerationHelper sqlGenerationHelper, ICurrentDbContext currentContext,
-            Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure.IConventionSetBuilder conventionSetBuilder, 
-            IDiagnosticsLogger<DbLoggerCategory.Migrations> logger,
-            IDiagnosticsLogger<DbLoggerCategory.Database.Command> commandLogger, IDatabaseProvider databaseProvider,
-            IStaticMigrationsService staticMigrationsService)
-            : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
-                rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, conventionSetBuilder, logger, commandLogger,
-                databaseProvider)
-#else   
         /// <inheritdoc />
         public MigratorWithStaticMigrations(IMigrationsAssembly migrationsAssembly, IHistoryRepository historyRepository, IDatabaseCreator databaseCreator,
             IMigrationsSqlGenerator migrationsSqlGenerator, IRawSqlCommandBuilder rawSqlCommandBuilder, IMigrationCommandExecutor migrationCommandExecutor,
@@ -59,7 +43,6 @@ namespace Stenn.EntityFrameworkCore.StaticMigrations
             : base(migrationsAssembly, historyRepository, databaseCreator, migrationsSqlGenerator,
                 rawSqlCommandBuilder, migrationCommandExecutor, connection, sqlGenerationHelper, currentContext, modelRuntimeInitializer, logger, commandLogger,
                 databaseProvider)
-#endif
         {
             StaticMigrationsService = staticMigrationsService;
             _historyRepository = historyRepository;

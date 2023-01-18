@@ -39,9 +39,6 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
             var ef6DbContextOptions = (IDbContextOptions)generic.Invoke(dependencies.Options, new object?[] { ef6RelationalOptions })!;
             //var ef6DbContextOptions = ((DbContextOptions)dependencies.Options).WithExtension(ef6RelationalOptions);
 
-#if NET5_0
-            var ef6Dependincies = dependencies.With(ef6DbContextOptions);
-#else
             var ef6Dependincies = new HistoryRepositoryDependencies(dependencies.DatabaseCreator, dependencies.RawSqlCommandBuilder, dependencies.Connection,
                 ef6DbContextOptions, dependencies.ModelDiffer, dependencies.MigrationsSqlGenerator, dependencies.SqlGenerationHelper,
                 dependencies.ConventionSetBuilder, dependencies.ModelDependencies, dependencies.TypeMappingSource, dependencies.CurrentContext,
@@ -52,7 +49,6 @@ namespace Stenn.EntityFrameworkCore.HistoricalMigrations.EF6
 #pragma warning restore CS0618
 #endif
                 dependencies.CommandLogger);
-#endif
 
             var ef6HistoryRepository = (IHistoryRepository?)Activator.CreateInstance(repository.GetType(), ef6Dependincies);
 

@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.XPath;
-#if NET5_0
-using Microsoft.EntityFrameworkCore;
-#endif
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Stenn.EntityDefinition.EntityFrameworkCore.Definitions;

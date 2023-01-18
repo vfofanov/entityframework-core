@@ -195,11 +195,7 @@ namespace Stenn.EntityFrameworkCore.Extensions.DependencyInjection
 
                 debugInfo["Static Migrations: Configurator"] = Extension._configurator.GetType().Name;
             }
-#if NET5_0
-            public override long GetServiceProviderHashCode()
-#else
             public override int GetServiceProviderHashCode()
-#endif
             {
                 if (_serviceProviderHash != null)
                 {

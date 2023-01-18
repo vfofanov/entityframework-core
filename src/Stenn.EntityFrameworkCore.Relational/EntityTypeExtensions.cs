@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-#if NET5_0
-using IReadOnlyEntityType = Microsoft.EntityFrameworkCore.Metadata.IEntityType;
-using IReadOnlyProperty = Microsoft.EntityFrameworkCore.Metadata.IProperty;
-#endif
 
 namespace Stenn.EntityFrameworkCore.Relational
 {
