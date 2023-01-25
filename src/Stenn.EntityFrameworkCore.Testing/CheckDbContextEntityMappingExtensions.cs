@@ -11,6 +11,7 @@ namespace Stenn.EntityFrameworkCore.Testing
         public static void CheckEntities(this DbContext dbContext, Func<IEntityType, bool>? filterEntities = null)
         {
             var entities = dbContext.Model.GetEntityTypes().Where(e => !e.IsAbstract() &&
+                                                                       !e.IsOwned() &&
                                                                        !e.HasSharedClrType);
             filterEntities ??= _ => true;
             entities = entities.Where(filterEntities);
